@@ -1,0 +1,24 @@
+﻿<Properties StartupConfiguration="{6D05938E-97C7-4646-B9A5-F3D4C94B3940}|Default">
+  <MonoDevelop.Ide.ItemProperties.Server FirstBuild="True" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.ItemProperties.Client FirstBuild="True" />
+  <MonoDevelop.Ide.Workbench>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="DAD-Project" expanded="True">
+            <Node name="Client" expanded="True">
+              <Node name="Program.cs" selected="True" />
+            </Node>
+            <Node name="Server" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
