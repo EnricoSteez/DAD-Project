@@ -1,8 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "HWN6U6Ln7kcikCh/U+7HKLHVwtkCPj4H7LgfhWQyCqiK34h4CztkgormN6zqHHov3Ndt6k7DWQGBKmjQqesLPA==",
+  "dgSpecHash": "z01PLLXz0ZtJ4TCPTLpsHEYJ2S54usjGeu545Lp5xrYxH50OhYdOua3WxKXL4RjxqLG4S5J0OvqcPxCuDMS14w==",
   "success": true,
   "projectFilePath": "/Users/enrico/Projects/DAD-Project/Server/Server.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/enrico/.nuget/packages/google.protobuf/3.13.0/google.protobuf.3.13.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/grpc.core/2.32.0/grpc.core.2.32.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/grpc.core.api/2.32.0/grpc.core.api.2.32.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/grpc.tools/2.32.0/grpc.tools.2.32.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/system.runtime.compilerservices.unsafe/4.5.2/system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512"
+  ],
   "logs": []
 }
