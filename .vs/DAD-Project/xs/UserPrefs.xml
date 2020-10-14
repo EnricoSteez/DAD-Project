@@ -2,19 +2,19 @@
   <MonoDevelop.Ide.ItemProperties.Server PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="Server/protos/protobuf.proto" Line="22" Column="1" />
+      <File FileName="Server/protos/protobuf.proto" Line="23" Column="29" />
+      <File FileName="Server/Program.cs" Line="14" Column="1" />
+      <File FileName="Server/Server.csproj" Line="15" Column="35" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="DAD-Project" expanded="True">
             <Node name="Client" expanded="True" />
-            <Node name="PuppetMaster" expanded="True">
-              <Node name="protos" expanded="True" />
-            </Node>
             <Node name="Server" expanded="True">
+              <Node name="Dependencies" expanded="True" />
               <Node name="protos" expanded="True">
-                <Node name="protobuf.proto" selected="True" />
+                <Node name="ServerServices.proto" selected="True" />
               </Node>
             </Node>
           </Node>
