@@ -1,0 +1,19 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Server.protos";
+
+
+//CLIENTS WRITES AN OBJECT ON ONE OF THE SERVER
+service WriteObjectService {
+    rpc WriteObject (WriteObjectRequest) returns (WriteObjectResponse) {}
+}
+
+message WriteObjectRequest {
+    int32 partition_id = 1;
+    int32 object_id = 2;
+    string value = 3;
+}
+
+message WriteObjectResponse {
+    int32 writeResult = 1;
+}

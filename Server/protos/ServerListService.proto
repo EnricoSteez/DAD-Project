@@ -1,0 +1,26 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Server.protos";
+
+
+service GetInformations {
+    rpc ListServer (ListServerRequest) returns (ListServerResponse) {}
+    rpc ListGlobal (ListGlobalRequest) returns (ListGlobalResponse) {}
+}
+
+message ListServerRequest {
+    int32 server_id = 1;
+}
+
+message ListServerResponse {
+    string storedObjects = 1; //not sure 
+    bool isMasterReplica = 2;
+}
+
+message ListGlobalRequest {
+
+}
+
+message ListGlobalResponse {
+    
+}
