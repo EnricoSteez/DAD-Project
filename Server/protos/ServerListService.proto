@@ -3,24 +3,56 @@
 option csharp_namespace = "Server.protos";
 
 
-service GetInformations {
+service DBServerServices {
     rpc ListServer (ListServerRequest) returns (ListServerResponse) {}
     rpc ListGlobal (ListGlobalRequest) returns (ListGlobalResponse) {}
+    rpc ReadObject (ReadObjectRequest) returns (ReadObjectResponse) {}
+    rpc WriteObject (WriteObjectRequest) returns (WriteObjectResponse) {}
+
 }
 
+
+//LIST SERVER
 message ListServerRequest {
     int32 server_id = 1;
 }
 
 message ListServerResponse {
-    string storedObjects = 1; //not sure 
+    string storedObjects = 1;
     bool isMasterReplica = 2;
 }
 
+
+//LIST GLOBAL
 message ListGlobalRequest {
 
 }
 
 message ListGlobalResponse {
     
+}
+
+
+//READ AN OBJECT
+message ReadObjectRequest {
+    int32 partition_id = 1;
+    int32 object_id = 2;
+    int32 server_id = 3;
+}
+
+message ReadObjectResponse {
+    string value = 1;
+}
+
+
+
+//WRITE AN OBJECT
+message WriteObjectRequest {
+    int32 partition_id = 1;
+    int32 object_id = 2;
+    string value = 3;
+}
+
+message WriteObjectResponse {
+    int32 writeResult = 1;
 }

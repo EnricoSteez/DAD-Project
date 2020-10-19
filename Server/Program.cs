@@ -4,17 +4,7 @@ using Server.protos;
 namespace Server
 {
 
-    public class ServerReadService : ReadObjectService.ReadObjectServiceBase
-    {
-
-    }
-
-    public class ServerWriteService : WriteObjectService.WriteObjectServiceBase
-    {
-
-    }
-
-    public class ServerListService : GetInformations.GetInformationsBase
+    public class ServerService : DBServerServices.DBServerServicesBase
     {
 
     }
