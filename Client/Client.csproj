@@ -18,7 +18,7 @@
     <None Remove="protos\ServerListService.proto" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="protos\ServerListService.proto" GrpcServices="Server" />
+    <Protobuf Include="protos\ServerClientService.proto" GrpcServices="Client" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="protos\" />
