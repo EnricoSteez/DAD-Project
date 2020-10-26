@@ -20,8 +20,8 @@ message ListServerRequest {
 }
 
 message ListServerResponse {
-    string storedObjects = 1;
-    bool isMasterReplica = 2;
+    string storedObjects = 1; 
+    bool isMasterReplica = 2; // TODO: this must be returned for each object
 }
 
 

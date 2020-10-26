@@ -283,6 +283,9 @@ namespace Server.protos {
     /// <summary>Field number for the "isMasterReplica" field.</summary>
     public const int IsMasterReplicaFieldNumber = 2;
     private bool isMasterReplica_;
+    /// <summary>
+    /// TODO: this must be returned for each object
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public bool IsMasterReplica {
       get { return isMasterReplica_; }
