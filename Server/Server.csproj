@@ -13,14 +13,15 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
         
-    <Protobuf Include="protos\ServerClientService.proto" GrpcServices="Server" />
-    
-        
     <PackageReference Include="Grpc.AspNetCore" Version="2.32.0" />
   </ItemGroup>
     
    
   <ItemGroup>
     <Folder Include="protos\" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Server" />
   </ItemGroup>
 </Project>

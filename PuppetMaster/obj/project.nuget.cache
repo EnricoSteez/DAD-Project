@@ -1,15 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "ES3hg0ykZYqPn/66+E5MKtRLQO+TNpJTzYOWfgVWrY2htNapcl8Bpkm1YajDN07d9OV4/0EuemDwfItP7Ebs0A==",
+  "dgSpecHash": "8z2Sp6z4fhG9FMTKS5q4r8YPabM3t5RCVEHKGTk1p4nlOqClecL0sG3ZtehKb0u4NPJSoRWThLzcMnE03ajrPQ==",
   "success": true,
-  "projectFilePath": "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\PuppetMaster\\PuppetMaster.csproj",
+  "projectFilePath": "/Users/enrico/Projects/DAD-Project/PuppetMaster/PuppetMaster.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\almof\\.nuget\\packages\\google.protobuf\\3.13.0\\google.protobuf.3.13.0.nupkg.sha512",
-    "C:\\Users\\almof\\.nuget\\packages\\grpc.core\\2.32.0\\grpc.core.2.32.0.nupkg.sha512",
-    "C:\\Users\\almof\\.nuget\\packages\\grpc.core.api\\2.32.0\\grpc.core.api.2.32.0.nupkg.sha512",
-    "C:\\Users\\almof\\.nuget\\packages\\grpc.tools\\2.32.0\\grpc.tools.2.32.0.nupkg.sha512",
-    "C:\\Users\\almof\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
-    "C:\\Users\\almof\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.2\\system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512"
+    "/Users/enrico/.nuget/packages/google.protobuf/3.13.0/google.protobuf.3.13.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/grpc.core/2.32.0/grpc.core.2.32.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/grpc.core.api/2.32.0/grpc.core.api.2.32.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/grpc.tools/2.32.0/grpc.tools.2.32.0.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512",
+    "/Users/enrico/.nuget/packages/system.runtime.compilerservices.unsafe/4.5.2/system.runtime.compilerservices.unsafe.4.5.2.nupkg.sha512"
   ],
   "logs": []
 }

@@ -88,53 +88,98 @@ namespace Server.protos {
       get { return global::Server.protos.ServerClientServiceReflection.Descriptor.Services[0]; }
     }
 
-    /// <summary>Base class for server-side implementations of ServerStorageServices</summary>
-    [grpc::BindServiceMethod(typeof(ServerStorageServices), "BindService")]
-    public abstract partial class ServerStorageServicesBase
+    /// <summary>Client for ServerStorageServices</summary>
+    public partial class ServerStorageServicesClient : grpc::ClientBase<ServerStorageServicesClient>
     {
-      public virtual global::System.Threading.Tasks.Task<global::Server.protos.ListServerResponse> ListServer(global::Server.protos.ListServerRequest request, grpc::ServerCallContext context)
+      /// <summary>Creates a new client for ServerStorageServices</summary>
+      /// <param name="channel">The channel to use to make remote calls.</param>
+      public ServerStorageServicesClient(grpc::ChannelBase channel) : base(channel)
       {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+      /// <summary>Creates a new client for ServerStorageServices that uses a custom <c>CallInvoker</c>.</summary>
+      /// <param name="callInvoker">The callInvoker to use to make remote calls.</param>
+      public ServerStorageServicesClient(grpc::CallInvoker callInvoker) : base(callInvoker)
+      {
+      }
+      /// <summary>Protected parameterless constructor to allow creation of test doubles.</summary>
+      protected ServerStorageServicesClient() : base()
+      {
+      }
+      /// <summary>Protected constructor to allow creation of configured clients.</summary>
+      /// <param name="configuration">The client configuration.</param>
+      protected ServerStorageServicesClient(ClientBaseConfiguration configuration) : base(configuration)
+      {
       }
 
-      public virtual global::System.Threading.Tasks.Task<global::Server.protos.ListGlobalResponse> ListGlobal(global::Server.protos.ListGlobalRequest request, grpc::ServerCallContext context)
+      public virtual global::Server.protos.ListServerResponse ListServer(global::Server.protos.ListServerRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+        return ListServer(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-
-      public virtual global::System.Threading.Tasks.Task<global::Server.protos.ReadObjectResponse> ReadObject(global::Server.protos.ReadObjectRequest request, grpc::ServerCallContext context)
+      public virtual global::Server.protos.ListServerResponse ListServer(global::Server.protos.ListServerRequest request, grpc::CallOptions options)
       {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+        return CallInvoker.BlockingUnaryCall(__Method_ListServer, null, options, request);
       }
-
-      public virtual global::System.Threading.Tasks.Task<global::Server.protos.WriteObjectResponse> WriteObject(global::Server.protos.WriteObjectRequest request, grpc::ServerCallContext context)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ListServerResponse> ListServerAsync(global::Server.protos.ListServerRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+        return ListServerAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-
-    }
-
-    /// <summary>Creates service definition that can be registered with a server</summary>
-    /// <param name="serviceImpl">An object implementing the server-side handling logic.</param>
-    public static grpc::ServerServiceDefinition BindService(ServerStorageServicesBase serviceImpl)
-    {
-      return grpc::ServerServiceDefinition.CreateBuilder()
-          .AddMethod(__Method_ListServer, serviceImpl.ListServer)
-          .AddMethod(__Method_ListGlobal, serviceImpl.ListGlobal)
-          .AddMethod(__Method_ReadObject, serviceImpl.ReadObject)
-          .AddMethod(__Method_WriteObject, serviceImpl.WriteObject).Build();
-    }
-
-    /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the  service binding logic.
-    /// Note: this method is part of an experimental API that can change or be removed without any prior notice.</summary>
-    /// <param name="serviceBinder">Service methods will be bound by calling <c>AddMethod</c> on this object.</param>
-    /// <param name="serviceImpl">An object implementing the server-side handling logic.</param>
-    public static void BindService(grpc::ServiceBinderBase serviceBinder, ServerStorageServicesBase serviceImpl)
-    {
-      serviceBinder.AddMethod(__Method_ListServer, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Server.protos.ListServerRequest, global::Server.protos.ListServerResponse>(serviceImpl.ListServer));
-      serviceBinder.AddMethod(__Method_ListGlobal, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Server.protos.ListGlobalRequest, global::Server.protos.ListGlobalResponse>(serviceImpl.ListGlobal));
-      serviceBinder.AddMethod(__Method_ReadObject, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Server.protos.ReadObjectRequest, global::Server.protos.ReadObjectResponse>(serviceImpl.ReadObject));
-      serviceBinder.AddMethod(__Method_WriteObject, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Server.protos.WriteObjectRequest, global::Server.protos.WriteObjectResponse>(serviceImpl.WriteObject));
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ListServerResponse> ListServerAsync(global::Server.protos.ListServerRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ListServer, null, options, request);
+      }
+      public virtual global::Server.protos.ListGlobalResponse ListGlobal(global::Server.protos.ListGlobalRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListGlobal(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual global::Server.protos.ListGlobalResponse ListGlobal(global::Server.protos.ListGlobalRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ListGlobal, null, options, request);
+      }
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ListGlobalResponse> ListGlobalAsync(global::Server.protos.ListGlobalRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListGlobalAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ListGlobalResponse> ListGlobalAsync(global::Server.protos.ListGlobalRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ListGlobal, null, options, request);
+      }
+      public virtual global::Server.protos.ReadObjectResponse ReadObject(global::Server.protos.ReadObjectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ReadObject(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual global::Server.protos.ReadObjectResponse ReadObject(global::Server.protos.ReadObjectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_ReadObject, null, options, request);
+      }
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ReadObjectResponse> ReadObjectAsync(global::Server.protos.ReadObjectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ReadObjectAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ReadObjectResponse> ReadObjectAsync(global::Server.protos.ReadObjectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_ReadObject, null, options, request);
+      }
+      public virtual global::Server.protos.WriteObjectResponse WriteObject(global::Server.protos.WriteObjectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return WriteObject(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual global::Server.protos.WriteObjectResponse WriteObject(global::Server.protos.WriteObjectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_WriteObject, null, options, request);
+      }
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.WriteObjectResponse> WriteObjectAsync(global::Server.protos.WriteObjectRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return WriteObjectAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.WriteObjectResponse> WriteObjectAsync(global::Server.protos.WriteObjectRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_WriteObject, null, options, request);
+      }
+      /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
+      protected override ServerStorageServicesClient NewInstance(ClientBaseConfiguration configuration)
+      {
+        return new ServerStorageServicesClient(configuration);
+      }
     }
 
   }
@@ -152,25 +197,34 @@ namespace Server.protos {
       get { return global::Server.protos.ServerClientServiceReflection.Descriptor.Services[1]; }
     }
 
-    /// <summary>Base class for server-side implementations of ServerCoordinationServices</summary>
-    [grpc::BindServiceMethod(typeof(ServerCoordinationServices), "BindService")]
-    public abstract partial class ServerCoordinationServicesBase
+    /// <summary>Client for ServerCoordinationServices</summary>
+    public partial class ServerCoordinationServicesClient : grpc::ClientBase<ServerCoordinationServicesClient>
     {
-    }
+      /// <summary>Creates a new client for ServerCoordinationServices</summary>
+      /// <param name="channel">The channel to use to make remote calls.</param>
+      public ServerCoordinationServicesClient(grpc::ChannelBase channel) : base(channel)
+      {
+      }
+      /// <summary>Creates a new client for ServerCoordinationServices that uses a custom <c>CallInvoker</c>.</summary>
+      /// <param name="callInvoker">The callInvoker to use to make remote calls.</param>
+      public ServerCoordinationServicesClient(grpc::CallInvoker callInvoker) : base(callInvoker)
+      {
+      }
+      /// <summary>Protected parameterless constructor to allow creation of test doubles.</summary>
+      protected ServerCoordinationServicesClient() : base()
+      {
+      }
+      /// <summary>Protected constructor to allow creation of configured clients.</summary>
+      /// <param name="configuration">The client configuration.</param>
+      protected ServerCoordinationServicesClient(ClientBaseConfiguration configuration) : base(configuration)
+      {
+      }
 
-    /// <summary>Creates service definition that can be registered with a server</summary>
-    /// <param name="serviceImpl">An object implementing the server-side handling logic.</param>
-    public static grpc::ServerServiceDefinition BindService(ServerCoordinationServicesBase serviceImpl)
-    {
-      return grpc::ServerServiceDefinition.CreateBuilder().Build();
-    }
-
-    /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the  service binding logic.
-    /// Note: this method is part of an experimental API that can change or be removed without any prior notice.</summary>
-    /// <param name="serviceBinder">Service methods will be bound by calling <c>AddMethod</c> on this object.</param>
-    /// <param name="serviceImpl">An object implementing the server-side handling logic.</param>
-    public static void BindService(grpc::ServiceBinderBase serviceBinder, ServerCoordinationServicesBase serviceImpl)
-    {
+      /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
+      protected override ServerCoordinationServicesClient NewInstance(ClientBaseConfiguration configuration)
+      {
+        return new ServerCoordinationServicesClient(configuration);
+      }
     }
 
   }
