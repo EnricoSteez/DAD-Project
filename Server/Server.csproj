@@ -12,7 +12,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+        
     <Protobuf Include="protos\ServerListService.proto" GrpcServices="Server" />
+    
         
     <PackageReference Include="Grpc.AspNetCore" Version="2.32.0" />
   </ItemGroup>

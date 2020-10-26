@@ -4,7 +4,7 @@ using Server.protos;
 namespace Server
 {
 
-    public class ServerService : DBServerServices.DBServerServicesBase
+    public class ServerService : ServerStorageServices.ServerStorageServicesBase
     {
 
     }
