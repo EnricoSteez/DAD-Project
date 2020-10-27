@@ -10,13 +10,8 @@ service ServerStorageServices {
     rpc WriteObject (WriteObjectRequest) returns (WriteObjectResponse) {}
 }
 
-//ServerCoordinationServicesClient object
-service ServerCoordinationServices {
-    
-}
-
 message ListServerRequest {
-    int32 server_id = 1;
+    string server_id = 1;
 }
 
 message ListServerResponse {
@@ -25,7 +20,6 @@ message ListServerResponse {
 }
 
 
-//LIST GLOBAL
 message ListGlobalRequest {
 
 }
@@ -37,9 +31,8 @@ message ListGlobalResponse {
 
 //READ AN OBJECT
 message ReadObjectRequest {
-    int32 partition_id = 1;
-    int32 object_id = 2;
-    //int32 server_id = 3;
+    string partition_id = 1;
+    string object_id = 2;
 }
 
 message ReadObjectResponse {
@@ -50,8 +43,8 @@ message ReadObjectResponse {
 
 //WRITE AN OBJECT
 message WriteObjectRequest {
-    int32 partition_id = 1;
-    int32 object_id = 2;
+    string partition_id = 1;
+    string object_id = 2;
     string value = 3;
 }
 
