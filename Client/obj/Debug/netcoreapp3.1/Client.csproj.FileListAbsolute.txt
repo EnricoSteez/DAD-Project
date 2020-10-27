@@ -49,3 +49,9 @@ D:/Users/almof/Documents/MEIC/DAD-Project/Client/obj/Debug/netcoreapp3.1/Client.
 /Users/enrico/Projects/DAD-Project/Client/obj/Debug/netcoreapp3.1/Client.dll
 /Users/enrico/Projects/DAD-Project/Client/obj/Debug/netcoreapp3.1/Client.pdb
 /Users/enrico/Projects/DAD-Project/Client/obj/Debug/netcoreapp3.1/Client.genruntimeconfig.cache
+D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.csprojAssemblyReference.cache
+D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.AssemblyInfoInputs.cache
+D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.AssemblyInfo.cs
+D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.csproj.CoreCompileInputs.cache
+D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.dll
+D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.pdb

@@ -9,24 +9,50 @@ using System.Threading;
 
 namespace Client
 {
-    class Program
+     
+
+        class Program
     {
-        private static Dictionary<int, ServerStorageServices.ServerStorageServicesClient> servers = new Dictionary<int, ServerStorageServices.ServerStorageServicesClient>();
-        
-        private static ServerStorageServices.ServerStorageServicesClient retrieveServer(int serverId)
+        private static int inc = 1;
+        private static Dictionary<string, GrpcServer> servers = new Dictionary<string, GrpcServer>();
+
+        private static Dictionary<string, string> masters = new Dictionary<string, string>(); //key - partitionId object - serverId
+
+        private static ServerStorageServices.ServerStorageServicesClient retrieveServer(string serverId)
         {
-            ServerStorageServices.ServerStorageServicesClient res = null;
-            if(servers.TryGetValue(serverId, out res))
+            GrpcServer res = null;
+            if (servers.TryGetValue(serverId, out res))
             {
-                return res;
+                return res.Service;
             }
-            GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:" + (1000 + serverId).ToString());
-            res = new ServerStorageServices.ServerStorageServicesClient(channel);
+            res = new GrpcServer("http://localhost:" + (1000 + inc++));
             servers.Add(serverId, res);
-            return res;
+            return res.Service;
         }
+        private static ServerStorageServices.ServerStorageServicesClient retrieveServer(string serverId, string partitionId)
+        {
+            GrpcServer res = null;
+            if (servers.TryGetValue(serverId, out res))
+            {
+                res.Partition_id = partitionId;
+                return res.Service;
+            }
+                res = new GrpcServer(partitionId, "http://localhost:" + (1000 + inc++));
+                servers.Add(serverId, res);
+                return res.Service;
+        }
+
+
+
+
+
         static void Main(string[] args)
         {
+            /* ------- POPULATE ------- */
+
+            
+
+            /* ------------------------*/
             int counter = 0;
             string line;
 
@@ -36,16 +62,19 @@ namespace Client
             {
                 System.Console.WriteLine(line);
                 string[] words = line.Split(' ', 4);
-                int objectId;
-                int partitionId;
-                int serverId;
+                string objectId;
+                string partitionId;
+                string serverId;
                 int rep = 1;
                 switch (words[0]) {
                     case "read":
                         
-                        if (words.Length == 4 && int.TryParse(words[1], out partitionId) && int.TryParse(words[2], out objectId) && int.TryParse(words[3], out serverId))
+                        if (words.Length == 4)
                         {
-                            var reply = retrieveServer(serverId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId});
+                            partitionId = words[1];
+                            objectId = words[2];
+                            serverId = words[3];
+                            var reply = retrieveServer(serverId, partitionId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId});
                             Console.WriteLine("Object {0} read: {1}", objectId, reply.Value.ToString());
                         }
                         else
@@ -54,11 +83,23 @@ namespace Client
                         }
                         break;
                     case "write":
-                        if (words.Length == 4 && int.TryParse(words[1], out partitionId) && int.TryParse(words[2], out objectId))
+                        
+                        if (words.Length == 4)
                         {
-                            int masterServerId = partitionId * 3;
-                            var reply = retrieveServer(masterServerId).WriteObject(new WriteObjectRequest { PartitionId = partitionId, ObjectId = objectId, Value = words[3] });
-                            Console.WriteLine("Write object {0} result: {1}", objectId, reply.WriteResult.ToString());
+                            partitionId = words[1];
+                            objectId = words[2];
+                            string masterServerId;
+                            if(masters.TryGetValue(partitionId, out masterServerId))
+                            {
+                                var reply = retrieveServer(masterServerId, partitionId).WriteObject(new WriteObjectRequest { PartitionId = partitionId, ObjectId = objectId, Value = words[3] });
+                                Console.WriteLine("Write object {0} result: {1}", objectId, reply.WriteResult.ToString());
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("Unkown master server.");
+                            }
+
                         }
                         else
                         {
@@ -66,8 +107,9 @@ namespace Client
                         }
                         break;
                     case "listServer":
-                        if(words.Length == 2 && int.TryParse(words[1], out serverId))
+                        if(words.Length == 2)
                         {
+                            serverId = words[1];
                             var reply = retrieveServer(serverId).ListServer(new ListServerRequest { ServerId = serverId });
                             Console.WriteLine("Objects: {0}", reply.StoredObjects);
                         }
