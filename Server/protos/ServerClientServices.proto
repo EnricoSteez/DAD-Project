@@ -39,8 +39,6 @@ message ReadObjectResponse {
     string value = 1;
 }
 
-
-
 //WRITE AN OBJECT
 message WriteObjectRequest {
     string partition_id = 1;
