@@ -1,1 +1,5 @@
-﻿read 1 1 1
+﻿read partition sdf$isdf server
+begin-repeat 3
+write part-1 obj-$i "value-$i"
+end-repeat
+read partition sdf$isdf server

@@ -2,10 +2,14 @@
 using Grpc.Net.Client;
 using Server.protos;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks.Dataflow;
 
 namespace Client
 {
@@ -18,7 +22,7 @@ namespace Client
 
         private static Dictionary<string, string> masters = new Dictionary<string, string>(); //key - partitionId object - serverId
 
-        private static ServerStorageServices.ServerStorageServicesClient retrieveServer(string serverId)
+        private static ServerStorageServices.ServerStorageServicesClient RetrieveServer(string serverId)
         {
             GrpcServer res = null;
             if (servers.TryGetValue(serverId, out res))
@@ -29,7 +33,7 @@ namespace Client
             servers.Add(serverId, res);
             return res.Service;
         }
-        private static ServerStorageServices.ServerStorageServicesClient retrieveServer(string serverId, string partitionId)
+        private static ServerStorageServices.ServerStorageServicesClient RetrieveServer(string serverId, string partitionId)
         {
             GrpcServer res = null;
             if (servers.TryGetValue(serverId, out res))
@@ -43,38 +47,59 @@ namespace Client
         }
 
 
+        private static List<string> TransformCommands(List<string> loopCommands, int reps)
+        {
+            
+            List<string> commands = new List<string>();
+            for(int i = reps; i > 0; i--)
+            {
+                foreach (string s in loopCommands)
+                {
+                    commands.Add(Regex.Replace(s, @"\$i", i.ToString(), RegexOptions.None));
+                }
+            }
+            return commands;
+        }
 
+        private static string GetElement(List<string> commands)
+        {
+            if(commands.Count == 0)
+            {
+                return null;
+            }
+            string res = commands[0];
+            commands.RemoveAt(0);
+            return res;
+        }
 
 
         static void Main(string[] args)
         {
-            /* ------- POPULATE ------- */
-
-            
-
-            /* ------------------------*/
             int counter = 0;
             string line;
 
+            List<string> loopCommands = new List<string>();
+            List<string> commands = new List<string>();
+
             // Read the file and display it line by line.  
             System.IO.StreamReader file = new System.IO.StreamReader(@"../../../test.txt");
-            while ((line = file.ReadLine()) != null)
+            while ((line = GetElement(commands)) != null || (line = file.ReadLine()) != null)
             {
-                System.Console.WriteLine(line);
                 string[] words = line.Split(' ', 4);
                 string objectId;
                 string partitionId;
                 string serverId;
                 int rep = 1;
+                
                 switch (words[0]) {
                     case "read":
                         
-                        if (words.Length == 4)
+                        if (words.Length == 4 )
                         {
                             partitionId = words[1];
                             objectId = words[2];
                             serverId = words[3];
-                            var reply = retrieveServer(serverId, partitionId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId});
+                            var reply = RetrieveServer(serverId, partitionId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId});
                             Console.WriteLine("Object {0} read: {1}", objectId, reply.Value.ToString());
                         }
                         else
@@ -84,14 +109,14 @@ namespace Client
                         break;
                     case "write":
                         
-                        if (words.Length == 4)
+                        if (words.Length == 4 )
                         {
                             partitionId = words[1];
                             objectId = words[2];
                             string masterServerId;
                             if(masters.TryGetValue(partitionId, out masterServerId))
                             {
-                                var reply = retrieveServer(masterServerId, partitionId).WriteObject(new WriteObjectRequest { PartitionId = partitionId, ObjectId = objectId, Value = words[3] });
+                                var reply = RetrieveServer(masterServerId, partitionId).WriteObject(new WriteObjectRequest { PartitionId = partitionId, ObjectId = objectId, Value = words[3] });
                                 Console.WriteLine("Write object {0} result: {1}", objectId, reply.WriteResult.ToString());
 
                             }
@@ -107,10 +132,10 @@ namespace Client
                         }
                         break;
                     case "listServer":
-                        if(words.Length == 2)
+                        if(words.Length == 2 )
                         {
                             serverId = words[1];
-                            var reply = retrieveServer(serverId).ListServer(new ListServerRequest { ServerId = serverId });
+                            var reply = RetrieveServer(serverId).ListServer(new ListServerRequest { ServerId = serverId });
                             Console.WriteLine("Objects: {0}", reply.StoredObjects);
                         }
                         else
@@ -119,7 +144,7 @@ namespace Client
                         }
                         break;
                     case "listGlobal":
-                        if(words.Length == 1)
+                        if(words.Length == 1 )
                         {
                             // TODO: list global
                         }
@@ -130,7 +155,7 @@ namespace Client
                         break;
                     case "wait":
                         int ms;
-                        if (words.Length == 2 && int.TryParse(words[1], out ms))
+                        if (words.Length == 2 && int.TryParse(words[1], out ms) )
                         {
 
                             Thread.Sleep(ms);
@@ -142,15 +167,21 @@ namespace Client
                         }
                         break;
                     case "begin-repeat":
-                        int temprep;
-                        if(words.Length == 2 && int.TryParse(words[1], out temprep))
-                        {
-                            if(temprep > 0)
+                        if (commands.Count == 0 && words.Length == 2 && int.TryParse(words[1], out rep))
+                        {                            
+                            if (rep > 0)
                             {
-                                rep = temprep;
+                                string lineaux = file.ReadLine();
+                                while (lineaux != null && lineaux != "end-repeat")
+                                {
+                                    loopCommands.Add(lineaux);
+                                    lineaux = file.ReadLine();
+                                }
+                                commands = TransformCommands(loopCommands, rep);
                             }
                             else
                             {
+                                rep = 0;
                                 Console.WriteLine("Invalid number of repetitions");
                             }
                         }
@@ -159,15 +190,8 @@ namespace Client
                             Console.WriteLine("Wrong number of args!");
                         }
                         break;
-                    case "end-repeat":
-                        if(words.Length == 0)
-                        {
-                            rep = 1;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Wrong number of args!");
-                        }
+                    default:
+                        Console.WriteLine("Invalid command!");
                         break;
 
                 }
