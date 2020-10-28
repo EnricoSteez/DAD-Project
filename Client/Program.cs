@@ -187,7 +187,7 @@ namespace Client
                         }
                         else
                         {
-                            Console.WriteLine("Wrong number of args!");
+                            Console.WriteLine("Invalid repetition!");
                         }
                         break;
                     default:
