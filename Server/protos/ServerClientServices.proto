@@ -19,7 +19,6 @@ message ListServerResponse {
     bool isMasterReplica = 2;
 }
 
-
 message ListGlobalRequest {
 
 }
@@ -27,7 +26,6 @@ message ListGlobalRequest {
 message ListGlobalResponse {
     
 }
-
 
 //READ AN OBJECT
 message ReadObjectRequest {

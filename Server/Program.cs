@@ -3,45 +3,61 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Grpc.Net.Client;
 using Server.protos;
 
 namespace Server
 {
+
     public class Server
     {
-        private Dictionary<string, string> Storage { get; }
-        public string Partition_id { get; }
+        private Dictionary<string, Resource> Storage { get; }
+        public Dictionary<string, ServerIdentification> SystemNodes { get; set; }
         public string Server_id { get; }
+        public string Partition_id { get; }
         public bool IsMasterReplica { get; }
         public  IPAddress Ip { get; }
 
+        public event EventHandler Unlock;
+
+
         public Server() //dummy implementation for debugging with just 1 server at localhost
         {
-            Partition_id = "1";
             Server_id = "1";
+            Partition_id = "A";
             IsMasterReplica = true;
             Ip = IPAddress.Parse("127.0.0.1");
             //empty storage at startup
-            Storage = new Dictionary<string, string>();
+            Storage = new Dictionary<string, Resource>();
+            //empty dictionary at startup
+            SystemNodes = new Dictionary<string, ServerIdentification>();
         }
 
-        public Server(string partition_id, string server_id, string ip, bool isMasterReplica)
+        public Server(string server_id, string partition_id, bool isMasterReplica, string ip)
         {
-            Partition_id = partition_id;
             Server_id = server_id;
+            Partition_id = partition_id;
             IsMasterReplica = isMasterReplica;
             Ip = IPAddress.Parse(ip);
-            //empty storage at startup
-            Storage = new Dictionary<string, string>();
+            Storage = new Dictionary<string, Resource>();
+            SystemNodes = new Dictionary<string, ServerIdentification>();
         }
 
-
-        public int AddObject(string id, string value)
+        internal int AddObject(string id, Resource value)
         {
             int result = 0;
             if (Storage.ContainsKey(id))
             {
-                Storage[id] = value;
+                Storage.TryGetValue(id, out Resource curVal);
+                if (curVal.Locked)
+                {
+                    //subscribe to the unlock event
+                    //TODO WAIT FOR UNLOCK
+                }
+                else
+                {
+                    lock (Storage[id]) { Storage[id] = value; }
+                }
             }
             else
             {
@@ -51,164 +67,99 @@ namespace Server
             return result;
         }
 
-        public string RetrieveObject(string id)
+        internal string RetrieveObject(string id)
         {
-            return Storage.GetValueOrDefault(id);
-        }
-
-    }
-
-    /*************************************** SERVICES FOR CLIENTS ***************************************/
-
-    public class ServerClientService : ServerStorageServices.ServerStorageServicesBase
-    {
-        public Server Local { get; }
-
-        public ServerClientService(Server server)
-        {
-            Local = server;
-        }
-
-        //--------------------READ OBJECT--------------------
-
-        public override Task<ReadObjectResponse> ReadObject(ReadObjectRequest request,
-            ServerCallContext context)
-        {
-            Console.WriteLine("Client " + context.Host + "Asked for something");
-            return Task.FromResult(RO(request));
-
-        }
-
-        private ReadObjectResponse RO(ReadObjectRequest request)
-        {
-            Console.WriteLine("He wants object with ID: " + request.ObjectId +
-                " from partition " + request.PartitionId);
-
-            ReadObjectResponse response = new ReadObjectResponse
+            if (Storage.ContainsKey(id))
             {
-                Value = Local.RetrieveObject(request.ObjectId)
-            };
-
-            return response;
+                if (Storage[id].Locked == false)
+                    return Storage[id].Value;
+                else //if the resource is locked
+                {
+                    //TODO WAIT FOR UNLOCK
+                }
+            }
+            return "N/A"; //no such resource on this server
         }
 
-        //--------------------WRITE OBJECT--------------------
-
-
-        public override Task<WriteObjectResponse> WriteObject(WriteObjectRequest request,
-            ServerCallContext context)
+        internal bool LockObject(string objectId)
         {
-            //the client takes care of connecting to the master server of the correct partition before writing
-            //No reason to check here
-            return Task.FromResult(WO(request));
-
-        }
-
-        private WriteObjectResponse WO(WriteObjectRequest request)
-        {
-            //TODO: SEND LOCK REQUEST TO OTHER REPLICAS OF THIS PARTITION AND WAIT FOR RESPONSE
-
-
-            WriteObjectResponse response = new WriteObjectResponse
-            {
-                WriteResult = Local.AddObject(request.ObjectId, request.Value)
-            };
-
-
-            //TODO: SEND UPDATED VALUE TO OTHER REPLICAS OF THIS PARTITION AND WAIT FOR RESPONSE
-
-            return response;
-        }
-    }
-
-    /*************************************** SERVICES AMONG SERVERS ***************************************/
-
-    /***************************************    SERVER SIDE    ***************************************/
-
-    public class ServerServerService : ServerCoordinationServices.ServerCoordinationServicesBase
-    {
-        public Server Local { get; }
-
-        public ServerServerService(Server local)
-        {
-            Local = local;
-        }
-
-        //TODO
-        //-------------------- SERVER SIDE LOCK OWN RESOURCE AND SEND CONFIRMATION-------------------- >> ??? ASK
-
-        public override Task<LockResponse> LockResourceService(LockRequest request, ServerCallContext context)
-        {
-            return Task.FromResult(LRS(request));
-        }
-
-        private LockResponse LRS(LockRequest request)
-        {
-            throw new NotImplementedException();
             
-            /*
-             * lock local resource in the dictionary
-             * send lock confirmation
-             */
-        }
-
-
-        //-------------------- SERVER SIDE UPDATE OWN VALUE AND CONFIRM TO THE MASTER -------------------- >> ??? ASK
-
-        public override Task<UnlockConfirmation> UpdateValue(NewValue tuple, ServerCallContext context)
-        {
-            return Task.FromResult(UV(tuple));
-        }
-
-        private UnlockConfirmation UV(NewValue tuple)
-        {
-            //here I'm sure I'm in the correct partition because this service is just for the master server
-            //The master server of this partition is the only one that will ask for this
-            //So I can just write in the dictionary without bothering 
-            Local.AddObject(tuple.Id, tuple.Value);
-
-            UnlockConfirmation result = new UnlockConfirmation
+            if(Storage.ContainsKey(objectId) && Storage[objectId].Locked == false)
             {
-                Ok = 1
-            };
-
-            return result;
+                lock (Storage[objectId])
+                {
+                    Storage[objectId].Locked = true;
+                    return true;
+                }
+            } else
+            {
+                //TODO WAIT FOR THE RESOURCE TO UNLOCK BEFORE LOCKING MYSELF
+                //subscribe to the unlock event
+                
+            }
+            return false;
         }
+
+        internal bool UnlockObject(string objectId)
+        {
+            if (Storage.ContainsKey(objectId) && Storage[objectId].Locked == true)
+            {
+                lock (Storage[objectId]) { Storage[objectId].Locked = false; }
+                    
+                //TODO trigger unlock event
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
-
-
+    
 
     class Program
     { 
 
         static void Main(string[] args)
         {
-            //decide parameters HERE IN THE MAIN BEFORE CREATING
-            Server local = new Server();
-            
+            Server local = new Server("1", "A", true, "127.0.0.1");
+            Server anotherOne = new Server("2", "A", false, "127.0.0.1");
 
-            Grpc.Core.Server server = new Grpc.Core.Server {
-                Services =
-                {
-                    ServerStorageServices.BindService(new ServerClientService(local)),
-                    ServerCoordinationServices.BindService(new ServerServerService(local))
-                },
-                
-                Ports = {new ServerPort("localhost", 1000+int.Parse(local.Partition_id), ServerCredentials.Insecure)}
+            List<Server> servers = new List<Server>
+            {
+                { local },
+                { anotherOne }
             };
-            server.Start();
 
-            /*and then in the writeObject implementation 
-             * if I'm master replica
-             * I should perform the lock requests to all other servers of my partition
-             * before writing locally 
-             * and then send them the updated value
-             */
+            //knowledge of all other nodes. This should be initialized by the Puppet Master in the future
+            foreach(Server s in servers)
+            {
+                foreach (Server s2 in servers)
+                {
+                    //serverPool contains an entry for every other node in the system
+                    //with its complete identity: ServerIdentification
+                    if(s2.Server_id != s.Server_id)
+                    {
+                        s.SystemNodes.Add(s2.Server_id, new ServerIdentification(s2.Server_id, s2.Partition_id, s2.Ip));
+                    }
+                    
+                }
+            }
+
+            Grpc.Core.Server server = new Grpc.Core.Server
+            {
+                Services =
+            {
+                ServerStorageServices.BindService(new ServerClientService(local)),
+                ServerCoordinationServices.BindService(new ServerServerService(local))
+            },
+
+                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(local.Partition_id), ServerCredentials.Insecure) }
+            };
+
+            server.Start();
 
             Console.WriteLine("Hello World!");
         }
-
-
     }
 }
