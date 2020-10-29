@@ -1,2 +1,2 @@
-obj/Debug/netcoreapp3.1/protos/ServerClientServices.cs \
-obj/Debug/netcoreapp3.1/protos/ServerClientServicesGrpc.cs: protos/ServerClientServices.proto
+obj\Debug\netcoreapp3.1\protos/ServerClientServices.cs \
+obj\Debug\netcoreapp3.1\protos/ServerClientServicesGrpc.cs: protos/ServerClientServices.proto

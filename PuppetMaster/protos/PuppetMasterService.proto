@@ -1,0 +1,78 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Server.protos";
+
+
+service PuppetMasterServices {
+    rpc Server (ServerRequest) returns (ServerResponse) {}
+    rpc Partition (PartitionRequest) returns (PartitionResponse) {}
+    rpc Status (StatusRequest) returns (StatusResponse) {}
+    rpc Client (ClientRequest) returns (ClientResponse) {}
+    rpc Crash (CrashRequest) returns (CrashResponse) {}
+    rpc Freeze (FreezeRequest) returns (FreezeResponse) {}
+    rpc Unfreeze (UnfreezeRequest) returns (UnfreezeResponse) {}
+}
+
+message ServerRequest {
+    string server_id = 1;
+    int32 min_delay = 2;
+    int32 max_delay = 3;
+    string url = 4;
+}
+
+message ServerResponse {
+    string success = 1;
+}
+
+message PartitionRequest {
+    string partition_name = 1;
+    repeated string server_id = 2;
+
+}
+
+message PartitionResponse {
+    string success = 1;
+}
+
+message StatusRequest {
+
+}
+
+message StatusResponse {
+    string success = 1;
+}
+
+
+message ClientRequest {
+    string username = 1;
+    string client_url = 2;
+    string scriptfile = 3;
+} 
+
+message ClientResponse {
+    string succes = 1;
+}
+
+message CrashRequest {
+
+}
+
+message CrashResponse {
+    string success = 1;
+}
+
+message FreezeRequest {
+
+}
+
+message FreezeResponse {
+    string success = 1;
+}
+
+message UnfreezeRequest {
+
+}
+
+message UnfreezeResponse {
+    string success = 1;
+}

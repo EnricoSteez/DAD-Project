@@ -1,7 +1,0 @@
-﻿syntax = "proto3";
-
-option csharp_namespace = "Server.protos";
-
-message ReplicationFactor {
-
-}
