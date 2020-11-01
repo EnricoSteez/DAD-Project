@@ -391,26 +391,28 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\almof\\.nuget\\packages\\": {}
+    "/Users/enrico/.nuget/packages/": {},
+    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\PuppetMaster\\PuppetMaster.csproj",
+      "projectUniqueName": "/Users/enrico/Projects/DAD-Project/PuppetMaster/PuppetMaster.csproj",
       "projectName": "PuppetMaster",
-      "projectPath": "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\PuppetMaster\\PuppetMaster.csproj",
-      "packagesPath": "C:\\Users\\almof\\.nuget\\packages\\",
-      "outputPath": "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\PuppetMaster\\obj\\",
+      "projectPath": "/Users/enrico/Projects/DAD-Project/PuppetMaster/PuppetMaster.csproj",
+      "packagesPath": "/Users/enrico/.nuget/packages/",
+      "outputPath": "/Users/enrico/Projects/DAD-Project/PuppetMaster/obj/",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+      ],
       "configFilePaths": [
-        "C:\\Users\\almof\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/enrico/.config/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -461,7 +463,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.403/RuntimeIdentifierGraph.json"
       }
     }
   }

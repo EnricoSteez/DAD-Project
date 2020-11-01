@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -17,8 +18,8 @@ namespace Server
         public string Partition_id { get; }
         public bool IsMasterReplica { get; }
         public  IPAddress Ip { get; }
-
-        public event EventHandler Unlock;
+        public int MinDelay;
+        public int MaxDelay;
 
 
         public Server() //dummy implementation for debugging with just 1 server at localhost
@@ -33,7 +34,7 @@ namespace Server
             SystemNodes = new Dictionary<string, ServerIdentification>();
         }
 
-        public Server(string server_id, string partition_id, bool isMasterReplica, string ip)
+        public Server(string server_id, string partition_id, bool isMasterReplica, string ip, int minDelay, int maxDelay)
         {
             Server_id = server_id;
             Partition_id = partition_id;
@@ -41,22 +42,24 @@ namespace Server
             Ip = IPAddress.Parse(ip);
             Storage = new Dictionary<string, Resource>();
             SystemNodes = new Dictionary<string, ServerIdentification>();
+            MinDelay = minDelay;
+            MaxDelay = maxDelay;
         }
 
         internal int AddObject(string id, Resource value)
         {
-            int result = 0;
             if (Storage.ContainsKey(id))
             {
-                Storage.TryGetValue(id, out Resource curVal);
-                if (curVal.Locked)
+                if (Storage[id].Locked)
                 {
-                    //subscribe to the unlock event
-                    //TODO WAIT FOR UNLOCK
+                    Console.WriteLine("Object {0} is locked, waiting for unlock ...", Storage[id].Value);
+                    Monitor.Wait(Storage[id]);
                 }
                 else
                 {
-                    lock (Storage[id]) { Storage[id] = value; }
+                    Monitor.Enter(Storage[id]);
+                    Storage[id] = value;
+                    Monitor.Exit(Storage[id]);
                 }
             }
             else
@@ -64,7 +67,7 @@ namespace Server
                 Storage.Add(id, value);
             }
 
-            return result;
+            return 0;
         }
 
         internal string RetrieveObject(string id)
@@ -73,40 +76,60 @@ namespace Server
             {
                 if (Storage[id].Locked == false)
                     return Storage[id].Value;
-                else //if the resource is locked
+                else //if the resource is locked I wait for a pulse on this resource from the Unlock function 
                 {
-                    //TODO WAIT FOR UNLOCK
+                    Monitor.Wait(Storage[id]);
+                    return Storage[id].Value;
                 }
             }
             return "N/A"; //no such resource on this server
         }
 
-        internal bool LockObject(string objectId)
+        internal bool LockObject(string id)
         {
             
-            if(Storage.ContainsKey(objectId) && Storage[objectId].Locked == false)
+            if(Storage.ContainsKey(id) && Storage[id].Locked == false)
             {
-                lock (Storage[objectId])
+                Monitor.Enter(Storage[id]);
+
+                Console.WriteLine("Thread {0} just got the permission for locking resource {1}",
+                    Thread.CurrentThread.Name, id);
+
+                Storage[id].Locked = true;
+
+                Monitor.Exit(Storage[id]);
+
+                return true;
+            } else //resource is already locked by someone else
+                //so I wait for it to release the lock and then I lock it myself
+            {
+                do
                 {
-                    Storage[objectId].Locked = true;
-                    return true;
-                }
-            } else
-            {
-                //TODO WAIT FOR THE RESOURCE TO UNLOCK BEFORE LOCKING MYSELF
-                //subscribe to the unlock event
-                
+                    Monitor.Wait(Storage[id]);
+                } while (Storage[id].Locked==true);
+
+
+                Monitor.Enter(Storage[id]);
+                Storage[id].Locked = true;
+                Monitor.Exit(Storage[id]);
+
+
+                return true;
             }
-            return false;
         }
 
         internal bool UnlockObject(string objectId)
         {
             if (Storage.ContainsKey(objectId) && Storage[objectId].Locked == true)
             {
-                lock (Storage[objectId]) { Storage[objectId].Locked = false; }
+                Monitor.Enter(Storage[objectId]);
+                Storage[objectId].Locked = false;
+                Monitor.Exit(Storage[objectId]);
+
+                //awake the processes sleeping on this object
+                Monitor.Pulse(Storage[objectId]);
                     
-                //TODO trigger unlock event
+                
                 return true;
             }
 
@@ -122,8 +145,8 @@ namespace Server
 
         static void Main(string[] args)
         {
-            Server local = new Server("1", "A", true, "127.0.0.1");
-            Server anotherOne = new Server("2", "A", false, "127.0.0.1");
+            Server local = new Server("1", "A", true, "127.0.0.1",0,0);
+            Server anotherOne = new Server("2", "A", false, "127.0.0.1",0,0);
 
             List<Server> servers = new List<Server>
             {

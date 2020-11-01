@@ -24,60 +24,65 @@ namespace Server.protos {
     static PuppetMasterServiceReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CiBwcm90b3MvUHVwcGV0TWFzdGVyU2VydmljZS5wcm90byJVCg1TZXJ2ZXJS",
-            "ZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIRCgltaW5fZGVsYXkYAiABKAUS",
-            "EQoJbWF4X2RlbGF5GAMgASgFEgsKA3VybBgEIAEoCSIhCg5TZXJ2ZXJSZXNw",
-            "b25zZRIPCgdzdWNjZXNzGAEgASgJIj0KEFBhcnRpdGlvblJlcXVlc3QSFgoO",
-            "cGFydGl0aW9uX25hbWUYASABKAkSEQoJc2VydmVyX2lkGAIgAygJIiQKEVBh",
-            "cnRpdGlvblJlc3BvbnNlEg8KB3N1Y2Nlc3MYASABKAkiDwoNU3RhdHVzUmVx",
-            "dWVzdCIhCg5TdGF0dXNSZXNwb25zZRIPCgdzdWNjZXNzGAEgASgJIkkKDUNs",
-            "aWVudFJlcXVlc3QSEAoIdXNlcm5hbWUYASABKAkSEgoKY2xpZW50X3VybBgC",
-            "IAEoCRISCgpzY3JpcHRmaWxlGAMgASgJIiAKDkNsaWVudFJlc3BvbnNlEg4K",
-            "BnN1Y2NlcxgBIAEoCSIOCgxDcmFzaFJlcXVlc3QiIAoNQ3Jhc2hSZXNwb25z",
-            "ZRIPCgdzdWNjZXNzGAEgASgJIg8KDUZyZWV6ZVJlcXVlc3QiIQoORnJlZXpl",
-            "UmVzcG9uc2USDwoHc3VjY2VzcxgBIAEoCSIRCg9VbmZyZWV6ZVJlcXVlc3Qi",
-            "IwoQVW5mcmVlemVSZXNwb25zZRIPCgdzdWNjZXNzGAEgASgJMt0CChRQdXBw",
-            "ZXRNYXN0ZXJTZXJ2aWNlcxIrCgZTZXJ2ZXISDi5TZXJ2ZXJSZXF1ZXN0Gg8u",
-            "U2VydmVyUmVzcG9uc2UiABI0CglQYXJ0aXRpb24SES5QYXJ0aXRpb25SZXF1",
-            "ZXN0GhIuUGFydGl0aW9uUmVzcG9uc2UiABIrCgZTdGF0dXMSDi5TdGF0dXNS",
-            "ZXF1ZXN0Gg8uU3RhdHVzUmVzcG9uc2UiABIrCgZDbGllbnQSDi5DbGllbnRS",
-            "ZXF1ZXN0Gg8uQ2xpZW50UmVzcG9uc2UiABIoCgVDcmFzaBINLkNyYXNoUmVx",
-            "dWVzdBoOLkNyYXNoUmVzcG9uc2UiABIrCgZGcmVlemUSDi5GcmVlemVSZXF1",
-            "ZXN0Gg8uRnJlZXplUmVzcG9uc2UiABIxCghVbmZyZWV6ZRIQLlVuZnJlZXpl",
-            "UmVxdWVzdBoRLlVuZnJlZXplUmVzcG9uc2UiAEIQqgINU2VydmVyLnByb3Rv",
-            "c2IGcHJvdG8z"));
+            "CiBwcm90b3MvUHVwcGV0TWFzdGVyU2VydmljZS5wcm90byJbChNTZXJ2ZXJS",
+            "ZXF1ZXN0T2JqZWN0EhEKCXNlcnZlcl9pZBgBIAEoCRIRCgltaW5fZGVsYXkY",
+            "AiABKAUSEQoJbWF4X2RlbGF5GAMgASgFEgsKA3VybBgEIAEoCSInChRTZXJ2",
+            "ZXJSZXNwb25zZU9iamVjdBIPCgdzdWNjZXNzGAEgASgJIkMKFlBhcnRpdGlv",
+            "blJlcXVlc3RPYmplY3QSFgoOcGFydGl0aW9uX25hbWUYASABKAkSEQoJc2Vy",
+            "dmVyX2lkGAIgAygJIioKF1BhcnRpdGlvblJlc3BvbnNlT2JqZWN0Eg8KB3N1",
+            "Y2Nlc3MYASABKAkiFQoTU3RhdHVzUmVxdWVzdE9iamVjdCInChRTdGF0dXNS",
+            "ZXNwb25zZU9iamVjdBIPCgdzdWNjZXNzGAEgASgJIk8KE0NsaWVudFJlcXVl",
+            "c3RPYmplY3QSEAoIdXNlcm5hbWUYASABKAkSEgoKY2xpZW50X3VybBgCIAEo",
+            "CRISCgpzY3JpcHRmaWxlGAMgASgJIiYKFENsaWVudFJlc3BvbnNlT2JqZWN0",
+            "Eg4KBnN1Y2NlcxgBIAEoCSIUChJDcmFzaFJlcXVlc3RPYmplY3QiJgoTQ3Jh",
+            "c2hSZXNwb25zZU9iamVjdBIPCgdzdWNjZXNzGAEgASgJIhUKE0ZyZWV6ZVJl",
+            "cXVlc3RPYmplY3QiJwoURnJlZXplUmVzcG9uc2VPYmplY3QSDwoHc3VjY2Vz",
+            "cxgBIAEoCSIXChVVbmZyZWV6ZVJlcXVlc3RPYmplY3QiKQoWVW5mcmVlemVS",
+            "ZXNwb25zZU9iamVjdBIPCgdzdWNjZXNzGAEgASgJMuIDChRQdXBwZXRNYXN0",
+            "ZXJTZXJ2aWNlcxI+Cg1TZXJ2ZXJSZXF1ZXN0EhQuU2VydmVyUmVxdWVzdE9i",
+            "amVjdBoVLlNlcnZlclJlc3BvbnNlT2JqZWN0IgASRwoQUGFydGl0aW9uUmVx",
+            "dWVzdBIXLlBhcnRpdGlvblJlcXVlc3RPYmplY3QaGC5QYXJ0aXRpb25SZXNw",
+            "b25zZU9iamVjdCIAEj4KDVN0YXR1c1JlcXVlc3QSFC5TdGF0dXNSZXF1ZXN0",
+            "T2JqZWN0GhUuU3RhdHVzUmVzcG9uc2VPYmplY3QiABI+Cg1DbGllbnRSZXF1",
+            "ZXN0EhQuQ2xpZW50UmVxdWVzdE9iamVjdBoVLkNsaWVudFJlc3BvbnNlT2Jq",
+            "ZWN0IgASOwoMQ3Jhc2hSZXF1ZXN0EhMuQ3Jhc2hSZXF1ZXN0T2JqZWN0GhQu",
+            "Q3Jhc2hSZXNwb25zZU9iamVjdCIAEj4KDUZyZWV6ZVJlcXVlc3QSFC5GcmVl",
+            "emVSZXF1ZXN0T2JqZWN0GhUuRnJlZXplUmVzcG9uc2VPYmplY3QiABJECg9V",
+            "bmZyZWV6ZVJlcXVlc3QSFi5VbmZyZWV6ZVJlcXVlc3RPYmplY3QaFy5VbmZy",
+            "ZWV6ZVJlc3BvbnNlT2JqZWN0IgBCEKoCDVNlcnZlci5wcm90b3NiBnByb3Rv",
+            "Mw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ServerRequest), global::Server.protos.ServerRequest.Parser, new[]{ "ServerId", "MinDelay", "MaxDelay", "Url" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ServerResponse), global::Server.protos.ServerResponse.Parser, new[]{ "Success" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.PartitionRequest), global::Server.protos.PartitionRequest.Parser, new[]{ "PartitionName", "ServerId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.PartitionResponse), global::Server.protos.PartitionResponse.Parser, new[]{ "Success" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.StatusRequest), global::Server.protos.StatusRequest.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.StatusResponse), global::Server.protos.StatusResponse.Parser, new[]{ "Success" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ClientRequest), global::Server.protos.ClientRequest.Parser, new[]{ "Username", "ClientUrl", "Scriptfile" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ClientResponse), global::Server.protos.ClientResponse.Parser, new[]{ "Succes" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.CrashRequest), global::Server.protos.CrashRequest.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.CrashResponse), global::Server.protos.CrashResponse.Parser, new[]{ "Success" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.FreezeRequest), global::Server.protos.FreezeRequest.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.FreezeResponse), global::Server.protos.FreezeResponse.Parser, new[]{ "Success" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.UnfreezeRequest), global::Server.protos.UnfreezeRequest.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.UnfreezeResponse), global::Server.protos.UnfreezeResponse.Parser, new[]{ "Success" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ServerRequestObject), global::Server.protos.ServerRequestObject.Parser, new[]{ "ServerId", "MinDelay", "MaxDelay", "Url" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ServerResponseObject), global::Server.protos.ServerResponseObject.Parser, new[]{ "Success" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.PartitionRequestObject), global::Server.protos.PartitionRequestObject.Parser, new[]{ "PartitionName", "ServerId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.PartitionResponseObject), global::Server.protos.PartitionResponseObject.Parser, new[]{ "Success" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.StatusRequestObject), global::Server.protos.StatusRequestObject.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.StatusResponseObject), global::Server.protos.StatusResponseObject.Parser, new[]{ "Success" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ClientRequestObject), global::Server.protos.ClientRequestObject.Parser, new[]{ "Username", "ClientUrl", "Scriptfile" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.ClientResponseObject), global::Server.protos.ClientResponseObject.Parser, new[]{ "Succes" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.CrashRequestObject), global::Server.protos.CrashRequestObject.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.CrashResponseObject), global::Server.protos.CrashResponseObject.Parser, new[]{ "Success" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.FreezeRequestObject), global::Server.protos.FreezeRequestObject.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.FreezeResponseObject), global::Server.protos.FreezeResponseObject.Parser, new[]{ "Success" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.UnfreezeRequestObject), global::Server.protos.UnfreezeRequestObject.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Server.protos.UnfreezeResponseObject), global::Server.protos.UnfreezeResponseObject.Parser, new[]{ "Success" }, null, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Messages
-  public sealed partial class ServerRequest : pb::IMessage<ServerRequest>
+  public sealed partial class ServerRequestObject : pb::IMessage<ServerRequestObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<ServerRequest> _parser = new pb::MessageParser<ServerRequest>(() => new ServerRequest());
+    private static readonly pb::MessageParser<ServerRequestObject> _parser = new pb::MessageParser<ServerRequestObject>(() => new ServerRequestObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<ServerRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<ServerRequestObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -90,14 +95,14 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ServerRequest() {
+    public ServerRequestObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ServerRequest(ServerRequest other) : this() {
+    public ServerRequestObject(ServerRequestObject other) : this() {
       serverId_ = other.serverId_;
       minDelay_ = other.minDelay_;
       maxDelay_ = other.maxDelay_;
@@ -106,8 +111,8 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ServerRequest Clone() {
-      return new ServerRequest(this);
+    public ServerRequestObject Clone() {
+      return new ServerRequestObject(this);
     }
 
     /// <summary>Field number for the "server_id" field.</summary>
@@ -156,11 +161,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as ServerRequest);
+      return Equals(other as ServerRequestObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(ServerRequest other) {
+    public bool Equals(ServerRequestObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -266,7 +271,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(ServerRequest other) {
+    public void MergeFrom(ServerRequestObject other) {
       if (other == null) {
         return;
       }
@@ -349,15 +354,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class ServerResponse : pb::IMessage<ServerResponse>
+  public sealed partial class ServerResponseObject : pb::IMessage<ServerResponseObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<ServerResponse> _parser = new pb::MessageParser<ServerResponse>(() => new ServerResponse());
+    private static readonly pb::MessageParser<ServerResponseObject> _parser = new pb::MessageParser<ServerResponseObject>(() => new ServerResponseObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<ServerResponse> Parser { get { return _parser; } }
+    public static pb::MessageParser<ServerResponseObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -370,21 +375,21 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ServerResponse() {
+    public ServerResponseObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ServerResponse(ServerResponse other) : this() {
+    public ServerResponseObject(ServerResponseObject other) : this() {
       success_ = other.success_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ServerResponse Clone() {
-      return new ServerResponse(this);
+    public ServerResponseObject Clone() {
+      return new ServerResponseObject(this);
     }
 
     /// <summary>Field number for the "success" field.</summary>
@@ -400,11 +405,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as ServerResponse);
+      return Equals(other as ServerResponseObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(ServerResponse other) {
+    public bool Equals(ServerResponseObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -471,7 +476,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(ServerResponse other) {
+    public void MergeFrom(ServerResponseObject other) {
       if (other == null) {
         return;
       }
@@ -521,15 +526,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class PartitionRequest : pb::IMessage<PartitionRequest>
+  public sealed partial class PartitionRequestObject : pb::IMessage<PartitionRequestObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<PartitionRequest> _parser = new pb::MessageParser<PartitionRequest>(() => new PartitionRequest());
+    private static readonly pb::MessageParser<PartitionRequestObject> _parser = new pb::MessageParser<PartitionRequestObject>(() => new PartitionRequestObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<PartitionRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<PartitionRequestObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -542,22 +547,22 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PartitionRequest() {
+    public PartitionRequestObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PartitionRequest(PartitionRequest other) : this() {
+    public PartitionRequestObject(PartitionRequestObject other) : this() {
       partitionName_ = other.partitionName_;
       serverId_ = other.serverId_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PartitionRequest Clone() {
-      return new PartitionRequest(this);
+    public PartitionRequestObject Clone() {
+      return new PartitionRequestObject(this);
     }
 
     /// <summary>Field number for the "partition_name" field.</summary>
@@ -583,11 +588,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as PartitionRequest);
+      return Equals(other as PartitionRequestObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(PartitionRequest other) {
+    public bool Equals(PartitionRequestObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -659,7 +664,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(PartitionRequest other) {
+    public void MergeFrom(PartitionRequestObject other) {
       if (other == null) {
         return;
       }
@@ -718,15 +723,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class PartitionResponse : pb::IMessage<PartitionResponse>
+  public sealed partial class PartitionResponseObject : pb::IMessage<PartitionResponseObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<PartitionResponse> _parser = new pb::MessageParser<PartitionResponse>(() => new PartitionResponse());
+    private static readonly pb::MessageParser<PartitionResponseObject> _parser = new pb::MessageParser<PartitionResponseObject>(() => new PartitionResponseObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<PartitionResponse> Parser { get { return _parser; } }
+    public static pb::MessageParser<PartitionResponseObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -739,21 +744,21 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PartitionResponse() {
+    public PartitionResponseObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PartitionResponse(PartitionResponse other) : this() {
+    public PartitionResponseObject(PartitionResponseObject other) : this() {
       success_ = other.success_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public PartitionResponse Clone() {
-      return new PartitionResponse(this);
+    public PartitionResponseObject Clone() {
+      return new PartitionResponseObject(this);
     }
 
     /// <summary>Field number for the "success" field.</summary>
@@ -769,11 +774,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as PartitionResponse);
+      return Equals(other as PartitionResponseObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(PartitionResponse other) {
+    public bool Equals(PartitionResponseObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -840,7 +845,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(PartitionResponse other) {
+    public void MergeFrom(PartitionResponseObject other) {
       if (other == null) {
         return;
       }
@@ -890,15 +895,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class StatusRequest : pb::IMessage<StatusRequest>
+  public sealed partial class StatusRequestObject : pb::IMessage<StatusRequestObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<StatusRequest> _parser = new pb::MessageParser<StatusRequest>(() => new StatusRequest());
+    private static readonly pb::MessageParser<StatusRequestObject> _parser = new pb::MessageParser<StatusRequestObject>(() => new StatusRequestObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<StatusRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<StatusRequestObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -911,29 +916,29 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public StatusRequest() {
+    public StatusRequestObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public StatusRequest(StatusRequest other) : this() {
+    public StatusRequestObject(StatusRequestObject other) : this() {
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public StatusRequest Clone() {
-      return new StatusRequest(this);
+    public StatusRequestObject Clone() {
+      return new StatusRequestObject(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as StatusRequest);
+      return Equals(other as StatusRequestObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(StatusRequest other) {
+    public bool Equals(StatusRequestObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -987,7 +992,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(StatusRequest other) {
+    public void MergeFrom(StatusRequestObject other) {
       if (other == null) {
         return;
       }
@@ -1026,15 +1031,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class StatusResponse : pb::IMessage<StatusResponse>
+  public sealed partial class StatusResponseObject : pb::IMessage<StatusResponseObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<StatusResponse> _parser = new pb::MessageParser<StatusResponse>(() => new StatusResponse());
+    private static readonly pb::MessageParser<StatusResponseObject> _parser = new pb::MessageParser<StatusResponseObject>(() => new StatusResponseObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<StatusResponse> Parser { get { return _parser; } }
+    public static pb::MessageParser<StatusResponseObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1047,21 +1052,21 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public StatusResponse() {
+    public StatusResponseObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public StatusResponse(StatusResponse other) : this() {
+    public StatusResponseObject(StatusResponseObject other) : this() {
       success_ = other.success_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public StatusResponse Clone() {
-      return new StatusResponse(this);
+    public StatusResponseObject Clone() {
+      return new StatusResponseObject(this);
     }
 
     /// <summary>Field number for the "success" field.</summary>
@@ -1077,11 +1082,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as StatusResponse);
+      return Equals(other as StatusResponseObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(StatusResponse other) {
+    public bool Equals(StatusResponseObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1148,7 +1153,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(StatusResponse other) {
+    public void MergeFrom(StatusResponseObject other) {
       if (other == null) {
         return;
       }
@@ -1198,15 +1203,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class ClientRequest : pb::IMessage<ClientRequest>
+  public sealed partial class ClientRequestObject : pb::IMessage<ClientRequestObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<ClientRequest> _parser = new pb::MessageParser<ClientRequest>(() => new ClientRequest());
+    private static readonly pb::MessageParser<ClientRequestObject> _parser = new pb::MessageParser<ClientRequestObject>(() => new ClientRequestObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<ClientRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<ClientRequestObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1219,14 +1224,14 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ClientRequest() {
+    public ClientRequestObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ClientRequest(ClientRequest other) : this() {
+    public ClientRequestObject(ClientRequestObject other) : this() {
       username_ = other.username_;
       clientUrl_ = other.clientUrl_;
       scriptfile_ = other.scriptfile_;
@@ -1234,8 +1239,8 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ClientRequest Clone() {
-      return new ClientRequest(this);
+    public ClientRequestObject Clone() {
+      return new ClientRequestObject(this);
     }
 
     /// <summary>Field number for the "username" field.</summary>
@@ -1273,11 +1278,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as ClientRequest);
+      return Equals(other as ClientRequestObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(ClientRequest other) {
+    public bool Equals(ClientRequestObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1370,7 +1375,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(ClientRequest other) {
+    public void MergeFrom(ClientRequestObject other) {
       if (other == null) {
         return;
       }
@@ -1442,15 +1447,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class ClientResponse : pb::IMessage<ClientResponse>
+  public sealed partial class ClientResponseObject : pb::IMessage<ClientResponseObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<ClientResponse> _parser = new pb::MessageParser<ClientResponse>(() => new ClientResponse());
+    private static readonly pb::MessageParser<ClientResponseObject> _parser = new pb::MessageParser<ClientResponseObject>(() => new ClientResponseObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<ClientResponse> Parser { get { return _parser; } }
+    public static pb::MessageParser<ClientResponseObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1463,21 +1468,21 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ClientResponse() {
+    public ClientResponseObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ClientResponse(ClientResponse other) : this() {
+    public ClientResponseObject(ClientResponseObject other) : this() {
       succes_ = other.succes_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ClientResponse Clone() {
-      return new ClientResponse(this);
+    public ClientResponseObject Clone() {
+      return new ClientResponseObject(this);
     }
 
     /// <summary>Field number for the "succes" field.</summary>
@@ -1493,11 +1498,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as ClientResponse);
+      return Equals(other as ClientResponseObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(ClientResponse other) {
+    public bool Equals(ClientResponseObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1564,7 +1569,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(ClientResponse other) {
+    public void MergeFrom(ClientResponseObject other) {
       if (other == null) {
         return;
       }
@@ -1614,15 +1619,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class CrashRequest : pb::IMessage<CrashRequest>
+  public sealed partial class CrashRequestObject : pb::IMessage<CrashRequestObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<CrashRequest> _parser = new pb::MessageParser<CrashRequest>(() => new CrashRequest());
+    private static readonly pb::MessageParser<CrashRequestObject> _parser = new pb::MessageParser<CrashRequestObject>(() => new CrashRequestObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<CrashRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<CrashRequestObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1635,29 +1640,29 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CrashRequest() {
+    public CrashRequestObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CrashRequest(CrashRequest other) : this() {
+    public CrashRequestObject(CrashRequestObject other) : this() {
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CrashRequest Clone() {
-      return new CrashRequest(this);
+    public CrashRequestObject Clone() {
+      return new CrashRequestObject(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as CrashRequest);
+      return Equals(other as CrashRequestObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(CrashRequest other) {
+    public bool Equals(CrashRequestObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1711,7 +1716,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(CrashRequest other) {
+    public void MergeFrom(CrashRequestObject other) {
       if (other == null) {
         return;
       }
@@ -1750,15 +1755,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class CrashResponse : pb::IMessage<CrashResponse>
+  public sealed partial class CrashResponseObject : pb::IMessage<CrashResponseObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<CrashResponse> _parser = new pb::MessageParser<CrashResponse>(() => new CrashResponse());
+    private static readonly pb::MessageParser<CrashResponseObject> _parser = new pb::MessageParser<CrashResponseObject>(() => new CrashResponseObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<CrashResponse> Parser { get { return _parser; } }
+    public static pb::MessageParser<CrashResponseObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1771,21 +1776,21 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CrashResponse() {
+    public CrashResponseObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CrashResponse(CrashResponse other) : this() {
+    public CrashResponseObject(CrashResponseObject other) : this() {
       success_ = other.success_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CrashResponse Clone() {
-      return new CrashResponse(this);
+    public CrashResponseObject Clone() {
+      return new CrashResponseObject(this);
     }
 
     /// <summary>Field number for the "success" field.</summary>
@@ -1801,11 +1806,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as CrashResponse);
+      return Equals(other as CrashResponseObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(CrashResponse other) {
+    public bool Equals(CrashResponseObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1872,7 +1877,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(CrashResponse other) {
+    public void MergeFrom(CrashResponseObject other) {
       if (other == null) {
         return;
       }
@@ -1922,15 +1927,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class FreezeRequest : pb::IMessage<FreezeRequest>
+  public sealed partial class FreezeRequestObject : pb::IMessage<FreezeRequestObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<FreezeRequest> _parser = new pb::MessageParser<FreezeRequest>(() => new FreezeRequest());
+    private static readonly pb::MessageParser<FreezeRequestObject> _parser = new pb::MessageParser<FreezeRequestObject>(() => new FreezeRequestObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<FreezeRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<FreezeRequestObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1943,29 +1948,29 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public FreezeRequest() {
+    public FreezeRequestObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public FreezeRequest(FreezeRequest other) : this() {
+    public FreezeRequestObject(FreezeRequestObject other) : this() {
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public FreezeRequest Clone() {
-      return new FreezeRequest(this);
+    public FreezeRequestObject Clone() {
+      return new FreezeRequestObject(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as FreezeRequest);
+      return Equals(other as FreezeRequestObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(FreezeRequest other) {
+    public bool Equals(FreezeRequestObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -2019,7 +2024,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(FreezeRequest other) {
+    public void MergeFrom(FreezeRequestObject other) {
       if (other == null) {
         return;
       }
@@ -2058,15 +2063,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class FreezeResponse : pb::IMessage<FreezeResponse>
+  public sealed partial class FreezeResponseObject : pb::IMessage<FreezeResponseObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<FreezeResponse> _parser = new pb::MessageParser<FreezeResponse>(() => new FreezeResponse());
+    private static readonly pb::MessageParser<FreezeResponseObject> _parser = new pb::MessageParser<FreezeResponseObject>(() => new FreezeResponseObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<FreezeResponse> Parser { get { return _parser; } }
+    public static pb::MessageParser<FreezeResponseObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -2079,21 +2084,21 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public FreezeResponse() {
+    public FreezeResponseObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public FreezeResponse(FreezeResponse other) : this() {
+    public FreezeResponseObject(FreezeResponseObject other) : this() {
       success_ = other.success_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public FreezeResponse Clone() {
-      return new FreezeResponse(this);
+    public FreezeResponseObject Clone() {
+      return new FreezeResponseObject(this);
     }
 
     /// <summary>Field number for the "success" field.</summary>
@@ -2109,11 +2114,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as FreezeResponse);
+      return Equals(other as FreezeResponseObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(FreezeResponse other) {
+    public bool Equals(FreezeResponseObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -2180,7 +2185,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(FreezeResponse other) {
+    public void MergeFrom(FreezeResponseObject other) {
       if (other == null) {
         return;
       }
@@ -2230,15 +2235,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class UnfreezeRequest : pb::IMessage<UnfreezeRequest>
+  public sealed partial class UnfreezeRequestObject : pb::IMessage<UnfreezeRequestObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<UnfreezeRequest> _parser = new pb::MessageParser<UnfreezeRequest>(() => new UnfreezeRequest());
+    private static readonly pb::MessageParser<UnfreezeRequestObject> _parser = new pb::MessageParser<UnfreezeRequestObject>(() => new UnfreezeRequestObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<UnfreezeRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<UnfreezeRequestObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -2251,29 +2256,29 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public UnfreezeRequest() {
+    public UnfreezeRequestObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public UnfreezeRequest(UnfreezeRequest other) : this() {
+    public UnfreezeRequestObject(UnfreezeRequestObject other) : this() {
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public UnfreezeRequest Clone() {
-      return new UnfreezeRequest(this);
+    public UnfreezeRequestObject Clone() {
+      return new UnfreezeRequestObject(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as UnfreezeRequest);
+      return Equals(other as UnfreezeRequestObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(UnfreezeRequest other) {
+    public bool Equals(UnfreezeRequestObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -2327,7 +2332,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(UnfreezeRequest other) {
+    public void MergeFrom(UnfreezeRequestObject other) {
       if (other == null) {
         return;
       }
@@ -2366,15 +2371,15 @@ namespace Server.protos {
 
   }
 
-  public sealed partial class UnfreezeResponse : pb::IMessage<UnfreezeResponse>
+  public sealed partial class UnfreezeResponseObject : pb::IMessage<UnfreezeResponseObject>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<UnfreezeResponse> _parser = new pb::MessageParser<UnfreezeResponse>(() => new UnfreezeResponse());
+    private static readonly pb::MessageParser<UnfreezeResponseObject> _parser = new pb::MessageParser<UnfreezeResponseObject>(() => new UnfreezeResponseObject());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<UnfreezeResponse> Parser { get { return _parser; } }
+    public static pb::MessageParser<UnfreezeResponseObject> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -2387,21 +2392,21 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public UnfreezeResponse() {
+    public UnfreezeResponseObject() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public UnfreezeResponse(UnfreezeResponse other) : this() {
+    public UnfreezeResponseObject(UnfreezeResponseObject other) : this() {
       success_ = other.success_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public UnfreezeResponse Clone() {
-      return new UnfreezeResponse(this);
+    public UnfreezeResponseObject Clone() {
+      return new UnfreezeResponseObject(this);
     }
 
     /// <summary>Field number for the "success" field.</summary>
@@ -2417,11 +2422,11 @@ namespace Server.protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as UnfreezeResponse);
+      return Equals(other as UnfreezeResponseObject);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(UnfreezeResponse other) {
+    public bool Equals(UnfreezeResponseObject other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -2488,7 +2493,7 @@ namespace Server.protos {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(UnfreezeResponse other) {
+    public void MergeFrom(UnfreezeResponseObject other) {
       if (other == null) {
         return;
       }
