@@ -38,7 +38,6 @@ message StatusRequestObject {
 }
 
 message StatusResponseObject {
-    string success = 1;
 }
 
 
@@ -49,7 +48,7 @@ message ClientRequestObject {
 } 
 
 message ClientResponseObject {
-    string succes = 1;
+    string success = 1;
 }
 
 message CrashRequestObject {
