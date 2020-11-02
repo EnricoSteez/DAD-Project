@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using Grpc.Core;
-using Grpc.Net.Client;
 using Server.protos;
 
 namespace Server
@@ -48,42 +46,74 @@ namespace Server
 
         internal int AddObject(string id, Resource value)
         {
-            if (Storage.ContainsKey(id))
+            Monitor.Enter(Storage);
+            if (Storage.ContainsKey(id)) //update resource
             {
-                if (Storage[id].Locked)
+                Resource res = Storage[id];
+                Monitor.Exit(Storage);
+
+                Monitor.Enter(res);
+
+                if (res.Locked) //wait
                 {
-                    Console.WriteLine("Object {0} is locked, waiting for unlock ...", Storage[id].Value);
-                    Monitor.Wait(Storage[id]);
+                    Console.WriteLine("Object {0} is locked, waiting for unlock ...", res.ObjectId);
+
+                    Monitor.Exit(res);
+                    //leave the lock and wait for someone to unflag
+                    while (res.Locked)
+                    {
+                        Monitor.Wait(res);
+                    }
                 }
-                else
-                {
-                    Monitor.Enter(Storage[id]);
-                    Storage[id] = value;
-                    Monitor.Exit(Storage[id]);
-                }
+
+                Monitor.Enter(Storage);
+
+                Storage[res.ObjectId] = value;
+
+                Monitor.Exit(Storage);
             }
-            else
+            else //add new resource to the dictionary
             {
                 Storage.Add(id, value);
+
                 //just in case someone is passing a locked resource
-                Monitor.Enter(Storage[id]);
-                Storage[id].Locked = false;
-                Monitor.Exit(Storage[id]);
+                Resource res = Storage[id];
+
+                Monitor.Exit(Storage);
+
+                Monitor.Enter(res);
+                res.Locked = false;
+                Monitor.Exit(res);
             }
 
             return 0;
         }
 
+        
         internal string RetrieveObject(string id)
         {
+            Monitor.Enter(Storage);
             if (Storage.ContainsKey(id))
             {
-                if (Storage[id].Locked == false)
-                    return Storage[id].Value;
+                Resource res = Storage[id];
+                Monitor.Exit(Storage);
+
+                Monitor.Enter(res);
+
+                if (!res.Locked)
+                    return res.Value;
                 else //if the resource is locked I wait for a pulse on this resource from the Unlock function 
                 {
-                    Monitor.Wait(Storage[id]);
-                    return Storage[id].Value;
+                    Monitor.Exit(res);
+                    //leave the lock and wait for someone to unflag
+                    while (res.Locked)
+                    {
+                        Monitor.Wait(res);
+                    }
+
+                    Monitor.Enter(res);
+
+                    return res.Value;
                 }
             }
             return "N/A"; //no such resource on this server
@@ -91,52 +121,92 @@ namespace Server
 
         internal bool LockObject(string id)
         {
-            
-            if(Storage.ContainsKey(id) && Storage[id].Locked == false)
+            Monitor.Enter(Storage);
+            if (Storage.ContainsKey(id))
             {
-                Monitor.Enter(Storage[id]);
+                Resource res = Storage[id];
+                Monitor.Exit(Storage);
 
-                Console.WriteLine("Thread {0} just got the permission for locking resource {1}",
+                Monitor.Enter(res);
+                if (!res.Locked)
+                {
+                    Console.WriteLine("Thread {0} just got the permission for locking resource {1}",
                     Thread.CurrentThread.Name, id);
 
-                Storage[id].Locked = true;
-
-                Monitor.Exit(Storage[id]);
-
-                return true;
-            } else //resource is already locked by someone else
-                //so I wait for it to release the lock and then I lock it myself
-            {
-                do
+                    res.Locked = true;
+                    Monitor.Exit(res);
+                }
+                else//resource is already locked by someone else
+                    //so I wait for him to release the lock and then I lock it myself
                 {
-                    Monitor.Wait(Storage[id]);
-                } while (Storage[id].Locked==true);
+                    Monitor.Exit(res);
+                    //leave the lock and wait for someone to unflag
+                    while (res.Locked)
+                    {
+                        Monitor.Wait(res);
+                    }
 
+                    //re-obtain the lock and flag myself
 
-                Monitor.Enter(Storage[id]);
-                Storage[id].Locked = true;
-                Monitor.Exit(Storage[id]);
+                    Monitor.Enter(res);
+                    res.Locked = true;
+                    Monitor.Exit(res);
 
+                }
 
                 return true;
             }
-        }
-
-        internal bool UnlockObject(string objectId)
-        {
-            if (Storage.ContainsKey(objectId) && Storage[objectId].Locked == true)
+            else
             {
-                Monitor.Enter(Storage[objectId]);
-                Storage[objectId].Locked = false;
-                Monitor.Exit(Storage[objectId]);
-
-                //awake the processes sleeping on this object
-                Monitor.Pulse(Storage[objectId]);
-                
-                return true;
+                Monitor.Exit(Storage);
             }
 
             return false;
+        }
+
+        internal bool UnlockObject(string id)
+        {
+            Monitor.Enter(Storage);
+            if (Storage.ContainsKey(id))
+            {
+                Resource res = Storage[id];
+                Monitor.Exit(Storage);
+
+                Monitor.Enter(res);
+                if(res.Locked)
+                    Storage[id].Locked = false;
+
+                Monitor.Exit(res);
+
+                //awake the processes sleeping on this object
+                Monitor.Pulse(res);
+                
+                return true;
+            } else
+            {
+                Monitor.Enter(Storage);
+            }
+
+            return false;
+        }
+
+        /*
+         * this special function is used in the server side only protocol for updating a value in the replicas
+         * When the master asks its replicas to lock a file, he then sends them the updated resource.
+         * Being the resource locked on the replicas due to the previous step, they can't update it locally 
+         * and this causes a deadlock.
+         * With this function, the replicas can update that value even if it's locked 
+         * because it's updated by the same server that requested the lock for this specific purpose
+         * (use carefully)
+         */
+        internal bool UpdateSpecialPermission(Resource resource)
+        {
+            Monitor.Enter(Storage[resource.ObjectId]);
+            Storage[resource.ObjectId] = resource;
+            Storage[resource.ObjectId].Locked = false;
+            Monitor.Exit(Storage[resource.ObjectId]);
+
+            return true;
         }
 
     }
