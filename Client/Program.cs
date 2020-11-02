@@ -76,7 +76,11 @@ namespace Client
 
         static void Main(string[] args)
         {
-            Console.WriteLine(args);
+            string fileName = @"../../../test.txt";
+            if (args.Length == 1)
+            {
+                fileName = args[0];
+            }
             int counter = 0;
             string line;
 
@@ -84,7 +88,7 @@ namespace Client
             List<string> commands = new List<string>();
 
             // Read the file and display it line by line.  
-            System.IO.StreamReader file = new System.IO.StreamReader(@"../../../test.txt");
+            System.IO.StreamReader file = new System.IO.StreamReader(fileName);
             while ((line = GetElement(commands)) != null || (line = file.ReadLine()) != null)
             {
                 string[] words = line.Split(' ', 4);

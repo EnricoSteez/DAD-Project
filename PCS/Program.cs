@@ -27,7 +27,7 @@ namespace PCS
     {
         static void Main(string[] args)
         {
-            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exea");
+            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe", "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\Client\\test.txt");
             //PuppetMasterServices.PuppetMasterServicesBase
             Console.WriteLine("Hello World!");
         }
