@@ -128,7 +128,6 @@ namespace Server
 
                 //awake the processes sleeping on this object
                 Monitor.Pulse(Storage[objectId]);
-                    
                 
                 return true;
             }

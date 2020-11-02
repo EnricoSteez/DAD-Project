@@ -2,9 +2,9 @@
   <MonoDevelop.Ide.ItemProperties.Server PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="Server/Program.cs" Line="84" Column="14" IsPinned="True" />
-      <File FileName="Server/ServerClientService.cs" Line="86" Column="46" />
-      <File FileName="Server/protos/ServerClientServices.proto" Line="23" Column="5" />
+      <File FileName="Server/Program.cs" Line="121" Column="52" IsPinned="True" />
+      <File FileName="Server/protos/ServerClientServices.proto" Line="38" Column="2" />
+      <File FileName="Server/ServerServerService.cs" Line="13" Column="37" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -18,9 +18,8 @@
               <Node name="Dependencies" expanded="True">
                 <Node name="PackageDependencies" expanded="True" />
               </Node>
-              <Node name="protos" expanded="True">
-                <Node name="ServerClientServices.proto" selected="True" />
-              </Node>
+              <Node name="protos" expanded="True" />
+              <Node name="ServerServerService.cs" selected="True" />
             </Node>
           </Node>
         </State>
