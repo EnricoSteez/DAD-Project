@@ -38,7 +38,7 @@ namespace Server
         {
             ReadObjectResponse response = new ReadObjectResponse
             {
-                Value = Local.RetrieveObject(request.ObjectId)
+                Value = Local.RetrieveObject(request.ObjectId, request.PartitionId)
             };
 
             return response;
@@ -60,70 +60,93 @@ namespace Server
 
         private WriteObjectResponse WO(WriteObjectRequest request)
         {
-            
-            foreach (string id in Local.SystemNodes.Keys)
+            if (Local.Storage.ContainsKey(request.PartitionId))
             {
-                Local.SystemNodes.TryGetValue(id, out ServerIdentification sampleServer);
-
-                if (Local.Partition_id == sampleServer.Partition)
+                //here I check if the object the clients wants to write is already stored in this partition or not
+                //and I do the locking request to all other servers replicating this partition
+                //only if necessary
+                if (Local.Storage[request.PartitionId].Elements.ContainsKey(request.ObjectId))
                 {
-                    GrpcChannel channel = GrpcChannel.ForAddress(
-                        sampleServer.Ip.ToString() + ":" + (1000 + int.Parse(id)).ToString());
-
-
-                    ServerCoordinationServices.ServerCoordinationServicesClient client =
-                        new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
-
-                    LockRequest req = new LockRequest
+                    foreach (string id in Local.SystemNodes.Keys)
                     {
-                        ObjectId = request.ObjectId
-                    };
+                        ServerIdentification sampleServer = Local.SystemNodes[id];
+
+                        foreach (string part in sampleServer.Partitions)
+                        {
+                            //look for other replicas (excluding myself)
+                            //by scrolling all partitions of every server and finding match with the requested one
+                            if (request.PartitionId == part && Local.Server_id != sampleServer.Id)
+                            {
+                                GrpcChannel channel = GrpcChannel.ForAddress(
+                                    sampleServer.Ip.ToString() + ":" + (1000 + int.Parse(id)).ToString());
 
 
-                    client.LockResourceService(req);
+                                ServerCoordinationServices.ServerCoordinationServicesClient client =
+                                    new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
+
+                                LockRequest req = new LockRequest
+                                {
+                                    ObjectId = request.ObjectId,
+                                    PartitionId = request.PartitionId
+                                };
+
+                                client.LockResourceService(req);
+                            }
+                        }
+
+                        //TODO WAIT FOR ALL RESPONSES?
+
+                    }
                 }
 
-                //TODO WAIT FOR ALL RESPONSES?
-
-            }
-
-            WriteObjectResponse response = new WriteObjectResponse
-            {
-                WriteResult = Local.AddObject(request.ObjectId, new Resource(request.ObjectId, request.Value))
-            };
-
-
-            //SEND UPDATED VALUE TO (AGAIN) OTHER REPLICAS OF THIS PARTITION
-            //There's no way to avoid doing the same loop twice because of the confirmations gathering "stall"
-            foreach (string id in Local.SystemNodes.Keys)
-            {
-                Local.SystemNodes.TryGetValue(id, out ServerIdentification sampleServer);
-
-                if (Local.Partition_id == sampleServer.Partition)
+                WriteObjectResponse response = new WriteObjectResponse
                 {
-                    GrpcChannel channel = GrpcChannel.ForAddress(
-                        sampleServer.Ip.ToString() + ":" + (1000 + int.Parse(id)).ToString());
+                    /*
+                     * I'm sure I'm the master replica because only the master replica for any resource
+                     * is  to receive the write request and serve it
+                     * Hence why Local.Server_id in the whoIsMaster field of the new Resource
+                    */
+
+                    WriteResult = Local.AddObject(new Resource(request.ObjectId, request.Value), request.PartitionId)
+                };
 
 
-                    ServerCoordinationServices.ServerCoordinationServicesClient client =
-                        new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
+                //SEND UPDATED VALUE TO (AGAIN) OTHER REPLICAS OF THIS PARTITION
+                //There's no way to avoid doing the same loop twice because of the confirmations gathering "stall"
+                foreach (string id in Local.SystemNodes.Keys)
+                {
+                    ServerIdentification sampleServer = Local.SystemNodes[id];
 
-                    NewValue newValue = new NewValue
+                    UpdateValueRequest valueToUpdate = new UpdateValueRequest
                     {
                         Id = request.ObjectId,
-                        Value = request.Value
+                        Value = request.Value,
+                        PartitionId = request.PartitionId
                     };
 
+                    foreach (string part in sampleServer.Partitions)
+                    {
+                        if (request.PartitionId == part && Local.Server_id != sampleServer.Id)
+                        {
+                            GrpcChannel channel = GrpcChannel.ForAddress(
+                                sampleServer.Ip + ":" + (1000 + int.Parse(id)).ToString());
 
-                    client.UpdateValue(newValue);
 
-                    
+                            ServerCoordinationServices.ServerCoordinationServicesClient client =
+                                new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
+
+                            client.UpdateValue(valueToUpdate);
+
+                        }
+
+                        //TODO WAIT FOR ALL CONFIRMATIONS?  
+                    }
                 }
 
-                //TODO WAIT FOR ALL CONFIRMATIONS?    
+                return response;
             }
 
-            return response;
+            return null;
         }
     }
 }
