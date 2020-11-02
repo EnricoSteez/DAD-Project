@@ -53,11 +53,11 @@ namespace Server
             //So I can just write in the dictionary without bothering
             //*****  when a new value is updated, it is automatically set to unlocked  *****
 
-            Local.AddObject(tuple.Id, new Resource(tuple.Id, tuple.Value));
+            
 
             UnlockConfirmation result = new UnlockConfirmation
             {
-                Ok = Local.UnlockObject(tuple.Id)
+                Ok = Local.UpdateSpecialPermission(new Resource(tuple.Id, tuple.Value))
 
             };
 
