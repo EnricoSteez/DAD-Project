@@ -20,7 +20,7 @@ message ListServerResponse {
 }
 
 message ListGlobalRequest {
-
+    
 }
 
 message ListGlobalResponse {
