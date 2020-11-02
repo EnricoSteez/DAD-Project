@@ -58,7 +58,7 @@ namespace Server
             UnlockConfirmation result = new UnlockConfirmation
             {
                 Ok = Local.UpdateSpecialPermission(new Resource(tuple.Id, tuple.Value))
-
+                //always true
             };
 
             return result;

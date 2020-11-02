@@ -1,26 +1,22 @@
-<Properties GitUserInfo="UsingGIT" StartupConfiguration="{6D05938E-97C7-4646-B9A5-F3D4C94B3940}|Default">
+﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{6D05938E-97C7-4646-B9A5-F3D4C94B3940}|Default">
   <MonoDevelop.Ide.ItemProperties.Server PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="Server/Program.cs" Line="228" Column="1" />
-      <File FileName="Server/ServerClientService.cs" Line="105" Column="57" />
-      <File FileName="Server/ServerServerService.cs" Line="65" Column="10" />
+      <File FileName="Server/Program.cs" Line="210" Column="10" />
+      <File FileName="Server/ServerClientService.cs" Line="107" Column="1" />
+      <File FileName="Server/ServerServerService.cs" Line="69" Column="1" />
+      <File FileName="Server/protos/ServerServerServices.proto" Line="8" Column="60" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="DAD-Project" expanded="True">
-            <Node name="Client" expanded="True">
-              <Node name="Dependencies" expanded="True" />
-            </Node>
-            <Node name="PuppetMaster" expanded="True" />
             <Node name="Server" expanded="True">
               <Node name="Dependencies" expanded="True">
                 <Node name="PackageDependencies" expanded="True" />
               </Node>
-              <Node name="protos" expanded="True">
-                <Node name="ServerServerServices.proto" selected="True" />
-              </Node>
+              <Node name="protos" expanded="True" />
+              <Node name="Program.cs" selected="True" />
             </Node>
           </Node>
         </State>
