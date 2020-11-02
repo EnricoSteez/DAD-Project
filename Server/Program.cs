@@ -234,10 +234,9 @@ namespace Server
                 {
                     //serverPool contains an entry for every other node in the system
                     //with its complete identity: ServerIdentification
-                    if(s2.Server_id != s.Server_id)
-                    {
-                        s.SystemNodes.Add(s2.Server_id, new ServerIdentification(s2.Server_id, s2.Partition_id, s2.Ip));
-                    }
+                    
+                    s.SystemNodes.Add(s2.Server_id, new ServerIdentification(s2.Server_id, s2.Partition_id, s2.Ip));
+                    
                     
                 }
             }
