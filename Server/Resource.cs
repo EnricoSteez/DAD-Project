@@ -7,12 +7,11 @@ namespace Server
         public string Value { get; }
         public bool Locked { get; set; }
 
-        public Resource(string id, string value)
+        public Resource(string objectId, string value)
         {
-            ObjectId = id;
+            ObjectId = objectId;
             Value = value;
             Locked = false;
         }
-
     }
 }

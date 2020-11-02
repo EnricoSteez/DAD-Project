@@ -30,7 +30,7 @@ namespace Server
 
             LockResponse response = new LockResponse
             {
-                Ok = Local.LockObject(request.ObjectId)
+                Ok = Local.LockObject(request.ObjectId, request.PartitionId)
             };
 
             return response;
@@ -51,13 +51,11 @@ namespace Server
             //here I'm sure I'm in the correct partition because this service is just for the master server
             //The master server of this partition is the only one that will ask for this
             //So I can just write in the dictionary without bothering
-            //*****  when a new value is updated, it is automatically set to unlocked  *****
-
-            
+            //*****  when a new value is updated through this function, it is automatically set to unlocked  *****
 
             UnlockConfirmation result = new UnlockConfirmation
             {
-                Ok = Local.UpdateSpecialPermission(new Resource(tuple.Id, tuple.Value))
+                Ok = Local.UpdateSpecialPermission(new Resource(tuple.Id, tuple.Value, tuple.WhoIsMaster))
                 //always true
             };
 
