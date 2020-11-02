@@ -57,7 +57,8 @@ namespace Server
 
             UnlockConfirmation result = new UnlockConfirmation
             {
-                Ok = true
+                Ok = Local.UnlockObject(tuple.Id)
+
             };
 
             return result;
