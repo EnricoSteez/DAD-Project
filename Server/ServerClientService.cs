@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -7,8 +8,6 @@ using Server.protos;
 namespace Server
 {
     /*************************************** SERVICES FOR CLIENTS ***************************************/
-
-    
 
     public class ServerClientService : ServerStorageServices.ServerStorageServicesBase
     {
@@ -26,17 +25,17 @@ namespace Server
         public override Task<ReadObjectResponse> ReadObject(ReadObjectRequest request,
             ServerCallContext context)
         {
-            Console.WriteLine("Client " + context.Host + "Asked for something");
+            Console.WriteLine("Client " + context.Host + " wants to READ {0} from Partition {1}",
+                request.ObjectId, request.PartitionId);
+            int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
+            Console.WriteLine("Client served in {0} seconds", waitTime);
+            Thread.Sleep(waitTime * 1000);
             return Task.FromResult(RO(request));
 
         }
 
-        //TODO implement waiting mechanism until resource "Lock" flag is false
         private ReadObjectResponse RO(ReadObjectRequest request)
         {
-            Console.WriteLine("He wants object with ID: " + request.ObjectId +
-                " from partition " + request.PartitionId);
-
             ReadObjectResponse response = new ReadObjectResponse
             {
                 Value = Local.RetrieveObject(request.ObjectId)
@@ -51,16 +50,17 @@ namespace Server
         public override Task<WriteObjectResponse> WriteObject(WriteObjectRequest request,
             ServerCallContext context)
         {
-            //the client takes care of connecting to the master server of the correct partition before writing
-            //No reason to check here
+            Console.WriteLine("Client " + context.Host + " wants to write {0}", request.ObjectId);
+            int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
+            Console.WriteLine("Client served in {0} seconds", waitTime);
+            Thread.Sleep(waitTime * 1000);
             return Task.FromResult(WO(request));
 
         }
 
         private WriteObjectResponse WO(WriteObjectRequest request)
         {
-            //Send lock request for the target object to all other nodes in the pool part of this own server's partition
-
+            
             foreach (string id in Local.SystemNodes.Keys)
             {
                 Local.SystemNodes.TryGetValue(id, out ServerIdentification sampleServer);
@@ -120,7 +120,7 @@ namespace Server
                     
                 }
 
-                //TODO WAIT FOR ALL CONFIRMATIONS?
+                //TODO WAIT FOR ALL CONFIRMATIONS?    
             }
 
             return response;
