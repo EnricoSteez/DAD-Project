@@ -23,8 +23,6 @@ namespace PuppetMaster
 
         private static PuppetMasterServices.PuppetMasterServicesClient PuppetMasterServicesClient()
         {
-            
-            
             res = new  ("http://localhost:" + 10000);
         }
 

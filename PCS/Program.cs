@@ -2,6 +2,7 @@
 using Server;
 using Server.protos;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace PCS
 
         public static void ThreadProc()
         {
-            Server.Program.Main(new string[0]);
+            //Server.Program.Main(new string[0]);
         }
 
         public override Task<ServerResponseObject> ServerRequest(ServerRequestObject request, ServerCallContext context)
@@ -26,7 +27,8 @@ namespace PCS
     {
         static void Main(string[] args)
         {
-            PuppetMasterServices.PuppetMasterServicesBase
+            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe", "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\Client\\test.txt");
+            //PuppetMasterServices.PuppetMasterServicesBase
             Console.WriteLine("Hello World!");
         }
     }
