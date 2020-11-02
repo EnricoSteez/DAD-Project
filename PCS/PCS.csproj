@@ -20,7 +20,4 @@
 	<ItemGroup>
 		<Folder Include="protos\" />
 	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\Server\Server.csproj" />
-	</ItemGroup>
 </Project>

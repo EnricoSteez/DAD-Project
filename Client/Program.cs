@@ -76,6 +76,7 @@ namespace Client
 
         static void Main(string[] args)
         {
+            Console.WriteLine(args);
             int counter = 0;
             string line;
 
