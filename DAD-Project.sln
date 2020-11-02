@@ -1,11 +1,14 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{6D05938E-97C7-4646-B9A5-F3D4C94B3940}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{6D05938E-97C7-4646-B9A5-F3D4C94B3940}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{249FF2DE-930F-413D-BE6F-FF112F85EE21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{249FF2DE-930F-413D-BE6F-FF112F85EE21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuppetMaster", "PuppetMaster\PuppetMaster.csproj", "{D8846E82-297F-40F1-9B62-F22B9AD9255E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuppetMaster", "PuppetMaster\PuppetMaster.csproj", "{D8846E82-297F-40F1-9B62-F22B9AD9255E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCS", "PCS\PCS.csproj", "{FC8127A3-36F0-4F22-967C-3596D71EF8EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,5 +28,15 @@ Global
 		{D8846E82-297F-40F1-9B62-F22B9AD9255E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8846E82-297F-40F1-9B62-F22B9AD9255E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8846E82-297F-40F1-9B62-F22B9AD9255E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC8127A3-36F0-4F22-967C-3596D71EF8EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC8127A3-36F0-4F22-967C-3596D71EF8EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC8127A3-36F0-4F22-967C-3596D71EF8EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC8127A3-36F0-4F22-967C-3596D71EF8EC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F5828314-88C4-4FB9-8B25-ACB75861223C}
 	EndGlobalSection
 EndGlobal

@@ -42,69 +42,69 @@ namespace Server.protos {
       return parser.ParseFrom(context.PayloadAsNewBuffer());
     }
 
-    static readonly grpc::Marshaller<global::Server.protos.ServerRequest> __Marshaller_ServerRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ServerRequest.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.ServerResponse> __Marshaller_ServerResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ServerResponse.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.PartitionRequest> __Marshaller_PartitionRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.PartitionRequest.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.PartitionResponse> __Marshaller_PartitionResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.PartitionResponse.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.StatusRequest> __Marshaller_StatusRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.StatusRequest.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.StatusResponse> __Marshaller_StatusResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.StatusResponse.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.ClientRequest> __Marshaller_ClientRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ClientRequest.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.ClientResponse> __Marshaller_ClientResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ClientResponse.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.CrashRequest> __Marshaller_CrashRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.CrashRequest.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.CrashResponse> __Marshaller_CrashResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.CrashResponse.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.FreezeRequest> __Marshaller_FreezeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.FreezeRequest.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.FreezeResponse> __Marshaller_FreezeResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.FreezeResponse.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.UnfreezeRequest> __Marshaller_UnfreezeRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.UnfreezeRequest.Parser));
-    static readonly grpc::Marshaller<global::Server.protos.UnfreezeResponse> __Marshaller_UnfreezeResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.UnfreezeResponse.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.ServerRequestObject> __Marshaller_ServerRequestObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ServerRequestObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.ServerResponseObject> __Marshaller_ServerResponseObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ServerResponseObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.PartitionRequestObject> __Marshaller_PartitionRequestObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.PartitionRequestObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.PartitionResponseObject> __Marshaller_PartitionResponseObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.PartitionResponseObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.StatusRequestObject> __Marshaller_StatusRequestObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.StatusRequestObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.StatusResponseObject> __Marshaller_StatusResponseObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.StatusResponseObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.ClientRequestObject> __Marshaller_ClientRequestObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ClientRequestObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.ClientResponseObject> __Marshaller_ClientResponseObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.ClientResponseObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.CrashRequestObject> __Marshaller_CrashRequestObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.CrashRequestObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.CrashResponseObject> __Marshaller_CrashResponseObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.CrashResponseObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.FreezeRequestObject> __Marshaller_FreezeRequestObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.FreezeRequestObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.FreezeResponseObject> __Marshaller_FreezeResponseObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.FreezeResponseObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.UnfreezeRequestObject> __Marshaller_UnfreezeRequestObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.UnfreezeRequestObject.Parser));
+    static readonly grpc::Marshaller<global::Server.protos.UnfreezeResponseObject> __Marshaller_UnfreezeResponseObject = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Server.protos.UnfreezeResponseObject.Parser));
 
-    static readonly grpc::Method<global::Server.protos.ServerRequest, global::Server.protos.ServerResponse> __Method_Server = new grpc::Method<global::Server.protos.ServerRequest, global::Server.protos.ServerResponse>(
+    static readonly grpc::Method<global::Server.protos.ServerRequestObject, global::Server.protos.ServerResponseObject> __Method_ServerRequest = new grpc::Method<global::Server.protos.ServerRequestObject, global::Server.protos.ServerResponseObject>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Server",
-        __Marshaller_ServerRequest,
-        __Marshaller_ServerResponse);
+        "ServerRequest",
+        __Marshaller_ServerRequestObject,
+        __Marshaller_ServerResponseObject);
 
-    static readonly grpc::Method<global::Server.protos.PartitionRequest, global::Server.protos.PartitionResponse> __Method_Partition = new grpc::Method<global::Server.protos.PartitionRequest, global::Server.protos.PartitionResponse>(
+    static readonly grpc::Method<global::Server.protos.PartitionRequestObject, global::Server.protos.PartitionResponseObject> __Method_PartitionRequest = new grpc::Method<global::Server.protos.PartitionRequestObject, global::Server.protos.PartitionResponseObject>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Partition",
-        __Marshaller_PartitionRequest,
-        __Marshaller_PartitionResponse);
+        "PartitionRequest",
+        __Marshaller_PartitionRequestObject,
+        __Marshaller_PartitionResponseObject);
 
-    static readonly grpc::Method<global::Server.protos.StatusRequest, global::Server.protos.StatusResponse> __Method_Status = new grpc::Method<global::Server.protos.StatusRequest, global::Server.protos.StatusResponse>(
+    static readonly grpc::Method<global::Server.protos.StatusRequestObject, global::Server.protos.StatusResponseObject> __Method_StatusRequest = new grpc::Method<global::Server.protos.StatusRequestObject, global::Server.protos.StatusResponseObject>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Status",
-        __Marshaller_StatusRequest,
-        __Marshaller_StatusResponse);
+        "StatusRequest",
+        __Marshaller_StatusRequestObject,
+        __Marshaller_StatusResponseObject);
 
-    static readonly grpc::Method<global::Server.protos.ClientRequest, global::Server.protos.ClientResponse> __Method_Client = new grpc::Method<global::Server.protos.ClientRequest, global::Server.protos.ClientResponse>(
+    static readonly grpc::Method<global::Server.protos.ClientRequestObject, global::Server.protos.ClientResponseObject> __Method_ClientRequest = new grpc::Method<global::Server.protos.ClientRequestObject, global::Server.protos.ClientResponseObject>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Client",
-        __Marshaller_ClientRequest,
-        __Marshaller_ClientResponse);
+        "ClientRequest",
+        __Marshaller_ClientRequestObject,
+        __Marshaller_ClientResponseObject);
 
-    static readonly grpc::Method<global::Server.protos.CrashRequest, global::Server.protos.CrashResponse> __Method_Crash = new grpc::Method<global::Server.protos.CrashRequest, global::Server.protos.CrashResponse>(
+    static readonly grpc::Method<global::Server.protos.CrashRequestObject, global::Server.protos.CrashResponseObject> __Method_CrashRequest = new grpc::Method<global::Server.protos.CrashRequestObject, global::Server.protos.CrashResponseObject>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Crash",
-        __Marshaller_CrashRequest,
-        __Marshaller_CrashResponse);
+        "CrashRequest",
+        __Marshaller_CrashRequestObject,
+        __Marshaller_CrashResponseObject);
 
-    static readonly grpc::Method<global::Server.protos.FreezeRequest, global::Server.protos.FreezeResponse> __Method_Freeze = new grpc::Method<global::Server.protos.FreezeRequest, global::Server.protos.FreezeResponse>(
+    static readonly grpc::Method<global::Server.protos.FreezeRequestObject, global::Server.protos.FreezeResponseObject> __Method_FreezeRequest = new grpc::Method<global::Server.protos.FreezeRequestObject, global::Server.protos.FreezeResponseObject>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Freeze",
-        __Marshaller_FreezeRequest,
-        __Marshaller_FreezeResponse);
+        "FreezeRequest",
+        __Marshaller_FreezeRequestObject,
+        __Marshaller_FreezeResponseObject);
 
-    static readonly grpc::Method<global::Server.protos.UnfreezeRequest, global::Server.protos.UnfreezeResponse> __Method_Unfreeze = new grpc::Method<global::Server.protos.UnfreezeRequest, global::Server.protos.UnfreezeResponse>(
+    static readonly grpc::Method<global::Server.protos.UnfreezeRequestObject, global::Server.protos.UnfreezeResponseObject> __Method_UnfreezeRequest = new grpc::Method<global::Server.protos.UnfreezeRequestObject, global::Server.protos.UnfreezeResponseObject>(
         grpc::MethodType.Unary,
         __ServiceName,
-        "Unfreeze",
-        __Marshaller_UnfreezeRequest,
-        __Marshaller_UnfreezeResponse);
+        "UnfreezeRequest",
+        __Marshaller_UnfreezeRequestObject,
+        __Marshaller_UnfreezeResponseObject);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -135,117 +135,117 @@ namespace Server.protos {
       {
       }
 
-      public virtual global::Server.protos.ServerResponse Server(global::Server.protos.ServerRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Server.protos.ServerResponseObject ServerRequest(global::Server.protos.ServerRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Server(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return ServerRequest(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual global::Server.protos.ServerResponse Server(global::Server.protos.ServerRequest request, grpc::CallOptions options)
+      public virtual global::Server.protos.ServerResponseObject ServerRequest(global::Server.protos.ServerRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Server, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_ServerRequest, null, options, request);
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.ServerResponse> ServerAsync(global::Server.protos.ServerRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ServerResponseObject> ServerRequestAsync(global::Server.protos.ServerRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return ServerAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return ServerRequestAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.ServerResponse> ServerAsync(global::Server.protos.ServerRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ServerResponseObject> ServerRequestAsync(global::Server.protos.ServerRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Server, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_ServerRequest, null, options, request);
       }
-      public virtual global::Server.protos.PartitionResponse Partition(global::Server.protos.PartitionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Server.protos.PartitionResponseObject PartitionRequest(global::Server.protos.PartitionRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Partition(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return PartitionRequest(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual global::Server.protos.PartitionResponse Partition(global::Server.protos.PartitionRequest request, grpc::CallOptions options)
+      public virtual global::Server.protos.PartitionResponseObject PartitionRequest(global::Server.protos.PartitionRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Partition, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_PartitionRequest, null, options, request);
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.PartitionResponse> PartitionAsync(global::Server.protos.PartitionRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.PartitionResponseObject> PartitionRequestAsync(global::Server.protos.PartitionRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return PartitionAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return PartitionRequestAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.PartitionResponse> PartitionAsync(global::Server.protos.PartitionRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.PartitionResponseObject> PartitionRequestAsync(global::Server.protos.PartitionRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Partition, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_PartitionRequest, null, options, request);
       }
-      public virtual global::Server.protos.StatusResponse Status(global::Server.protos.StatusRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Server.protos.StatusResponseObject StatusRequest(global::Server.protos.StatusRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Status(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return StatusRequest(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual global::Server.protos.StatusResponse Status(global::Server.protos.StatusRequest request, grpc::CallOptions options)
+      public virtual global::Server.protos.StatusResponseObject StatusRequest(global::Server.protos.StatusRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Status, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_StatusRequest, null, options, request);
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.StatusResponse> StatusAsync(global::Server.protos.StatusRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.StatusResponseObject> StatusRequestAsync(global::Server.protos.StatusRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return StatusAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return StatusRequestAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.StatusResponse> StatusAsync(global::Server.protos.StatusRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.StatusResponseObject> StatusRequestAsync(global::Server.protos.StatusRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Status, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_StatusRequest, null, options, request);
       }
-      public virtual global::Server.protos.ClientResponse Client(global::Server.protos.ClientRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Server.protos.ClientResponseObject ClientRequest(global::Server.protos.ClientRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Client(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return ClientRequest(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual global::Server.protos.ClientResponse Client(global::Server.protos.ClientRequest request, grpc::CallOptions options)
+      public virtual global::Server.protos.ClientResponseObject ClientRequest(global::Server.protos.ClientRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Client, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_ClientRequest, null, options, request);
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.ClientResponse> ClientAsync(global::Server.protos.ClientRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ClientResponseObject> ClientRequestAsync(global::Server.protos.ClientRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return ClientAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return ClientRequestAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.ClientResponse> ClientAsync(global::Server.protos.ClientRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.ClientResponseObject> ClientRequestAsync(global::Server.protos.ClientRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Client, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_ClientRequest, null, options, request);
       }
-      public virtual global::Server.protos.CrashResponse Crash(global::Server.protos.CrashRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Server.protos.CrashResponseObject CrashRequest(global::Server.protos.CrashRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Crash(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return CrashRequest(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual global::Server.protos.CrashResponse Crash(global::Server.protos.CrashRequest request, grpc::CallOptions options)
+      public virtual global::Server.protos.CrashResponseObject CrashRequest(global::Server.protos.CrashRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Crash, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_CrashRequest, null, options, request);
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.CrashResponse> CrashAsync(global::Server.protos.CrashRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.CrashResponseObject> CrashRequestAsync(global::Server.protos.CrashRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return CrashAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return CrashRequestAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.CrashResponse> CrashAsync(global::Server.protos.CrashRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.CrashResponseObject> CrashRequestAsync(global::Server.protos.CrashRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Crash, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_CrashRequest, null, options, request);
       }
-      public virtual global::Server.protos.FreezeResponse Freeze(global::Server.protos.FreezeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Server.protos.FreezeResponseObject FreezeRequest(global::Server.protos.FreezeRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Freeze(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return FreezeRequest(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual global::Server.protos.FreezeResponse Freeze(global::Server.protos.FreezeRequest request, grpc::CallOptions options)
+      public virtual global::Server.protos.FreezeResponseObject FreezeRequest(global::Server.protos.FreezeRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Freeze, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_FreezeRequest, null, options, request);
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.FreezeResponse> FreezeAsync(global::Server.protos.FreezeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.FreezeResponseObject> FreezeRequestAsync(global::Server.protos.FreezeRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return FreezeAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return FreezeRequestAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.FreezeResponse> FreezeAsync(global::Server.protos.FreezeRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.FreezeResponseObject> FreezeRequestAsync(global::Server.protos.FreezeRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Freeze, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_FreezeRequest, null, options, request);
       }
-      public virtual global::Server.protos.UnfreezeResponse Unfreeze(global::Server.protos.UnfreezeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual global::Server.protos.UnfreezeResponseObject UnfreezeRequest(global::Server.protos.UnfreezeRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return Unfreeze(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return UnfreezeRequest(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual global::Server.protos.UnfreezeResponse Unfreeze(global::Server.protos.UnfreezeRequest request, grpc::CallOptions options)
+      public virtual global::Server.protos.UnfreezeResponseObject UnfreezeRequest(global::Server.protos.UnfreezeRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.BlockingUnaryCall(__Method_Unfreeze, null, options, request);
+        return CallInvoker.BlockingUnaryCall(__Method_UnfreezeRequest, null, options, request);
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.UnfreezeResponse> UnfreezeAsync(global::Server.protos.UnfreezeRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.UnfreezeResponseObject> UnfreezeRequestAsync(global::Server.protos.UnfreezeRequestObject request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
-        return UnfreezeAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+        return UnfreezeRequestAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
       }
-      public virtual grpc::AsyncUnaryCall<global::Server.protos.UnfreezeResponse> UnfreezeAsync(global::Server.protos.UnfreezeRequest request, grpc::CallOptions options)
+      public virtual grpc::AsyncUnaryCall<global::Server.protos.UnfreezeResponseObject> UnfreezeRequestAsync(global::Server.protos.UnfreezeRequestObject request, grpc::CallOptions options)
       {
-        return CallInvoker.AsyncUnaryCall(__Method_Unfreeze, null, options, request);
+        return CallInvoker.AsyncUnaryCall(__Method_UnfreezeRequest, null, options, request);
       }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       protected override PuppetMasterServicesClient NewInstance(ClientBaseConfiguration configuration)

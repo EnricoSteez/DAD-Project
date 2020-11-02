@@ -117,10 +117,10 @@ namespace Server
 
     
 
-    class Program
+    public class Program
     { 
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Server local = new Server("1", "A", true, "127.0.0.1");
             Server anotherOne = new Server("2", "A", false, "127.0.0.1");

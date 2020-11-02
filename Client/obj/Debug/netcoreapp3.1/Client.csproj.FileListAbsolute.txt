@@ -48,3 +48,4 @@ D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.
 D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.dll
 D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.pdb
 D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.genruntimeconfig.cache
+D:\Users\almof\Documents\MEIC\DAD-Project\Client\obj\Debug\netcoreapp3.1\Client.csprojAssemblyReference.cache

@@ -1,0 +1,4 @@
+D:\Users\almof\Documents\MEIC\DAD-Project\PCS\obj\Debug\netcoreapp3.1\PCS.csprojAssemblyReference.cache
+D:\Users\almof\Documents\MEIC\DAD-Project\PCS\obj\Debug\netcoreapp3.1\PCS.AssemblyInfoInputs.cache
+D:\Users\almof\Documents\MEIC\DAD-Project\PCS\obj\Debug\netcoreapp3.1\PCS.AssemblyInfo.cs
+D:\Users\almof\Documents\MEIC\DAD-Project\PCS\obj\Debug\netcoreapp3.1\PCS.csproj.CoreCompileInputs.cache
