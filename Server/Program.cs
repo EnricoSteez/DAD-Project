@@ -65,6 +65,10 @@ namespace Server
             else
             {
                 Storage.Add(id, value);
+                //just in case someone is passing a locked resource
+                Monitor.Enter(Storage[id]);
+                Storage[id].Locked = false;
+                Monitor.Exit(Storage[id]);
             }
 
             return 0;

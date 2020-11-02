@@ -1,10 +1,10 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{6D05938E-97C7-4646-B9A5-F3D4C94B3940}|Default">
   <MonoDevelop.Ide.ItemProperties.Server PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Server/ServerServerService.cs">
     <Files>
-      <File FileName="Server/Program.cs" Line="121" Column="52" IsPinned="True" />
-      <File FileName="Server/protos/ServerClientServices.proto" Line="38" Column="2" />
-      <File FileName="Server/ServerServerService.cs" Line="13" Column="37" />
+      <File FileName="Server/Program.cs" Line="129" Column="62" IsPinned="True" />
+      <File FileName="Server/protos/ServerClientServices.proto" />
+      <File FileName="Server/ServerServerService.cs" Line="54" Column="63" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
