@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks.Dataflow;
+using Grpc.Net.Client;
 
 namespace PuppetMaster
 
@@ -19,22 +20,44 @@ namespace PuppetMaster
     class PuppetMaster
     {
 
-        // Start with server setup (server and Partition commands)
 
+        private static PuppetMasterServices.PuppetMasterServicesClient PuppetMasterServicesClient()
+        {
+            
+            
+            res = new  ("http://localhost:" + 10000);
+        }
 
+        private static List<string> TransformCommands(List<string> loopCommands, int reps)
+        {
+            List<string> commands = new List<string>();
+            for(int i = reps; i > 0; i--)
+            {
+                foreach (string s in loopCommands)
+                {
+                    commands.Add(Regex.Replace(s, @"\$i", i.ToString(), RegexOptions.None));
+                }
+            }
+            return commands;
+        }
 
-
-        // Make Pm able to read a sequence of commands from a Script fileand execute them
-        // don't forget 'Wait x_ms' command
-
-
+        private static string GetElement(List<string> commands)
+        {
+            if(commands.Count == 0)
+            {
+                return null;
+            }
+            string res = commands[0];
+            commands.RemoveAt(0);
+            return res;
+        }
 
 
 
         static void Main(string[] args)
         {
-
-            /*int counter = 0;
+            
+            int counter = 0;
             string line;
 
             List<string> loopCommands = new List<string>();
@@ -65,9 +88,10 @@ namespace PuppetMaster
                         }
                         else
                         {
-
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
+                // Script starts with Server setup (Server and Partition commands)
                     // create server process
                     case "server":
                         if (words.Length == 5 && int.TryParse(words[3], out minDelay) && int.TryParse(words[4], out maxDelay))
@@ -82,7 +106,7 @@ namespace PuppetMaster
                         }
                         else
                         {
-
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
                     // configure system to store partition on given servers
@@ -95,7 +119,7 @@ namespace PuppetMaster
                         }
                         else
                         {
-
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
                     // create client process
@@ -109,7 +133,7 @@ namespace PuppetMaster
                         }
                         else
                         {
-
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
                     // all nodes print current status
@@ -120,7 +144,7 @@ namespace PuppetMaster
                         }
                         else
                         {
-
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
 
@@ -133,7 +157,7 @@ namespace PuppetMaster
                         }
                         else
                         {
-
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
                     // simulate delay in process (stops processing messages until unfreeze received)
@@ -144,7 +168,7 @@ namespace PuppetMaster
                         }
                         else
                         {
-
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
                     // process back to normal operation
@@ -155,7 +179,21 @@ namespace PuppetMaster
                         }
                         else
                         {
+                            Console.WriteLine("Wrong number of arguments!");
+                        }
+                        break;
 
+                                        
+                    case "wait":
+                        int ms
+                        if (words.Length == 2 && int.TryParse(words[1], out ms)
+                        {
+                            Thread.Sleep(ms);
+                            Console.WriteLine("Waiting {0} ms", words[1]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Wrong number of arguments!");
                         }
                         break;
                     default:
@@ -164,8 +202,7 @@ namespace PuppetMaster
                 }
 
             }
-            */
-        }
+            }
     }
 }
             

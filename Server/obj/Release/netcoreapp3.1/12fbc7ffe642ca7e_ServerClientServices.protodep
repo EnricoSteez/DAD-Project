@@ -1,0 +1,2 @@
+obj\Release\netcoreapp3.1\protos/ServerClientServices.cs \
+obj\Release\netcoreapp3.1\protos/ServerClientServicesGrpc.cs: protos/ServerClientServices.proto
