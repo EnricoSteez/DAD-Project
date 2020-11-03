@@ -38,7 +38,7 @@ namespace Server
 
 
 
-        //-------------------- SERVER SIDE UPDATE OWN VALUE AND CONFIRM TO THE MASTER -------------------- >> ??? ASK
+        //-------------------- SERVER SIDE UPDATE OWN VALUE AND CONFIRM TO THE MASTER --------------------
 
 
         public override Task<UnlockConfirmation> UpdateValue(UpdateValueRequest tuple, ServerCallContext context)
@@ -62,5 +62,30 @@ namespace Server
             return result;
         }
 
+
+
+
+
+        //-------------------- SERVER SIDE SEND INFO ABOUT PARTITION AND RESOURCES --------------------
+        public override Task<SendInfoResponse> SendInfo(SendInfoRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(SI(request));
+        }
+
+        private SendInfoResponse SI(SendInfoRequest request)
+        {
+            SendInfoResponse response = new SendInfoResponse();
+
+            foreach(Partition p in Local.Storage.Values)
+            {
+                response.Partitions.Add(p.Id);
+                foreach(Resource r in p.Elements.Values)
+                {
+                    response.Objects.Add(r.ObjectId);
+                }
+            }
+
+            return response;
+        }
     }
 }
