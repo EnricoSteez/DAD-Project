@@ -62,10 +62,11 @@ namespace Server
 
         }
 
-        private async WriteObjectResponse WO(WriteObjectRequest request)
+        private WriteObjectResponse WO(WriteObjectRequest request)
         {
             List<Task> tasks = new System.Collections.Generic.List<Task>();
             Task requests = null;
+            int failed = 0;
             if (Local.Storage.ContainsKey(request.PartitionId))
             {
                 //here I check if the object the clients wants to write is already stored in this partition or not
@@ -99,9 +100,12 @@ namespace Server
                                 tasks.Add(Task.Run(() => {
                                     try
                                     {
-                                        LockResponse l = client.LockResourceService(req);
+                                        LockResponse l = client.LockResourceService(req, deadline: DateTime.UtcNow.AddSeconds(5));
                                     }
-                                    catch { 
+                                    catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+                                    {
+                                        Interlocked.Increment(ref failed);
+                                        Console.WriteLine("Timeout.");
                                     }
                                 })) ;
                                     
@@ -112,6 +116,17 @@ namespace Server
                 }
 
                 requests.Wait();
+                if (requests.Status == TaskStatus.RanToCompletion)
+                    Console.WriteLine("All lock requests succeeded.");
+                else if (requests.Status == TaskStatus.Faulted)
+                    Console.WriteLine("{0} lock requests timed out", failed);
+
+
+                tasks.Clear();
+
+                requests = null;
+                failed = 0;
+
                 WriteObjectResponse response = new WriteObjectResponse
                 {
                     /*
@@ -148,13 +163,30 @@ namespace Server
                             ServerCoordinationServices.ServerCoordinationServicesClient client =
                                 new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
 
-                            client.UpdateValue(valueToUpdate);
+                            tasks.Add(Task.Run(() => {
+                                try
+                                {
+                                    UnlockConfirmation l = client.UpdateValue(valueToUpdate, deadline: DateTime.UtcNow.AddSeconds(5));
+                                }
+                                catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+                                {
+                                    Interlocked.Increment(ref failed);
+                                    Console.WriteLine("Timeout.");
+                                }
+                            }));
 
-                        }
-
-                        //TODO WAIT FOR ALL CONFIRMATIONS?  
+                        }   
                     }
+
                 }
+                requests = Task.WhenAll(tasks);
+
+                requests.Wait();
+
+                if (requests.Status == TaskStatus.RanToCompletion)
+                    Console.WriteLine("All unlock requests succeeded.");
+                else if (requests.Status == TaskStatus.Faulted)
+                    Console.WriteLine("{0} unlock requests timed out", failed);
 
                 return response;
             }
