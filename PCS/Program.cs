@@ -35,10 +35,16 @@ namespace PCS
     {
         static void Main(string[] args)
         {
-            PuppetMasterServices.PuppetMasterServicesBase.ClientRequest();
-            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe", "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\Client\\test.txt");
-            //PuppetMasterServices.PuppetMasterServicesBase
-            Console.WriteLine("Hello World!");
+            Grpc.Core.Server server = new Grpc.Core.Server
+            {
+                Services =
+                {
+                    PuppetMasterServices.BindService(new PCSServerService())
+                },
+                Ports = { new ServerPort("localhost", 10000, ServerCredentials.Insecure) }
+            };
+
+            server.Start();
         }
     }
 }

@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
+using Microsoft.AspNetCore.Http.Features;
 using Server.protos;
 
 namespace Server
@@ -58,8 +62,10 @@ namespace Server
 
         }
 
-        private WriteObjectResponse WO(WriteObjectRequest request)
+        private async WriteObjectResponse WO(WriteObjectRequest request)
         {
+            List<Task> tasks = new System.Collections.Generic.List<Task>();
+            Task requests = null;
             if (Local.Storage.ContainsKey(request.PartitionId))
             {
                 //here I check if the object the clients wants to write is already stored in this partition or not
@@ -90,15 +96,22 @@ namespace Server
                                     PartitionId = request.PartitionId
                                 };
 
-                                client.LockResourceService(req);
+                                tasks.Add(Task.Run(() => {
+                                    try
+                                    {
+                                        LockResponse l = client.LockResourceService(req);
+                                    }
+                                    catch { 
+                                    }
+                                })) ;
+                                    
                             }
                         }
-
-                        //TODO WAIT FOR ALL RESPONSES?
-
                     }
+                    requests = Task.WhenAll(tasks);
                 }
 
+                requests.Wait();
                 WriteObjectResponse response = new WriteObjectResponse
                 {
                     /*
