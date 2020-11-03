@@ -157,7 +157,7 @@ namespace Server
                         if (request.PartitionId == part && Local.Server_id != sampleServer.Id)
                         {
                             GrpcChannel channel = GrpcChannel.ForAddress(
-                                sampleServer.Ip + ":" + (1000 + int.Parse(id)).ToString());
+                                sampleServer.Ip + ":" + (1000 + int.Parse(sampleServer.Id)).ToString());
 
 
                             ServerCoordinationServices.ServerCoordinationServicesClient client =
@@ -167,6 +167,8 @@ namespace Server
                                 try
                                 {
                                     UnlockConfirmation l = client.UpdateValue(valueToUpdate, deadline: DateTime.UtcNow.AddSeconds(5));
+                                    channel.ShutdownAsync();
+
                                 }
                                 catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
                                 {
@@ -191,7 +193,7 @@ namespace Server
                 return response;
             }
 
-            return null;
+            return new WriteObjectResponse { WriteResult = -1 };
         }
 
 
@@ -237,6 +239,24 @@ namespace Server
                 //in our structure, no server has knowledge of the objects stored in other servers
                 //all a server knows about other nodes is the ServerIdentification mask
                 //which contains Server ID, stored PartitionIDs and IP Address.
+
+
+                foreach(ServerIdentification server in Local.SystemNodes.Values)
+                {
+                    GrpcChannel channel = GrpcChannel.ForAddress(
+                                server.Ip + ":" + (1000 + int.Parse(server.Id)).ToString());
+
+
+                    ServerCoordinationServices.ServerCoordinationServicesClient client =
+                        new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
+
+                    SendInfoResponse res = client.SendInfo(new SendInfoRequest());
+
+                    response.Partitions.Add(res.Partitions);
+                    response.Objects.Add(res.Objects);
+
+                    channel.ShutdownAsync();
+                }
             }
 
             return response;

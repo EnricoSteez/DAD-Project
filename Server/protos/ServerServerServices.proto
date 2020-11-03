@@ -6,6 +6,7 @@ option csharp_namespace = "Server.protos";
 service ServerCoordinationServices {
     rpc LockResourceService (LockRequest) returns (LockResponse) {}
     rpc UpdateValue (UpdateValueRequest) returns (UnlockConfirmation) {}
+    rpc SendInfo (SendInfoRequest) returns (SendInfoResponse) {}
 }
 
 message LockRequest{
@@ -25,4 +26,13 @@ message UpdateValueRequest{
 
 message UnlockConfirmation{
     bool ok = 1;
+}
+
+message SendInfoRequest{
+
+}
+
+message SendInfoResponse{
+    repeated string partitions = 1;
+    repeated string objects = 2;
 }
