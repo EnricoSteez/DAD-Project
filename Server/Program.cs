@@ -16,6 +16,7 @@ namespace Server
         public  IPAddress Ip { get; }
         public int MinDelay;
         public int MaxDelay;
+        private List<string> _isMasterOf;
 
 
         public Server() //dummy implementation for debugging with just 1 server at localhost
@@ -26,6 +27,7 @@ namespace Server
             Storage = new Dictionary<string, Partition>();
             //empty dictionary at startup
             SystemNodes = new Dictionary<string, ServerIdentification>();
+            _isMasterOf = new List<string>();
         }
 
         public Server(string server_id, string ip, int minDelay, int maxDelay)
@@ -36,6 +38,7 @@ namespace Server
             SystemNodes = new Dictionary<string, ServerIdentification>();
             MinDelay = minDelay;
             MaxDelay = maxDelay;
+            _isMasterOf = new List<string>();
         }
 
         internal int AddObject(Resource newValue, string partitionId)
@@ -269,6 +272,12 @@ namespace Server
             Storage.Add(p.Id, p);
 
             Monitor.Exit(Storage);
+
+            if (p.MasterId == Server_id)
+            {
+                _isMasterOf.Add(p.Id);
+            }
+            
         }
     }
 
@@ -281,14 +290,20 @@ namespace Server
             Partition B = new Partition("B", "2");
             Partition C = new Partition("C", "3");
 
-            Server local = new Server("1","127.0.0.1",0,0);
+            Server first = new Server("1","127.0.0.1",0,0);
             Server anotherOne = new Server("1", "127.0.0.1", 0, 0);
 
+            first.AddPartition(A);
+            first.AddPartition(B);
+            first.AddPartition(C);
 
+            anotherOne.AddPartition(A);
+            anotherOne.AddPartition(B);
+            anotherOne.AddPartition(C);
 
             List<Server> servers = new List<Server>
             {
-                { local },
+                { first },
                 { anotherOne }
             };
 
@@ -309,11 +324,11 @@ namespace Server
             {
                 Services =
                 {
-                    ServerStorageServices.BindService(new ServerClientService(local)),
-                    ServerCoordinationServices.BindService(new ServerServerService(local))
+                    ServerStorageServices.BindService(new ServerClientService(first)),
+                    ServerCoordinationServices.BindService(new ServerServerService(first))
                 },
 
-                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(local.Server_id), ServerCredentials.Insecure) }
+                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(first.Server_id), ServerCredentials.Insecure) }
             };
 
             server.Start();
