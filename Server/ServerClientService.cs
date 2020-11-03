@@ -148,5 +148,53 @@ namespace Server
 
             return null;
         }
+
+
+        public override Task<ListServerResponse> ListServer(ListServerRequest request, ServerCallContext context)
+        {
+            int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
+            Thread.Sleep(waitTime * 1000);
+            return Task.FromResult(LS(request));
+        }
+
+        private ListServerResponse LS(ListServerRequest request)
+        {
+            ListServerResponse response = new ListServerResponse();
+            foreach(Partition p in Local.Storage.Values)
+            {
+                //if this server is master of a partition, then it's also master of all the resources of the partition
+                bool isMaster = p.MasterId.Equals(Local.Server_id);
+                
+                foreach (Resource resource in p.Elements.Values)
+                {
+                    response.StoredObjects.Add(resource.ObjectId);
+                    response.IsMasterReplica.Add(isMaster);
+                }
+            }
+
+            return response;
+        }
+
+        public override Task<ListGlobalResponse> ListGlobal(ListGlobalRequest request, ServerCallContext context)
+        {
+            int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
+            Thread.Sleep(waitTime * 1000);
+            return Task.FromResult(LG(request));
+        }
+
+        private ListGlobalResponse LG(ListGlobalRequest request)
+        {
+            ListGlobalResponse response = new ListGlobalResponse();
+            
+            foreach(ServerIdentification s in Local.SystemNodes.Values)
+            {
+                //TODO make a service among servers to retrieve informations on demand only if it's necessary
+                //in our structure, no server has knowledge of the objects stored in other servers
+                //all a server knows about other nodes is the ServerIdentification mask
+                //which contains Server ID, stored PartitionIDs and IP Address.
+            }
+
+            return response;
+        }
     }
 }
