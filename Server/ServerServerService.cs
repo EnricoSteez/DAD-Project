@@ -6,7 +6,7 @@ using Server.protos;
 namespace Server
 {
     /*************************************** SERVICES AMONG SERVERS ***************************************/
-    /***************************************    SERVER SIDE    ***************************************/
+    /***************************************    (SERVER SIDE)    ***************************************/
 
     public class ServerServerService : ServerCoordinationServices.ServerCoordinationServicesBase
     {
@@ -41,12 +41,12 @@ namespace Server
         //-------------------- SERVER SIDE UPDATE OWN VALUE AND CONFIRM TO THE MASTER -------------------- >> ??? ASK
 
 
-        public override Task<UnlockConfirmation> UpdateValue(NewValue tuple, ServerCallContext context)
+        public override Task<UnlockConfirmation> UpdateValue(UpdateValueRequest tuple, ServerCallContext context)
         {
             return Task.FromResult(UV(tuple));
         }
 
-        private UnlockConfirmation UV(NewValue tuple)
+        private UnlockConfirmation UV(UpdateValueRequest tuple)
         {
             //here I'm sure I'm in the correct partition because this service is just for the master server
             //The master server of this partition is the only one that will ask for this
@@ -55,7 +55,7 @@ namespace Server
 
             UnlockConfirmation result = new UnlockConfirmation
             {
-                Ok = Local.UpdateSpecialPermission(new Resource(tuple.Id, tuple.Value, tuple.WhoIsMaster))
+                Ok = Local.UpdateSpecialPermission(new Resource(tuple.Id, tuple.Value), tuple.PartitionId)
                 //always true
             };
 
