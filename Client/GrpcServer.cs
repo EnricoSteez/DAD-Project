@@ -1,12 +1,14 @@
 ﻿using Grpc.Net.Client;
 using Server.protos;
+using System;
+using System.Net.Http;
 
 namespace Client
 {
     class GrpcServer
     {
 
-        public string Partition_id { get; set; }
+        // public string Partition_id { get; set; }
         //private string Server_id { get; }
         //private bool IsMasterReplica { get; }
         public string Url { get; }
@@ -16,14 +18,13 @@ namespace Client
 
         public GrpcServer( string url)
         {
-
-            // Server_id = server_id;
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             Url = url;
             GrpcChannel channel = GrpcChannel.ForAddress(Url);
             Service = new ServerStorageServices.ServerStorageServicesClient(channel);
         }
 
-        public GrpcServer(string partition_id, /*string server_id,*/ string url)
+        /*public GrpcServer(string partition_id, string url)
         {
 
             Partition_id = partition_id;
@@ -31,6 +32,6 @@ namespace Client
             Url = url;
             GrpcChannel channel = GrpcChannel.ForAddress(Url);
             Service = new ServerStorageServices.ServerStorageServicesClient(channel);
-        }
+        }*/
     }
 }

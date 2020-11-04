@@ -34,18 +34,6 @@ namespace Client
             servers.Add(serverId, res);
             return res.Service;
         }
-        private static ServerStorageServices.ServerStorageServicesClient RetrieveServer(string serverId, string partitionId)
-        {
-            GrpcServer res = null;
-            if (servers.TryGetValue(serverId, out res))
-            {
-                res.Partition_id = partitionId;
-                return res.Service;
-            }
-                res = new GrpcServer(partitionId, "http://localhost:" + (1000 + inc++));
-                servers.Add(serverId, res);
-                return res.Service;
-        }
 
 
         private static List<string> TransformCommands(List<string> loopCommands, int reps)
@@ -76,6 +64,9 @@ namespace Client
 
         static void Main(string[] args)
         {
+            servers.Add("1", new GrpcServer("http://127.0.0.1:1001"));
+            servers.Add("2", new GrpcServer("http://127.0.0.1:1002"));
+            masters.Add("A", "1");
             string fileName = @"../../../test.txt";
             if (args.Length == 1)
             {
@@ -105,7 +96,7 @@ namespace Client
                             partitionId = words[1];
                             objectId = words[2];
                             serverId = words[3];
-                            var reply = RetrieveServer(serverId, partitionId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId});
+                            var reply = RetrieveServer(serverId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId});
                             Console.WriteLine("Object {0} read: {1}", objectId, reply.Value.ToString());
                         }
                         else
@@ -122,8 +113,9 @@ namespace Client
                             string masterServerId;
                             if(masters.TryGetValue(partitionId, out masterServerId))
                             {
-                                var reply = RetrieveServer(masterServerId, partitionId).WriteObject(new WriteObjectRequest { PartitionId = partitionId, ObjectId = objectId, Value = words[3] });
-                                Console.WriteLine("Write object {0} result: {1}", objectId, reply.WriteResult.ToString());
+                                ServerStorageServices.ServerStorageServicesClient s = RetrieveServer(masterServerId);
+                                var reply = s.WriteObject(new WriteObjectRequest { PartitionId = partitionId, ObjectId = objectId, Value = words[3] });
+                                Console.WriteLine("Write object {0} result: {1}", objectId, reply.WriteResult);
 
                             }
                             else

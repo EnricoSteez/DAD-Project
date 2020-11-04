@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using Grpc.Core;
+using Grpc.Net.Client;
 using Server.protos;
 
 namespace Server
@@ -287,24 +288,17 @@ namespace Server
         public static void Main(string[] args)
         {
             Partition A = new Partition("A", "1");
-            Partition B = new Partition("B", "2");
-            Partition C = new Partition("C", "3");
 
             Server first = new Server("1","127.0.0.1",0,0);
-            Server anotherOne = new Server("1", "127.0.0.1", 0, 0);
+            Server second = new Server("2", "127.0.0.1", 0, 0);
 
             first.AddPartition(A);
-            first.AddPartition(B);
-            first.AddPartition(C);
-
-            anotherOne.AddPartition(A);
-            anotherOne.AddPartition(B);
-            anotherOne.AddPartition(C);
+            second.AddPartition(A);
 
             List<Server> servers = new List<Server>
             {
                 { first },
-                { anotherOne }
+                { second },
             };
 
             //knowledge of all other nodes. This should be initialized by the Puppet Master in the future
@@ -320,20 +314,38 @@ namespace Server
                 }
             }
 
+            Server init;
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
+            if (args[0] == "1")
+            {
+                init = first;
+            }
+            else
+            {
+                init = second;
+            }
+
             Grpc.Core.Server server = new Grpc.Core.Server
             {
                 Services =
                 {
-                    ServerStorageServices.BindService(new ServerClientService(first)),
-                    ServerCoordinationServices.BindService(new ServerServerService(first))
+                    ServerStorageServices.BindService(new ServerClientService(init)),
+                    ServerCoordinationServices.BindService(new ServerServerService(init))
                 },
 
-                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(first.Server_id), ServerCredentials.Insecure) }
+                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(init.Server_id), ServerCredentials.Insecure) }
             };
+            try
+            {
+                server.Start();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            Console.ReadLine();
 
-            server.Start();
-
-            Console.WriteLine("Hello World!");
         }
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -20,7 +20,7 @@
   <ItemGroup>
     <Folder Include="protos\" />
         
-    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Server" />
+    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Both" />
     <Protobuf Include="protos\ServerServerServices.proto" GrpcServices="Both" />
   </ItemGroup>
     

@@ -22,6 +22,7 @@ namespace Server
 
         public override Task<LockResponse> LockResourceService(LockRequest request, ServerCallContext context)
         {
+            Console.WriteLine("LockResourceService Received");
             return Task.FromResult(LRS(request));
         }
 
@@ -43,6 +44,7 @@ namespace Server
 
         public override Task<UnlockConfirmation> UpdateValue(UpdateValueRequest tuple, ServerCallContext context)
         {
+            Console.WriteLine("Update Value Request Received");
             return Task.FromResult(UV(tuple));
         }
 

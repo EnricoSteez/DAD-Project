@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Server": {
+      "commandName": "Project",
+      "commandLineArgs": "1"
+    },
+    "Server2": {
+      "commandName": "Project",
+      "commandLineArgs": "2"
+    }
+  }
+}

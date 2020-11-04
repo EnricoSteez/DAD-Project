@@ -80,12 +80,13 @@ namespace Server
 
                         foreach (string part in sampleServer.Partitions)
                         {
+
                             //look for other replicas (excluding myself)
                             //by scrolling all partitions of every server and finding match with the requested one
                             if (request.PartitionId == part && Local.Server_id != sampleServer.Id)
                             {
                                 GrpcChannel channel = GrpcChannel.ForAddress(
-                                    sampleServer.Ip.ToString() + ":" + (1000 + int.Parse(id)).ToString());
+                                    "http://" + sampleServer.Ip.ToString() + ":" + (1000 + int.Parse(id)).ToString());
 
 
                                 ServerCoordinationServices.ServerCoordinationServicesClient client =
@@ -113,17 +114,19 @@ namespace Server
                         }
                     }
                     requests = Task.WhenAll(tasks);
+                    Console.WriteLine("Going to wait");
+                    requests.Wait();
+                    if (requests.Status == TaskStatus.RanToCompletion)
+                        Console.WriteLine("All lock requests succeeded.");
+                    else if (requests.Status == TaskStatus.Faulted)
+                        Console.WriteLine("{0} lock requests timed out", failed);
                 }
 
-                requests.Wait();
-                if (requests.Status == TaskStatus.RanToCompletion)
-                    Console.WriteLine("All lock requests succeeded.");
-                else if (requests.Status == TaskStatus.Faulted)
-                    Console.WriteLine("{0} lock requests timed out", failed);
+
 
 
                 tasks.Clear();
-
+                Console.WriteLine("Going to Write");
                 requests = null;
                 failed = 0;
 
@@ -156,13 +159,22 @@ namespace Server
                     {
                         if (request.PartitionId == part && Local.Server_id != sampleServer.Id)
                         {
-                            GrpcChannel channel = GrpcChannel.ForAddress(
-                                sampleServer.Ip + ":" + (1000 + int.Parse(sampleServer.Id)).ToString());
-
+                            Console.WriteLine("found a server with this partition");
+                            GrpcChannel channel = null;
+                            try
+                            {
+                                channel = GrpcChannel.ForAddress(
+                                "http://" + sampleServer.Ip + ":" + (1000 + int.Parse(sampleServer.Id)).ToString());
+                                Console.WriteLine("created the channel");
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("failed to create channel: " + e.Message);
+                            }
+                            
 
                             ServerCoordinationServices.ServerCoordinationServicesClient client =
                                 new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
-
                             tasks.Add(Task.Run(() => {
                                 try
                                 {
@@ -181,6 +193,7 @@ namespace Server
                     }
 
                 }
+                Console.WriteLine("waiting for update confirmations");
                 requests = Task.WhenAll(tasks);
 
                 requests.Wait();
