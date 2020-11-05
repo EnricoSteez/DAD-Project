@@ -29,10 +29,14 @@ message UnlockConfirmation{
 }
 
 message SendInfoRequest{
-
+    
 }
 
 message SendInfoResponse{
-    repeated string partitions = 1;
-    repeated string objects = 2;
+    repeated PartitionID partitions = 1;
+}
+
+message PartitionID {
+    string PartitionId = 1;
+    repeated string ObjectIds = 2;
 }

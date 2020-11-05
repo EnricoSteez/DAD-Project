@@ -64,11 +64,7 @@ namespace Server
             return result;
         }
 
-
-
-
-
-        //-------------------- SERVER SIDE SEND INFO ABOUT PARTITION AND RESOURCES --------------------
+        //-------------------- SERVER SIDE SEND INFO ABOUT PARTITIONS AND RESOURCES --------------------
         public override Task<SendInfoResponse> SendInfo(SendInfoRequest request, ServerCallContext context)
         {
             return Task.FromResult(SI(request));
@@ -78,15 +74,20 @@ namespace Server
         {
             SendInfoResponse response = new SendInfoResponse();
 
-            foreach(Partition p in Local.Storage.Values)
+            foreach (Partition p in Local.Storage.Values)
             {
-                response.Partitions.Add(p.Id);
-                foreach(Resource r in p.Elements.Values)
+                PartitionID pid = new PartitionID()
                 {
-                    response.Objects.Add(r.ObjectId);
-                }
-            }
+                    PartitionId = p.Id
+                };
 
+                foreach (Resource r in p.Elements.Values)
+                {
+                    pid.ObjectIds.Add(r.ObjectId);
+                }
+
+                response.Partitions.Add(pid);
+            }
             return response;
         }
     }
