@@ -2,7 +2,6 @@
 
 option csharp_namespace = "Server.protos";
 
-//ServerCoordinationServicesClient object
 service ServerStorageServices {
     rpc ListServer (ListServerRequest) returns (ListServerResponse) {}
     rpc ListGlobal (ListGlobalRequest) returns (ListGlobalResponse) {}
@@ -11,25 +10,22 @@ service ServerStorageServices {
 }
 
 message ListServerRequest {
-    string server_id = 1;
 }
 
 message ListServerResponse {
-    string storedObjects = 1;
-    bool isMasterReplica = 2;
+    repeated string storedObjects = 1;
+    repeated bool isMasterReplica = 2;
 }
-
 
 message ListGlobalRequest {
-
-}
-
-message ListGlobalResponse {
     
 }
 
+message ListGlobalResponse {
+    repeated string partitions = 1;
+    repeated string objects = 2;
+}
 
-//READ AN OBJECT
 message ReadObjectRequest {
     string partition_id = 1;
     string object_id = 2;
