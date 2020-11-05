@@ -1,3 +1,1 @@
-﻿write A 123 "first"
-write A 123 "modified"
-read A 123 2
+﻿listGlobal

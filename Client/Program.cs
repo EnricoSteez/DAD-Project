@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
@@ -22,7 +23,8 @@ namespace Client
         private static Dictionary<string, GrpcServer> servers = new Dictionary<string, GrpcServer>();
 
         private static Dictionary<string, string> masters = new Dictionary<string, string>(); //key - partitionId object - serverId
-
+        
+        private static Dictionary<string, List<string>> partitions =  new Dictionary<string, List<string>>(); //key - partitionId object - list of servers with that partition
         private static ServerStorageServices.ServerStorageServicesClient RetrieveServer(string serverId)
         {
             GrpcServer res = null;
@@ -67,6 +69,7 @@ namespace Client
             servers.Add("1", new GrpcServer("http://127.0.0.1:1001"));
             servers.Add("2", new GrpcServer("http://127.0.0.1:1002"));
             masters.Add("A", "1");
+            partitions.Add("A", new List<string>(new string[] { "1", "2" }));
             string fileName = @"../../../test.txt";
             if (args.Length == 1)
             {
@@ -87,7 +90,6 @@ namespace Client
                 string partitionId;
                 string serverId;
                 int rep = 1;
-                
                 switch (words[0]) {
                     case "read":
                         
@@ -96,8 +98,53 @@ namespace Client
                             partitionId = words[1];
                             objectId = words[2];
                             serverId = words[3];
-                            var reply = RetrieveServer(serverId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId});
-                            Console.WriteLine("Object {0} read: {1}", objectId, reply.Value.ToString());
+                            ReadObjectResponse reply = null;
+                            try
+                            {
+                                reply = RetrieveServer(serverId).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId });
+                            }
+                            catch (RpcException ex) when (ex.StatusCode == StatusCode.Internal)
+                            {
+                                Console.WriteLine("server unreachable");
+                                List<string> otherservers;
+                                if(partitions.TryGetValue(partitionId, out otherservers))
+                                {
+                                    foreach (string s in otherservers)
+                                    {
+                                        if(s != serverId)
+                                        {
+                                            Console.WriteLine("Trying other server...");
+                                            try
+                                            {
+                                                reply = RetrieveServer(s).ReadObject(new ReadObjectRequest { PartitionId = partitionId, ObjectId = objectId });
+                                            }
+                                            catch(RpcException exx) when (exx.StatusCode == StatusCode.Internal)
+                                            {
+                                                Console.WriteLine("server unreachable");
+                                            }
+                                            catch (Exception exx)
+                                            {
+                                                Console.WriteLine("Unexpected Error!!\n{0}", exx.Message);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Unexpected Error!!\n{0}", ex.Message);
+                            }
+                            if(reply != null)
+                            {
+                                Console.WriteLine("Object {0} read: {1}", objectId, reply.Value.ToString());
+                            }
+                            else
+                            {
+                                Console.WriteLine("Error getting reply");
+                            }
+                            
                         }
                         else
                         {
@@ -115,6 +162,7 @@ namespace Client
                             {
                                 ServerStorageServices.ServerStorageServicesClient s = RetrieveServer(masterServerId);
                                 var reply = s.WriteObject(new WriteObjectRequest { PartitionId = partitionId, ObjectId = objectId, Value = words[3] });
+                                
                                 Console.WriteLine("Write object {0} result: {1}", objectId, reply.WriteResult);
 
                             }
@@ -133,8 +181,26 @@ namespace Client
                         if(words.Length == 2 )
                         {
                             serverId = words[1];
-                            var reply = RetrieveServer(serverId).ListServer(new ListServerRequest { ServerId = serverId });
-                            Console.WriteLine("Objects: {0}", reply.StoredObjects);
+                            try
+                            {
+                                ListServerResponse reply = RetrieveServer(serverId).ListServer(new ListServerRequest { });
+                                Console.WriteLine("Objects:");
+                                IEnumerator<string> objects = reply.StoredObjects.GetEnumerator();
+                                IEnumerator<bool> isMasterReplica = reply.IsMasterReplica.GetEnumerator();
+                                foreach (string s in reply.StoredObjects)
+                                {
+                                    isMasterReplica.MoveNext();
+                                    Console.WriteLine("Object: {0} is master replica? {1}", s, isMasterReplica.Current);
+                                }
+                            }
+                            catch (RpcException exx) when (exx.StatusCode == StatusCode.Internal)
+                            {
+                                Console.WriteLine("server unreachable");
+                            }
+                            catch (Exception exx)
+                            {
+                                Console.WriteLine("Unexpected Error!!\n{0}", exx.Message);
+                            }
                         }
                         else
                         {
@@ -144,7 +210,33 @@ namespace Client
                     case "listGlobal":
                         if(words.Length == 1 )
                         {
-                            // TODO: list global
+                            foreach(string serv in servers.Keys)
+                            {
+                                try
+                                {
+                                    ListGlobalResponse reply = RetrieveServer(serv).ListGlobal(new ListGlobalRequest { });
+                                    Console.WriteLine("Partitions:");
+                                    foreach (string s in reply.Partitions)
+                                    {
+                                        Console.WriteLine("->{0}", s);
+                                    }
+                                    Console.WriteLine("Objects:");
+                                    foreach (string s in reply.Objects)
+                                    {
+                                        Console.WriteLine("->{0}", s);
+                                    }
+                                    break;
+                                }
+                                catch (RpcException exx) when (exx.StatusCode == StatusCode.Internal)
+                                {
+                                    Console.WriteLine("server unreachable");
+                                }
+                                catch (Exception exx)
+                                {
+                                    Console.WriteLine("Unexpected Error!!\n{0}", exx.Message);
+                                }
+                            }
+                            
                         }
                         else
                         {
