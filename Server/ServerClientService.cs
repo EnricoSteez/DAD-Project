@@ -214,6 +214,7 @@ namespace Server
         {
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Thread.Sleep(waitTime * 1000);
+            Console.WriteLine(Local.Storage.Values);
             return Task.FromResult(LS(request));
         }
 
@@ -244,43 +245,47 @@ namespace Server
 
         private ListGlobalResponse LG(ListGlobalRequest request)
         {
+
+            Console.WriteLine("listGlobal");
             ListGlobalResponse response = new ListGlobalResponse();
-            
-            foreach(ServerIdentification s in Local.SystemNodes.Values)
+
+            foreach(ServerIdentification server in Local.SystemNodes.Values)
             {
+                GrpcChannel channel = GrpcChannel.ForAddress(
+                            "http://" + server.Ip + ":" + (1000 + int.Parse(server.Id)).ToString());
 
-                foreach(ServerIdentification server in Local.SystemNodes.Values)
+
+                ServerCoordinationServices.ServerCoordinationServicesClient client =
+                    new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
+
+                SendInfoResponse res = client.SendInfo(new SendInfoRequest());
+                Console.WriteLine("Conected to server {0}", server.Id);
+                /* this is super dumb but using the same message (PartitionIdentification)
+                    * in two different methods that reside in different .proto files
+                    * creates a lot of conflicts
+                    * initializing the same message in both files create redeclaration
+                    * while initializing it only in 1 file leads to "undefined message"
+                    * we'll fix this after...
+                    */
+                foreach (PartitionID pid in res.Partitions)
                 {
-                    GrpcChannel channel = GrpcChannel.ForAddress(
-                                server.Ip + ":" + (1000 + int.Parse(server.Id)).ToString());
 
-
-                    ServerCoordinationServices.ServerCoordinationServicesClient client =
-                        new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
-
-                    SendInfoResponse res = client.SendInfo(new SendInfoRequest());
-
-                    /* this is super dumb but using the same message (PartitionIdentification)
-                     * in two different methods that reside in different .proto files
-                     * creates a lot of conflicts
-                     * initializing the same message in both files create redeclaration
-                     * while initializing it only in 1 file leads to "undefined message"
-                     * we'll fix this after...
-                     */
-                    foreach (PartitionID pid in res.Partitions)
+                    Console.WriteLine("found partition {0}", pid);
+                    PartitionIdentification p = new PartitionIdentification
                     {
-                        PartitionIdentification p = new PartitionIdentification
-                        {
-                            PartitionId = pid.PartitionId
-                        };
+                        PartitionId = pid.PartitionId
+                    };
 
+                    if (!response.Partitions.Contains(p))
+                    {
                         p.ObjectIds.Add(pid.ObjectIds);
+
                         response.Partitions.Add(p);
                     }
-
-                    channel.ShutdownAsync();
-                    
                 }
+
+                channel.ShutdownAsync();
+                    
             }
 
             return response;

@@ -287,23 +287,30 @@ namespace Server
 
         public static void Main(string[] args)
         {
-            Partition A = new Partition("p1", "1");
-            Partition B = new Partition("p2", "2");
 
-            Server first = new Server("1","127.0.0.1",0,0);
-            Server second = new Server("2", "127.0.0.1", 0, 0);
+            int nservers = 3;
+            int npartitions = 2;
+            List < Server > servers = new List<Server>();
+            List<Partition> partitions = new List<Partition>();
 
-            first.AddPartition(A);
-            second.AddPartition(A);
 
-            first.AddPartition(B);
-            second.AddPartition(B);
 
-            List<Server> servers = new List<Server>
+
+            for (int i = 1; i <= nservers; i++)
             {
-                { first },
-                { second },
-            };
+                servers.Add(new Server(i.ToString(), "127.0.0.1", 0, 0));
+            }
+            for (int i = 1; i <= npartitions; i++)
+            {
+                partitions.Add(new Partition("p" + i, i.ToString()));
+            }
+            foreach(Server s in servers)
+            {
+                foreach(Partition p in partitions)
+                {
+                    s.AddPartition(p);
+                }
+            }
 
             //knowledge of all other nodes. This should be initialized by the Puppet Master in the future
             foreach(Server s in servers)
@@ -321,34 +328,37 @@ namespace Server
             Server init;
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-            if (args[0] == "1")
-            {
-                init = first;
-            }
-            else
-            {
-                init = second;
-            }
 
-            Grpc.Core.Server server = new Grpc.Core.Server
+            int servernumber;
+
+            if(int.TryParse(args[0], out servernumber))
             {
-                Services =
+                init = servers[servernumber - 1];
+                Grpc.Core.Server server = new Grpc.Core.Server
+                {
+                    Services =
                 {
                     ServerStorageServices.BindService(new ServerClientService(init)),
                     ServerCoordinationServices.BindService(new ServerServerService(init))
                 },
 
-                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(init.Server_id), ServerCredentials.Insecure) }
-            };
-            try
-            {
-                server.Start();
+                    Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(init.Server_id), ServerCredentials.Insecure) }
+                };
+                try
+                {
+                    server.Start();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                Console.ReadLine();
             }
-            catch(Exception e)
-            {
-                Console.WriteLine(e.Message);
+            else {
+                Console.WriteLine("Wrong ARGUMENT");
             }
-            Console.ReadLine();
+
+
 
         }
     }

@@ -42,7 +42,7 @@ namespace Client
         {
             
             List<string> commands = new List<string>();
-            for(int i = 0; i < reps; i++)
+            for(int i = 1; i <= reps; i++)
             {
                 foreach (string s in loopCommands)
                 {
@@ -68,10 +68,11 @@ namespace Client
         {
             servers.Add("1", new GrpcServer("http://127.0.0.1:1001"));
             servers.Add("2", new GrpcServer("http://127.0.0.1:1002"));
+            servers.Add("3", new GrpcServer("http://127.0.0.1:1003"));
             masters.Add("p1", "1");
             masters.Add("p2", "2");
-            partitions.Add("p1", new List<string>(new string[] { "1", "2" }));
-            partitions.Add("p2", new List<string>(new string[] { "1", "2" }));
+            partitions.Add("p1", new List<string>(new string[] { "1", "2", "3" }));
+            partitions.Add("p2", new List<string>(new string[] { "1", "2", "3" }));
             string fileName = @"../../../test.txt";
             if (args.Length == 1)
             {
@@ -204,7 +205,7 @@ namespace Client
                                 foreach (string s in reply.StoredObjects)
                                 {
                                     isMasterReplica.MoveNext();
-                                    Console.WriteLine("Object: {0} is master replica? {1}", s, isMasterReplica.Current);
+                                    Console.WriteLine("Object: {0}, is server {1} master replica? {2}", s, serverId,isMasterReplica.Current);
                                 }
                             }
                             catch (RpcException exx) when (exx.StatusCode == StatusCode.Internal)
@@ -230,14 +231,14 @@ namespace Client
                                 {
                                     ListGlobalResponse reply = RetrieveServer(serv).ListGlobal(new ListGlobalRequest { });
                                     Console.WriteLine("Partitions:");
-                                    foreach (string s in reply.Partitions)
+                                    foreach (PartitionIdentification p in reply.Partitions)
                                     {
-                                        Console.WriteLine("->{0}", s);
-                                    }
-                                    Console.WriteLine("Objects:");
-                                    foreach (string s in reply.Objects)
-                                    {
-                                        Console.WriteLine("->{0}", s);
+                                        Console.WriteLine("->{0}", p.PartitionId);
+                                        Console.WriteLine("\tObjects:");
+                                        foreach(string oid in p.ObjectIds)
+                                        {
+                                            Console.WriteLine("\t\t{0}", oid);
+                                        }
                                     }
                                     break;
                                 }
@@ -262,8 +263,8 @@ namespace Client
                         if (words.Length == 2 && int.TryParse(words[1], out ms) )
                         {
 
-                            Thread.Sleep(ms);
                             Console.WriteLine("Wainting {0} ms", words[1]);
+                            Thread.Sleep(ms);
                         }
                         else
                         {
