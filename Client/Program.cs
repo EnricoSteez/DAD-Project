@@ -42,7 +42,7 @@ namespace Client
         {
             
             List<string> commands = new List<string>();
-            for(int i = reps; i > 0; i--)
+            for(int i = 0; i < reps; i++)
             {
                 foreach (string s in loopCommands)
                 {
@@ -68,8 +68,10 @@ namespace Client
         {
             servers.Add("1", new GrpcServer("http://127.0.0.1:1001"));
             servers.Add("2", new GrpcServer("http://127.0.0.1:1002"));
-            masters.Add("A", "1");
-            partitions.Add("A", new List<string>(new string[] { "1", "2" }));
+            masters.Add("p1", "1");
+            masters.Add("p2", "2");
+            partitions.Add("p1", new List<string>(new string[] { "1", "2" }));
+            partitions.Add("p2", new List<string>(new string[] { "1", "2" }));
             string fileName = @"../../../test.txt";
             if (args.Length == 1)
             {
@@ -95,9 +97,21 @@ namespace Client
                         
                         if (words.Length == 4 )
                         {
+                            
                             partitionId = words[1];
                             objectId = words[2];
                             serverId = words[3];
+                            if(serverId == "-1")
+                            {
+                                List<string> partitionservers;
+                                if(partitions.TryGetValue(partitionId, out partitionservers))
+                                {
+                                    if(partitionservers.Count > 0)
+                                    {
+                                        serverId = partitionservers[0];
+                                    }
+                                }
+                            }
                             ReadObjectResponse reply = null;
                             try
                             {

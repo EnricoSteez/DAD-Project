@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Client": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Users\\almof\\Documents\\MEIC\\DAD-Project\\Client\\client_script1"
+    }
+  }
+}

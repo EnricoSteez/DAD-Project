@@ -287,13 +287,17 @@ namespace Server
 
         public static void Main(string[] args)
         {
-            Partition A = new Partition("A", "1");
+            Partition A = new Partition("p1", "1");
+            Partition B = new Partition("p2", "2");
 
             Server first = new Server("1","127.0.0.1",0,0);
             Server second = new Server("2", "127.0.0.1", 0, 0);
 
             first.AddPartition(A);
             second.AddPartition(A);
+
+            first.AddPartition(B);
+            second.AddPartition(B);
 
             List<Server> servers = new List<Server>
             {
