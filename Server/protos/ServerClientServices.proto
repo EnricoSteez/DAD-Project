@@ -22,8 +22,12 @@ message ListGlobalRequest {
 }
 
 message ListGlobalResponse {
-    repeated string partitions = 1;
-    repeated string objects = 2;
+    repeated PartitionIdentification partitions = 1;
+}
+
+message PartitionIdentification {
+    string PartitionId = 1;
+    repeated string ObjectIds = 2;
 }
 
 message ReadObjectRequest {

@@ -248,11 +248,6 @@ namespace Server
             
             foreach(ServerIdentification s in Local.SystemNodes.Values)
             {
-                //TODO make a service among servers to retrieve informations on demand only if it's necessary
-                //in our structure, no server has knowledge of the objects stored in other servers
-                //all a server knows about other nodes is the ServerIdentification mask
-                //which contains Server ID, stored PartitionIDs and IP Address.
-
 
                 foreach(ServerIdentification server in Local.SystemNodes.Values)
                 {
@@ -265,10 +260,26 @@ namespace Server
 
                     SendInfoResponse res = client.SendInfo(new SendInfoRequest());
 
-                    response.Partitions.Add(res.Partitions);
-                    response.Objects.Add(res.Objects);
+                    /* this is super dumb but using the same message (PartitionIdentification)
+                     * in two different methods that reside in different .proto files
+                     * creates a lot of conflicts
+                     * initializing the same message in both files create redeclaration
+                     * while initializing it only in 1 file leads to "undefined message"
+                     * we'll fix this after...
+                     */
+                    foreach (PartitionID pid in res.Partitions)
+                    {
+                        PartitionIdentification p = new PartitionIdentification
+                        {
+                            PartitionId = pid.PartitionId
+                        };
+
+                        p.ObjectIds.Add(pid.ObjectIds);
+                        response.Partitions.Add(p);
+                    }
 
                     channel.ShutdownAsync();
+                    
                 }
             }
 
