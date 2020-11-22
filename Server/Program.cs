@@ -284,81 +284,56 @@ namespace Server
 
     public class Program
     {
-
         public static void Main(string[] args)
         {
+            string id = args[0];
+            string url = args[1];
+            int.TryParse(args[2], out int minDelay);
+            int.TryParse(args[3], out int maxDelay);
 
-            int nservers = 5;
-            int npartitions = 2;
-            List < Server > servers = new List<Server>();
-            List<Partition> partitions = new List<Partition>();
+            /*
+             * this is working only if PCS passes as arguments only the actually stored partitions
+             * and not all the partitions of the system
+             */
 
-            //serverId = args[0];
-            //url = args[1];
-            //minDelay = args[2];
-            //maxDelay = args[3];
+            List<string> partitionIds = new List<string>();
+            List<string> masterIds = new List<string>();
 
-            for (int i = 1; i <= nservers; i++)
+            for (int i=4 ; i<args.Length; i+=2)
             {
-                servers.Add(new Server(i.ToString(), "127.0.0.1", 0, 0));
+                partitionIds.Add(args[i]);
+                masterIds.Add(args[i + 1]);
             }
-            for (int i = 1; i <= npartitions; i++)
-            {
-                partitions.Add(new Partition("p" + i, i.ToString()));
-            }
-            servers[0].AddPartition(partitions[0]);
-            servers[1].AddPartition(partitions[0]);
-            servers[1].AddPartition(partitions[1]);
-            servers[2].AddPartition(partitions[0]);
-            servers[4].AddPartition(partitions[1]);
-            servers[3].AddPartition(partitions[1]);
-
-            //knowledge of all other nodes. This should be initialized by the Puppet Master in the future
-            foreach(Server s in servers)
-            {
-                foreach (Server s2 in servers)
-                {
-                    //serverPool contains an entry for every other node in the system
-                    //with its complete identity: ServerIdentification
-                    
-                    s.SystemNodes.Add(s2.Server_id, new ServerIdentification(s2));
-                    
-                }
-            }
-
-            Server init;
+            
+            Server init = new Server(id,url,minDelay,maxDelay);
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-
-            int servernumber;
-
-            if(int.TryParse(args[0], out servernumber))
+            for(int i = 0; i < partitionIds.ToArray().Length ; i++)
             {
-                init = servers[servernumber - 1];
-                Grpc.Core.Server server = new Grpc.Core.Server
-                {
-                    Services =
+                init.AddPartition(new Partition(partitionIds[i],masterIds[i]));
+            }
+            
+
+            Grpc.Core.Server server = new Grpc.Core.Server
+            {
+                Services =
                 {
                     ServerStorageServices.BindService(new ServerClientService(init)),
                     ServerCoordinationServices.BindService(new ServerServerService(init))
                 },
 
-                    Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(init.Server_id), ServerCredentials.Insecure) }
-                };
-                try
-                {
-                    server.Start();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-                Console.ReadLine();
-            }
-            else {
-                Console.WriteLine("Wrong ARGUMENT");
-            }
+                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(init.Server_id), ServerCredentials.Insecure) }
+            };
 
+            try
+            {
+                server.Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            Console.ReadLine();
 
 
         }
