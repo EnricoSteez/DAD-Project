@@ -33,7 +33,7 @@ namespace Server
                 request.ObjectId, request.PartitionId);
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Console.WriteLine("Client served in {0} seconds", waitTime);
-            Thread.Sleep(waitTime * 1000);
+            //Thread.Sleep(waitTime * 1000); //Timer event
             return Task.FromResult(RO(request));
 
         }
@@ -57,7 +57,7 @@ namespace Server
             Console.WriteLine("Client " + context.Host + " wants to write {0}", request.ObjectId);
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Console.WriteLine("Client served in {0} seconds", waitTime);
-            Thread.Sleep(waitTime * 1000);
+            //Thread.Sleep(waitTime * 1000);
             return Task.FromResult(WO(request));
 
         }
@@ -114,7 +114,6 @@ namespace Server
                         }
                     }
                     requests = Task.WhenAll(tasks);
-                    Console.WriteLine("Going to wait");
                     requests.Wait();
                     if (requests.Status == TaskStatus.RanToCompletion)
                         Console.WriteLine("All lock requests succeeded.");

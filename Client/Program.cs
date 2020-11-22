@@ -69,10 +69,12 @@ namespace Client
             servers.Add("1", new GrpcServer("http://127.0.0.1:1001"));
             servers.Add("2", new GrpcServer("http://127.0.0.1:1002"));
             servers.Add("3", new GrpcServer("http://127.0.0.1:1003"));
+            servers.Add("4", new GrpcServer("http://127.0.0.1:1004"));
+            servers.Add("5", new GrpcServer("http://127.0.0.1:1005"));
             masters.Add("p1", "1");
             masters.Add("p2", "2");
             partitions.Add("p1", new List<string>(new string[] { "1", "2", "3" }));
-            partitions.Add("p2", new List<string>(new string[] { "1", "2", "3" }));
+            partitions.Add("p2", new List<string>(new string[] { "2",  "4", "5" }));
             string fileName = @"../../../test.txt";
             if (args.Length == 1)
             {

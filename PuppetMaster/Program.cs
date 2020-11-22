@@ -61,6 +61,33 @@ namespace PuppetMaster
             List<string> loopCommands = new List<string>();
             List<string> commands = new List<string>();
 
+            /*----*/
+            int nservers = 5;
+            int npartitions = 2;
+            List<Server.ServerIdentification> servers = new List<Server.ServerIdentification>();
+            Dictionary<String, List<String>> partitions = new Dictionary<String, List<string>>(); //IMPORTANT: mapping partition Id to a list of server Ids where the partition is replicated (first is master)
+            //IMPORTANT: ->>> when you create a server, search for that server id in the list of every entry in the dictionary
+            //the master Id will be the first element of the list.
+
+
+            for (int i = 1; i <= nservers; i++)
+            {
+                servers.Add(new Server.Server(i.ToString(), "127.0.0.1", 0, 0));
+            }
+            for (int i = 1; i <= npartitions; i++)
+            {
+                partitions.Add(new Server.Partition("p" + i, i.ToString()));
+            }
+            servers[0].AddPartition(partitions[0]);
+            servers[1].AddPartition(partitions[0]);
+            servers[1].AddPartition(partitions[1]);
+            servers[2].AddPartition(partitions[0]);
+            servers[4].AddPartition(partitions[1]);
+            servers[3].AddPartition(partitions[1]);
+
+
+            /*----*/
+
             // Read the file and display it line by line. (idem Client)
             System.IO.StreamReader file = new System.IO.StreamReader(@"../../../test.txt");
             while ((line = GetElement(commands)) != null || (line = file.ReadLine()) != null)
@@ -69,8 +96,7 @@ namespace PuppetMaster
 
                 string serverId;
                 string URL;
-                string minDelay;
-                string maxDelay;
+
                 string partitionName;
                 string username;
                 string scriptFile;
@@ -82,7 +108,7 @@ namespace PuppetMaster
                     case "replicationFactor":
                         if (words.Length == 2 && int.TryParse(words[1], out r))
                         {
-
+                            ///???
                         }
                         else
                         {
@@ -92,8 +118,13 @@ namespace PuppetMaster
                 // Script starts with Server setup (Server and Partition commands)
                     // create server process
                     case "server":
+                        int minDelay;
+                        int maxDelay;
+                        //TODO: send information about which partitions to store (this information must be created according to the Partition command)
                         if (words.Length == 5 && int.TryParse(words[3], out minDelay) && int.TryParse(words[4], out maxDelay))
                         {
+                            ServerRequestObject srequest = new ServerRequestObject();
+                            srequest.Partitions.Add(new PartitionMessage { Id = "p1", MasterId = "s1" });
                             serverId = words[1];
                             URL = words[2];
 
@@ -109,6 +140,7 @@ namespace PuppetMaster
                         break;
                     // configure system to store partition on given servers
                     case "partition":
+                        //TODO: store locally the partition
                         if (int.TryParse(words[1], out r) && words.Length == r + 3)
                         {
                             partitionName = words[2];
@@ -122,6 +154,7 @@ namespace PuppetMaster
                         break;
                     // create client process
                     case "client":
+                        //TODO: PASS EVERY PARTITION (ID, MASTERID) IN THE DICTIONARY TO THE EVERYPARTITION PARAMETER IN THE REQUEST
                         if (words.Length == 4)
                         {
 
@@ -136,6 +169,7 @@ namespace PuppetMaster
                         break;
                     // all nodes print current status
                     case "status":
+                        //TODO: loop through all the servers and send status request
                         if (words.Length == 1)
                         {
 

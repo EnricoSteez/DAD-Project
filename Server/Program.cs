@@ -288,13 +288,15 @@ namespace Server
         public static void Main(string[] args)
         {
 
-            int nservers = 3;
+            int nservers = 5;
             int npartitions = 2;
             List < Server > servers = new List<Server>();
             List<Partition> partitions = new List<Partition>();
 
-
-
+            //serverId = args[0];
+            //url = args[1];
+            //minDelay = args[2];
+            //maxDelay = args[3];
 
             for (int i = 1; i <= nservers; i++)
             {
@@ -304,13 +306,12 @@ namespace Server
             {
                 partitions.Add(new Partition("p" + i, i.ToString()));
             }
-            foreach(Server s in servers)
-            {
-                foreach(Partition p in partitions)
-                {
-                    s.AddPartition(p);
-                }
-            }
+            servers[0].AddPartition(partitions[0]);
+            servers[1].AddPartition(partitions[0]);
+            servers[1].AddPartition(partitions[1]);
+            servers[2].AddPartition(partitions[0]);
+            servers[4].AddPartition(partitions[1]);
+            servers[3].AddPartition(partitions[1]);
 
             //knowledge of all other nodes. This should be initialized by the Puppet Master in the future
             foreach(Server s in servers)
