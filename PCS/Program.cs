@@ -16,13 +16,18 @@ namespace PCS
         public override Task<ClientResponseObject> ClientRequest(ClientRequestObject request, ServerCallContext context)
         {
             
-            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe", request.Username + " " + request.ClientUrl + " " + request.Scriptfile);
+            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe ", request.Scriptfile + " " + request.ClientUrl + " " + request.Username);
             return Task.FromResult(new ClientResponseObject { Success = "true" });
         }
 
         public override Task<ServerResponseObject> ServerRequest(ServerRequestObject request, ServerCallContext context)
         {
-            Process.Start("..\\..\\..\\..\\Server\\bin\\Debug\\netcoreapp3.1\\Server.exe", request.ServerId + " " + request.Url + " " + request.MinDelay + " " + request.MaxDelay);
+            String argumentsString = request.ServerId + " " + request.Url + " " + request.MinDelay + " " + request.MaxDelay;
+            foreach(PartitionMessage pm in request.Partitions)
+            {
+                argumentsString += " " + pm.Id + " " + pm.MasterId;
+            }
+            Process.Start("..\\..\\..\\..\\Server\\bin\\Debug\\netcoreapp3.1\\Server.exe", argumentsString);
             return Task.FromResult(new ServerResponseObject { Success = "true" });
         }
         public override Task<StatusResponseObject> StatusRequest(StatusRequestObject request, ServerCallContext context)

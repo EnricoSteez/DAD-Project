@@ -33,7 +33,7 @@ namespace Server
                 request.ObjectId, request.PartitionId);
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Console.WriteLine("Client served in {0} seconds", waitTime);
-            Thread.Sleep(waitTime * 1000);
+            //Thread.Sleep(waitTime * 1000); //Timer event
             return Task.FromResult(RO(request));
 
         }
@@ -57,7 +57,7 @@ namespace Server
             Console.WriteLine("Client " + context.Host + " wants to write {0}", request.ObjectId);
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Console.WriteLine("Client served in {0} seconds", waitTime);
-            Thread.Sleep(waitTime * 1000);
+            //Thread.Sleep(waitTime * 1000);
             return Task.FromResult(WO(request));
 
         }
@@ -114,7 +114,6 @@ namespace Server
                         }
                     }
                     requests = Task.WhenAll(tasks);
-                    Console.WriteLine("Going to wait");
                     requests.Wait();
                     if (requests.Status == TaskStatus.RanToCompletion)
                         Console.WriteLine("All lock requests succeeded.");
@@ -245,6 +244,8 @@ namespace Server
 
         private ListGlobalResponse LG(ListGlobalRequest request)
         {
+            List<Task> tasks = new System.Collections.Generic.List<Task>();
+            int failed = 0;
 
             Console.WriteLine("listGlobal");
             ListGlobalResponse response = new ListGlobalResponse();
@@ -258,8 +259,36 @@ namespace Server
                 ServerCoordinationServices.ServerCoordinationServicesClient client =
                     new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
 
-                SendInfoResponse res = client.SendInfo(new SendInfoRequest());
-                Console.WriteLine("Conected to server {0}", server.Id);
+                SendInfoResponse res = null;
+
+
+                tasks.Add(Task.Run(() => {
+                    try
+                    {
+                        SendInfoResponse res = client.SendInfo(new SendInfoRequest(), deadline: DateTime.UtcNow.AddSeconds(5));
+                        Console.WriteLine("Conected to server {0}", server.Id);
+                    }
+                    catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+                    {
+                        Interlocked.Increment(ref failed);
+                        Console.WriteLine("Timeout.");
+                    }
+                    catch(Exception e)
+                    {
+                        Interlocked.Increment(ref failed);
+                        Console.WriteLine("Error: " + e.StackTrace);
+                    }
+                }));
+
+                Task union = Task.WhenAll(tasks);
+
+                union.Wait();
+
+                if (failed > 0)
+                {
+                    Console.WriteLine("Failed: " + failed);
+                }
+
                 /* this is super dumb but using the same message (PartitionIdentification)
                     * in two different methods that reside in different .proto files
                     * creates a lot of conflicts
@@ -267,20 +296,29 @@ namespace Server
                     * while initializing it only in 1 file leads to "undefined message"
                     * we'll fix this after...
                     */
+
                 foreach (PartitionID pid in res.Partitions)
                 {
-
-                    Console.WriteLine("found partition {0}", pid);
-                    PartitionIdentification p = new PartitionIdentification
+                    bool toInsert = true;
+                    foreach (PartitionIdentification partitionIdentification in response.Partitions)
                     {
-                        PartitionId = pid.PartitionId
-                    };
-
-                    if (!response.Partitions.Contains(p))
+                        if (pid.PartitionId.Equals(partitionIdentification.PartitionId))
+                        {
+                            toInsert = false;
+                        }
+                    }
+                    if (toInsert)
                     {
+                        PartitionIdentification p = new PartitionIdentification
+                        {
+                            PartitionId = pid.PartitionId
+                        };
+
+
                         p.ObjectIds.Add(pid.ObjectIds);
 
                         response.Partitions.Add(p);
+                        
                     }
                 }
 
