@@ -26,5 +26,10 @@ namespace Server
             }
         }
 
+        public ServerIdentification(string id ,string ip)
+        {
+            Id = id;
+            Ip = ip;
+        }
     }
 }

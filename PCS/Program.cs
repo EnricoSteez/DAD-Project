@@ -2,6 +2,7 @@
 using Server;
 using Server.protos;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,13 +12,19 @@ namespace PCS
 
     public class PCSServerService : PuppetMasterServices.PuppetMasterServicesBase
     {
+        private Dictionary<string, Process> servers;
 
+
+        public PCSServerService()
+        {
+            servers = new Dictionary<string, Process>();
+        }
 
         public override Task<ClientResponseObject> ClientRequest(ClientRequestObject request, ServerCallContext context)
         {
             
             Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe ", request.Scriptfile + " " + request.ClientUrl + " " + request.Username);
-            return Task.FromResult(new ClientResponseObject { Success = "true" });
+            return Task.FromResult(new ClientResponseObject { Succes = "true" });
         }
 
         public override Task<ServerResponseObject> ServerRequest(ServerRequestObject request, ServerCallContext context)
@@ -27,13 +34,20 @@ namespace PCS
             {
                 argumentsString += " " + pm.Id + " " + pm.MasterId;
             }
-            Process.Start("..\\..\\..\\..\\Server\\bin\\Debug\\netcoreapp3.1\\Server.exe", argumentsString);
+            Process server = Process.Start("..\\..\\..\\..\\Server\\bin\\Debug\\netcoreapp3.1\\Server.exe", argumentsString);
+            servers.Add(request.ServerId, server);
             return Task.FromResult(new ServerResponseObject { Success = "true" });
         }
-        public override Task<StatusResponseObject> StatusRequest(StatusRequestObject request, ServerCallContext context)
+        public override Task<CrashResponseObject> CrashRequest(CrashRequestObject request, ServerCallContext context)
         {
-            Console.WriteLine("STH");
-            return Task.FromResult(new StatusResponseObject { });
+            Process server;
+            if(servers.TryGetValue(request.ServerId, out server))
+            {
+                server.Kill();
+                servers.Remove(request.ServerId);
+                return Task.FromResult(new CrashResponseObject { Success = true });
+            }
+            return Task.FromResult(new CrashResponseObject { Success = false });
         }
     }
     class Program

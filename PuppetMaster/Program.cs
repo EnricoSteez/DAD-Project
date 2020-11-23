@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks.Dataflow;
 using Grpc.Net.Client;
+using System.Linq;
 
 namespace PuppetMaster
 
@@ -23,7 +24,6 @@ namespace PuppetMaster
         
         private static PuppetMasterServices.PuppetMasterServicesClient PuppetMasterServicesClient()
         {
-
 
             GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:" + 10000);
             PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
@@ -44,6 +44,7 @@ namespace PuppetMaster
                 }
             }
             return commands;
+
         }
 
         private static string GetElement(List<string> commands)
@@ -62,21 +63,17 @@ namespace PuppetMaster
         static void Main(string[] args)
         {
             
-            int counter = 0;
             string line;
 
             List<string> loopCommands = new List<string>();
             List<string> commands = new List<string>();
 
             /*----*/
-            int nservers = 5;
-            int npartitions = 2;
             List<Server.ServerIdentification> servers = new List<Server.ServerIdentification>();
             Dictionary<String, List<String>> partitions = new Dictionary<String, List<string>>(); 
             //IMPORTANT: mapping partition Id to a list of server Ids where the partition is replicated (first is master)
             //IMPORTANT: ->>> when you create a server, search for that server id in the list of every entry in the dictionary
             //the master Id will be the first element of the list.
-
 
             /*----*/
 
@@ -95,8 +92,7 @@ namespace PuppetMaster
                 string username;
                 string scriptFile;
                 int r;
-                
-                
+
 
                 switch (words[0]) {
                     // configure system
@@ -118,15 +114,15 @@ namespace PuppetMaster
                         //TODO: send information about which partitions to store (this information must be created according to the Partition command)
                         if (words.Length == 5 )
                         {
-                           
-                            //srequest..Add(new PartitionMessage { Id = "p1", MasterId = "s1" });
                             serverId = words[1];
                             URL = words[2];
 
                             int.TryParse(words[3], out minDelay);
                             int.TryParse(words[4], out maxDelay);
-                          
-                            GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:" + 2000);
+
+                            string address = String.Join(':', words[2].Split(':').SkipLast(1).ToArray());
+                            GrpcChannel channel = GrpcChannel.ForAddress( address + ':' + 10000);
+                           
                             PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
 
                             ServerRequestObject request = new ServerRequestObject
@@ -140,18 +136,23 @@ namespace PuppetMaster
                             foreach(string partition in partitions.Keys)
                             {
                                 if (partitions[partition].Contains(serverId)){
-                                    //request.Everypartition.Add( new PartitionMessage { Id = "partition", MasterId = "sid"}
+                                    
                                     PartitionMessage p = new PartitionMessage();
-                                    p.id = partition;
-                                    p.masterId = partitions[partition][0];
+                                    p.Id = partition;
+                                    p.MasterId = partitions[partition][0];
+                                    request.Partitions.Add(p);
                                 }
                             }
+
+                            
                             ServerResponseObject result = node.ServerRequest(request);
 
                             Console.WriteLine(result);
 
-                            
-
+                            if (result.Success)
+                            {
+                                servers.Add(new Server.ServerIdentification(serverId, URL));
+                            }
                         }
                         else
                         {
@@ -186,7 +187,10 @@ namespace PuppetMaster
                             username = words[1];
                             URL = words[2];
                             scriptFile = words[3];
-                            GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:" + 1000);
+
+                            string address = String.Join(':', words[2].Split(':').SkipLast(1).ToArray());
+                            GrpcChannel channel = GrpcChannel.ForAddress(address + ':' + 10000);
+
                             PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
 
                             ClientRequestObject request = new ClientRequestObject
@@ -196,6 +200,15 @@ namespace PuppetMaster
                                 Scriptfile = scriptFile
 
                             };
+
+                            foreach(string partition in partitions.Keys)
+                            {
+                                PartitionMessage p = new PartitionMessage();
+                                p.Id = partition;
+                                p.MasterId = partitions[partition][0];
+                                // all servers later
+                                request.Everypartition.Add(p);
+                            }
 
                             ClientResponseObject result = node.ClientRequest(request);
 
@@ -218,7 +231,9 @@ namespace PuppetMaster
 
                             };
 
-                            StatusResponseObject result = StatusRequest(request);
+                            //StatusResponseObject result = StatusRequest(request);
+
+                            // iterate and send to server itself (like freeze and unfreeze)
                         }
                         else
                         {
@@ -229,9 +244,14 @@ namespace PuppetMaster
                     // DEBUGGING COMMANDS
                     // force process to crash
                     case "crash":
+                        //send the request to the correspondent PCS
                         if (words.Length == 2)
                         {
                             serverId = words[1];
+
+                            // check server address
+                            // send crash request to that address + port 10000
+                            
                         }
                         else
                         {
@@ -243,6 +263,7 @@ namespace PuppetMaster
                         if (words.Length == 2)
                         {
                             serverId = words[1];
+                            // iterate over all the servers and send them freeze req
                         }
                         else
                         {
@@ -253,6 +274,7 @@ namespace PuppetMaster
                     case "unfreeze":
                         if (words.Length == 2)
                         {
+                                // idem freeze req
                             serverId = words[1];
                         }
                         else
@@ -261,19 +283,6 @@ namespace PuppetMaster
                         }
                         break;
 
-                                        
-                    case "wait":
-                        int ms;
-                        if (words.Length == 2 && int.TryParse(words[1], out ms))
-                        {
-                            Process.Sleep(ms);
-                            Console.WriteLine("Waiting {0} ms", words[1]);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Wrong number of arguments!");
-                        }
-                        break;
                     default:
                         Console.WriteLine("Invalid command!");
                         break;

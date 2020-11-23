@@ -15,7 +15,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Server" />
+    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Client" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="protos\" />

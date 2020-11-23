@@ -49,11 +49,11 @@ message ClientResponseObject {
 }
 
 message CrashRequestObject {
-
+    string server_id = 1;
 }
 
 message CrashResponseObject {
-    string success = 1;
+    bool success = 1;
 }
 
 message FreezeRequestObject {

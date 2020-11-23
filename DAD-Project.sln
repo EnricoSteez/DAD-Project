@@ -7,8 +7,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{249FF2DE-930F-413D-BE6F-FF112F85EE21}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuppetMaster", "PuppetMaster\PuppetMaster.csproj", "{D8846E82-297F-40F1-9B62-F22B9AD9255E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6D05938E-97C7-4646-B9A5-F3D4C94B3940} = {6D05938E-97C7-4646-B9A5-F3D4C94B3940}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCS", "PCS\PCS.csproj", "{FC8127A3-36F0-4F22-967C-3596D71EF8EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCS", "PCS\PCS.csproj", "{FC8127A3-36F0-4F22-967C-3596D71EF8EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

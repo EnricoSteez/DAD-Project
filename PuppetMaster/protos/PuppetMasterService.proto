@@ -17,7 +17,7 @@ message ServerRequestObject {
     int32 min_delay = 2;
     int32 max_delay = 3;
     string url = 4;
-    repeated PartitionMessage everypartition = 5;
+    repeated PartitionMessage partitions = 5;
 }
 
 message PartitionMessage {
@@ -26,7 +26,7 @@ message PartitionMessage {
 }
 
 message ServerResponseObject {
-    string success = 1;
+    bool success = 1;
 }
 
 message StatusRequestObject {
@@ -45,7 +45,7 @@ message ClientRequestObject {
 } 
 
 message ClientResponseObject {
-    string succes = 1;
+    bool succes = 1;
 }
 
 message CrashRequestObject {
