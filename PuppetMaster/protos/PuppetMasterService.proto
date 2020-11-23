@@ -17,7 +17,7 @@ message ServerRequestObject {
     int32 min_delay = 2;
     int32 max_delay = 3;
     string url = 4;
-    repeated PartitionMessage everypartition = 5;
+    repeated PartitionMessage partitions = 5;
 }
 
 message PartitionMessage {
@@ -41,7 +41,7 @@ message ClientRequestObject {
     string username = 1;
     string client_url = 2;
     string scriptfile = 3;
-    repeated PartitionMessage everypartition = 4
+    repeated PartitionMessage everypartition = 4;
 } 
 
 message ClientResponseObject {

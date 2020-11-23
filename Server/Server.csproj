@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="protos\PuppetMasterService.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Grpc.Core" Version="2.32.0" />
     <PackageReference Include="Grpc.Tools" Version="2.32.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -18,8 +22,7 @@
     
    
   <ItemGroup>
-    <Folder Include="protos\" />
-        
+    <Protobuf Include="protos\PuppetMasterService.proto" GrpcServices="Server" />
     <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Both" />
     <Protobuf Include="protos\ServerServerServices.proto" GrpcServices="Both" />
   </ItemGroup>

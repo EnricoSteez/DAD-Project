@@ -41,7 +41,7 @@ message ClientRequestObject {
     string username = 1;
     string client_url = 2;
     string scriptfile = 3;
-    repeated PartitionMessage everypartition = 4
+    repeated PartitionMessage everypartition = 4;
 } 
 
 message ClientResponseObject {
@@ -49,11 +49,11 @@ message ClientResponseObject {
 }
 
 message CrashRequestObject {
-
+    string server_id = 1;
 }
 
 message CrashResponseObject {
-    string success = 1;
+    bool success = 1;
 }
 
 message FreezeRequestObject {

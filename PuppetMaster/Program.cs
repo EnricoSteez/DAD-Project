@@ -23,20 +23,8 @@ namespace PuppetMaster
 
         private static PuppetMasterServices.PuppetMasterServicesClient PuppetMasterServicesClient()
         {
-            res = new  ("http://localhost:" + 10000);
-        }
-
-        private static List<string> TransformCommands(List<string> loopCommands, int reps)
-        {
-            List<string> commands = new List<string>();
-            for(int i = reps; i > 0; i--)
-            {
-                foreach (string s in loopCommands)
-                {
-                    commands.Add(Regex.Replace(s, @"\$i", i.ToString(), RegexOptions.None));
-                }
-            }
-            return commands;
+            //res = new  ("http://localhost:" + 10000);
+            return null;
         }
 
         private static string GetElement(List<string> commands)
@@ -55,35 +43,17 @@ namespace PuppetMaster
         static void Main(string[] args)
         {
             
-            int counter = 0;
             string line;
 
             List<string> loopCommands = new List<string>();
             List<string> commands = new List<string>();
 
             /*----*/
-            int nservers = 5;
-            int npartitions = 2;
             List<Server.ServerIdentification> servers = new List<Server.ServerIdentification>();
             Dictionary<String, List<String>> partitions = new Dictionary<String, List<string>>(); //IMPORTANT: mapping partition Id to a list of server Ids where the partition is replicated (first is master)
             //IMPORTANT: ->>> when you create a server, search for that server id in the list of every entry in the dictionary
             //the master Id will be the first element of the list.
 
-
-            for (int i = 1; i <= nservers; i++)
-            {
-                servers.Add(new Server.Server(i.ToString(), "127.0.0.1", 0, 0));
-            }
-            for (int i = 1; i <= npartitions; i++)
-            {
-                partitions.Add(new Server.Partition("p" + i, i.ToString()));
-            }
-            servers[0].AddPartition(partitions[0]);
-            servers[1].AddPartition(partitions[0]);
-            servers[1].AddPartition(partitions[1]);
-            servers[2].AddPartition(partitions[0]);
-            servers[4].AddPartition(partitions[1]);
-            servers[3].AddPartition(partitions[1]);
 
 
             /*----*/
@@ -92,7 +62,7 @@ namespace PuppetMaster
             System.IO.StreamReader file = new System.IO.StreamReader(@"../../../test.txt");
             while ((line = GetElement(commands)) != null || (line = file.ReadLine()) != null)
             {
-                string[] words = line.Split(' ', ); // depends how many words to split
+                string[] words = line.Split(' '); // depends how many words to split
 
                 string serverId;
                 string URL;
@@ -100,7 +70,7 @@ namespace PuppetMaster
                 string partitionName;
                 string username;
                 string scriptFile;
-                string r;
+                int r;
 
 
                 switch (words[0]) {
@@ -183,6 +153,7 @@ namespace PuppetMaster
                     // DEBUGGING COMMANDS
                     // force process to crash
                     case "crash":
+                        //send the request to the correspondent PCS
                         if (words.Length == 2)
                         {
                             serverId = words[1];
@@ -208,20 +179,6 @@ namespace PuppetMaster
                         if (words.Length == 2)
                         {
                             serverId = words[1];
-                        }
-                        else
-                        {
-                            Console.WriteLine("Wrong number of arguments!");
-                        }
-                        break;
-
-                                        
-                    case "wait":
-                        int ms
-                        if (words.Length == 2 && int.TryParse(words[1], out ms)
-                        {
-                            Thread.Sleep(ms);
-                            Console.WriteLine("Waiting {0} ms", words[1]);
                         }
                         else
                         {
