@@ -20,11 +20,18 @@ namespace PuppetMaster
     class PuppetMaster
     {
 
-
+        
         private static PuppetMasterServices.PuppetMasterServicesClient PuppetMasterServicesClient()
         {
-            res = new  ("http://localhost:" + 10000);
+
+
+            GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:" + 10000);
+            PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
+
+            return 
         }
+
+
 
         private static List<string> TransformCommands(List<string> loopCommands, int reps)
         {
@@ -69,13 +76,14 @@ namespace PuppetMaster
 
                 string serverId;
                 string URL;
-                string minDelay;
-                string maxDelay;
+                int minDelay;
+                int maxDelay;
                 string partitionName;
                 string username;
                 string scriptFile;
-                string r;
-
+                int r;
+                
+                
 
                 switch (words[0]) {
                     // configure system
@@ -97,10 +105,25 @@ namespace PuppetMaster
                             serverId = words[1];
                             URL = words[2];
 
-                            if (minDelay == 0 && maxDelay == 0)
-                            {
+                            // normal implementation without delays yet
 
-                            }
+                            GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:" + 2000);
+                            PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
+
+                            ServerRequestObject request = new ServerRequestObject
+                            {
+                                ServerId = serverId,
+                                Url = URL,
+                                MaxDelay = maxDelay,
+                                MinDelay = minDelay
+                            };
+
+                            ServerResponseObject result = node.ServerRequest(request);
+
+                            Console.WriteLine(result);
+
+                            
+
                         }
                         else
                         {
@@ -113,7 +136,6 @@ namespace PuppetMaster
                         {
                             partitionName = words[2];
                             // do all r serverIds
-
                         }
                         else
                         {
@@ -124,10 +146,23 @@ namespace PuppetMaster
                     case "client":
                         if (words.Length == 4)
                         {
-
                             username = words[1];
                             URL = words[2];
                             scriptFile = words[3];
+                            GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:" + 1000);
+                            PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
+
+                            ClientRequestObject request = new ClientRequestObject
+                            {
+                                ClientUrl = URL,
+                                Username = username,
+                                Scriptfile = scriptFile
+
+                            };
+
+                            ClientResponseObject result = node.ClientRequest(request);
+
+                            Console.WriteLine(result);
                         }
                         else
                         {
@@ -139,6 +174,13 @@ namespace PuppetMaster
                         if (words.Length == 1)
                         {
 
+
+                            StatusRequestObject request = new StatusRequestObject
+                            {
+
+                            };
+
+                            StatusResponseObject result = StatusRequest(request);
                         }
                         else
                         {
@@ -183,10 +225,10 @@ namespace PuppetMaster
 
                                         
                     case "wait":
-                        int ms
-                        if (words.Length == 2 && int.TryParse(words[1], out ms)
+                        int ms;
+                        if (words.Length == 2 && int.TryParse(words[1], out ms))
                         {
-                            Thread.Sleep(ms);
+                            Process.Sleep(ms);
                             Console.WriteLine("Waiting {0} ms", words[1]);
                         }
                         else
