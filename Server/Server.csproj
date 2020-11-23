@@ -22,7 +22,7 @@
         
     <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Both" />
     <Protobuf Include="protos\ServerServerServices.proto" GrpcServices="Both" />
+    <Protobuf Include="protos\PuppetMasterService.proto" GrpcServices="Server" />
   </ItemGroup>
-    
     
 </Project>

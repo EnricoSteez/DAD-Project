@@ -4,13 +4,12 @@ option csharp_namespace = "Server.protos";
 
 
 service PuppetMasterServices {
-    rpc ServerRequest (ServerRequestObject) returns (ServerResponseObject) {}
-    rpc PartitionRequest (PartitionRequestObject) returns (PartitionResponseObject) {}
-    rpc StatusRequest (StatusRequestObject) returns (StatusResponseObject) {}
-    rpc ClientRequest (ClientRequestObject) returns (ClientResponseObject) {}
-    rpc CrashRequest (CrashRequestObject) returns (CrashResponseObject) {}
-    rpc FreezeRequest (FreezeRequestObject) returns (FreezeResponseObject) {}
-    rpc UnfreezeRequest (UnfreezeRequestObject) returns (UnfreezeResponseObject) {}
+    rpc ServerRequest (ServerRequestObject) returns (ServerResponseObject) {} //PCS
+    rpc StatusRequest (StatusRequestObject) returns (StatusResponseObject) {} //Server
+    rpc ClientRequest (ClientRequestObject) returns (ClientResponseObject) {} //PCS
+    rpc CrashRequest (CrashRequestObject) returns (CrashResponseObject) {} //Server
+    rpc FreezeRequest (FreezeRequestObject) returns (FreezeResponseObject) {} //Server
+    rpc UnfreezeRequest (UnfreezeRequestObject) returns (UnfreezeResponseObject) {} //Server
 }
 
 message ServerRequestObject {
@@ -18,19 +17,15 @@ message ServerRequestObject {
     int32 min_delay = 2;
     int32 max_delay = 3;
     string url = 4;
+    repeated PartitionMessage partitions = 5;
+}
+
+message PartitionMessage {
+    string id = 1;
+    string masterId = 2;
 }
 
 message ServerResponseObject {
-    string success = 1;
-}
-
-message PartitionRequestObject {
-    string partition_name = 1;
-    repeated string server_id = 2;
-
-}
-
-message PartitionResponseObject {
     string success = 1;
 }
 
@@ -46,6 +41,7 @@ message ClientRequestObject {
     string username = 1;
     string client_url = 2;
     string scriptfile = 3;
+    repeated PartitionMessage everypartition = 4
 } 
 
 message ClientResponseObject {
