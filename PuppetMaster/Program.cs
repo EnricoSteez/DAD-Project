@@ -224,16 +224,19 @@ namespace PuppetMaster
                         //TODO: loop through all the servers and send status request
                         if (words.Length == 1)
                         {
+                            StatusRequestObject request = new StatusRequestObject{};
 
-
-                            StatusRequestObject request = new StatusRequestObject
+                            // iterate and send to server itself
+                            foreach (Server.ServerIdentification serv in servers)
                             {
+                                //string sid = serv.Id;
+                                string sip = serv.Ip;
+                                string address = String.Join(':', sip.Split(':').SkipLast(1).ToArray());
 
-                            };
-
-                            //StatusResponseObject result = StatusRequest(request);
-
-                            // iterate and send to server itself (like freeze and unfreeze)
+                                GrpcChannel channel = GrpcChannel.ForAddress(address + ':' + 10000);
+                                PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
+                                StatusResponseObject result = node.StatusRequest(request);
+                            }
                         }
                         else
                         {
@@ -244,14 +247,30 @@ namespace PuppetMaster
                     // DEBUGGING COMMANDS
                     // force process to crash
                     case "crash":
-                        //send the request to the correspondent PCS
                         if (words.Length == 2)
                         {
                             serverId = words[1];
+                            CrashRequestObject request = new CrashRequestObject
+                            { };
 
-                            // check server address
-                            // send crash request to that address + port 10000
-                            
+                            // send crash request to corresponding server address + port 10000
+                            foreach (Server.ServerIdentification serv in servers)
+                            {
+                                if (serv.Id.Contains(serverId))
+                                {
+                                    string urll = serv.Ip;
+
+                                    // extracting address from url
+                                    string address = String.Join(':', urll.Split(':').SkipLast(1).ToArray());
+
+                                    // send crash request
+                                    GrpcChannel channel = GrpcChannel.ForAddress(address + ':' + 10000);
+                                    PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
+                                    CrashResponseObject result = node.CrashRequest(request);
+                                }
+                                else
+                                    Console.WriteLine("Server not found");
+                            }
                         }
                         else
                         {
@@ -263,7 +282,26 @@ namespace PuppetMaster
                         if (words.Length == 2)
                         {
                             serverId = words[1];
-                            // iterate over all the servers and send them freeze req
+                            FreezeRequestObject request = new FreezeRequestObject
+                            { };
+                            // iterate over all the servers and send the freeze req
+                            foreach (Server.ServerIdentification serv in servers)
+                            {
+                                if (serv.Id.Contains(serverId))
+                                {
+                                    string urll = serv.Ip;
+
+                                    // extracting address from url
+                                    string address = String.Join(':', urll.Split(':').SkipLast(1).ToArray());
+
+                                    // send freeze request
+                                    GrpcChannel channel = GrpcChannel.ForAddress(address + ':' + 10000);
+                                    PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
+                                    FreezeResponseObject result = node.FreezeRequest(request);
+                                }
+                                else
+                                    Console.WriteLine("Server not found");
+                            }
                         }
                         else
                         {
@@ -274,8 +312,25 @@ namespace PuppetMaster
                     case "unfreeze":
                         if (words.Length == 2)
                         {
-                                // idem freeze req
                             serverId = words[1];
+                            UnfreezeRequestObject request = new UnfreezeRequestObject{ };
+
+                            // iterate over all the servers and send the unfreeze req
+                            foreach (Server.ServerIdentification serv in servers)
+                            {
+                                if (serv.Id.Contains(serverId))
+                                {
+                                    string urll = serv.Ip;
+
+                                    // extracting address from url
+                                    string address = String.Join(':', urll.Split(':').SkipLast(1).ToArray());
+
+                                    // send unfreeze request
+                                    GrpcChannel channel = GrpcChannel.ForAddress(address + ':' + 10000);
+                                    PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
+                                    UnfreezeResponseObject result = node.UnfreezeRequest(request);
+                                }
+                            }
                         }
                         else
                         {

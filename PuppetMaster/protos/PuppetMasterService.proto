@@ -4,12 +4,12 @@ option csharp_namespace = "Server.protos";
 
 
 service PuppetMasterServices {
-    rpc ServerRequest (ServerRequestObject) returns (ServerResponseObject) {} //PCS
-    rpc StatusRequest (StatusRequestObject) returns (StatusResponseObject) {} //Server
-    rpc ClientRequest (ClientRequestObject) returns (ClientResponseObject) {} //PCS
-    rpc CrashRequest (CrashRequestObject) returns (CrashResponseObject) {} //Server
-    rpc FreezeRequest (FreezeRequestObject) returns (FreezeResponseObject) {} //Server
-    rpc UnfreezeRequest (UnfreezeRequestObject) returns (UnfreezeResponseObject) {} //Server
+    rpc ServerRequest (ServerRequestObject) returns (ServerResponseObject) {} //to PCS
+    rpc StatusRequest (StatusRequestObject) returns (StatusResponseObject) {} //to Server
+    rpc ClientRequest (ClientRequestObject) returns (ClientResponseObject) {} //to PCS
+    rpc CrashRequest (CrashRequestObject) returns (CrashResponseObject) {} //to Server
+    rpc FreezeRequest (FreezeRequestObject) returns (FreezeResponseObject) {} //to Server
+    rpc UnfreezeRequest (UnfreezeRequestObject) returns (UnfreezeResponseObject) {} //to Server
 }
 
 message ServerRequestObject {
