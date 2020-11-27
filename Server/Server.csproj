@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="protos\PuppetMasterService.proto" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Grpc.Core" Version="2.32.0" />
     <PackageReference Include="Grpc.Tools" Version="2.32.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,13 +15,12 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.32.0" />
     <PackageReference Include="Google.Protobuf" Version="3.13.0" />
   </ItemGroup>
-    
-   
   <ItemGroup>
-    <Protobuf Include="protos\PuppetMasterService.proto" GrpcServices="Server" />
-    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Both" />
+    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Server" />
     <Protobuf Include="protos\ServerServerServices.proto" GrpcServices="Both" />
     <Protobuf Include="protos\PuppetMasterService.proto" GrpcServices="Server" />
   </ItemGroup>
-    
+  <ItemGroup>
+    <Folder Include="protos\" />
+  </ItemGroup>
 </Project>
