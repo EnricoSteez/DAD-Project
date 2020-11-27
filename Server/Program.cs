@@ -286,7 +286,9 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            
+            ServerClientService.delay();
+            return;
+            string[] a = { "12", "111" };
             string id = args[0];
             string url = args[1];
             int.TryParse(args[2], out int minDelay);

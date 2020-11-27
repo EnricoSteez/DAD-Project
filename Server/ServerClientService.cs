@@ -16,12 +16,32 @@ namespace Server
     public class ServerClientService : ServerStorageServices.ServerStorageServicesBase
     {
 
+
         public Server Local { get; }
 
 
         public ServerClientService(Server server)
         {
             Local = server;
+        }
+
+
+        private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+        }
+        public static void delay()
+        {
+            // Create a timer and set a two second interval.
+            System.Timers.Timer aTimer = new System.Timers.Timer(2000);
+
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += OnTimedEvent;
+
+            aTimer.AutoReset = false;
+
+            aTimer.Start();
+
         }
 
         //--------------------READ OBJECT--------------------
