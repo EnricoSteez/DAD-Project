@@ -19,9 +19,10 @@ message LockResponse{
 }
 
 message UpdateValueRequest{
-    string id = 1;
-    string value = 2;
-    string partitionId = 3;
+    string partitionId = 1;
+    string id = 2;
+    string value = 3;
+    int32 version = 4;
 }
 
 message UnlockConfirmation{

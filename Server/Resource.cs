@@ -6,12 +6,22 @@ namespace Server
         public string ObjectId { get; }
         public string Value { get; }
         public bool Locked { get; set; }
+        public int Version { get; set; }
 
         public Resource(string objectId, string value)
         {
             ObjectId = objectId;
             Value = value;
             Locked = false;
+            Version = 1;
+        }
+
+        public Resource(string objectId, string value, int version)
+        {
+            ObjectId = objectId;
+            Value = value;
+            Locked = false;
+            Version = version;
         }
     }
 }

@@ -80,11 +80,13 @@ namespace Server
                     Monitor.Enter(p);
 
                     p.Elements[newValue.ObjectId] = newValue;
+                    p.Elements[newValue.ObjectId].Version++;
 
                     Monitor.Exit(p);
                 }
-                else //add new resource to the Elements of the correct Partition
+                else //add new resource to the Elements of the correct Partition, with version=1
                 {
+                    newValue.Version = 1;
                     p.Elements.Add(newValue.ObjectId, newValue);
 
                     //just in case someone is passing a locked resource
@@ -259,9 +261,9 @@ namespace Server
          */
         internal bool UpdateSpecialPermission(Resource resource, string partitionId)
         {
-            Monitor.Enter(Storage[partitionId].Elements);
+            Monitor.Enter(Storage[partitionId]);
             Storage[partitionId].Elements[resource.ObjectId] = resource;
-            Monitor.Exit(Storage[partitionId].Elements);
+            Monitor.Exit(Storage[partitionId]);
 
             return true;
         }
