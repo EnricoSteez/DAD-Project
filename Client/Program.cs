@@ -116,7 +116,7 @@ namespace Client
 
                         ReadObjectResponse readResponse = null;
                         bool retry = true;
-                        int attempt = 1;
+                        int attempt = 0;
                         string firstAttempt = currentServerId;
 
                         int lastKnownVersion = lastKnownObjects.GetValueOrDefault(objectId,0);
@@ -133,7 +133,6 @@ namespace Client
                             try
                             {
                                 readResponse = currentServer.ReadObject(readRequest);
-
                                 retry = false;
                             }
                             catch (RpcException ex) when (ex.StatusCode == StatusCode.Internal)
@@ -180,7 +179,10 @@ namespace Client
 
                         if(readResponse != null)
                         {
-                            Console.WriteLine("Object {0} read: {1}   V{2}",readResponse.Id, readResponse.Value, readResponse.Version);
+                            if(readResponse.Id == "OLDER VERSION" && readResponse.Value == "OLDER VERSION" && readResponse.Version == "OLDER VERSION")
+                                Console.WriteLine("The server only has an older version of this object");
+                            else
+                                Console.WriteLine("Object {0} read: {1}   V{2}",readResponse.Id, readResponse.Value, readResponse.Version);
                         }
                         else
                         {
