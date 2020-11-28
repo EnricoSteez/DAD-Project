@@ -96,16 +96,16 @@ namespace PuppetMaster
 
                 switch (words[0]) {
                     // configure system
-                    case "replicationFactor":
-                        if (words.Length == 2 && int.TryParse(words[1], out r))
-                        {
-                            ///???
-                        }
-                        else
-                        {
-                            Console.WriteLine("Wrong number of arguments!");
-                        }
-                        break;
+                    //case "replicationFactor":
+                    //    if (words.Length == 2 && int.TryParse(words[1], out r))
+                    //    {
+                    //        ///???
+                    //    }
+                    //    else
+                    //    {
+                    //        Console.WriteLine("Wrong number of arguments!");
+                    //    }
+                    //    break;
                 // Script starts with Server setup (Server and Partition commands)
                     // create server process
                     case "server":
@@ -120,7 +120,7 @@ namespace PuppetMaster
                             int.TryParse(words[3], out minDelay);
                             int.TryParse(words[4], out maxDelay);
 
-                            string address = String.Join(':', words[2].Split(':').SkipLast(1).ToArray());
+                            string address = String.Join(':', URL.Split(':').SkipLast(1).ToArray());
                             GrpcChannel channel = GrpcChannel.ForAddress( address + ':' + 10000);
                            
                             PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
@@ -143,8 +143,6 @@ namespace PuppetMaster
                                     request.Partitions.Add(p);
                                 }
                             }
-
-                            
                             ServerResponseObject result = node.ServerRequest(request);
 
                             Console.WriteLine(result);
