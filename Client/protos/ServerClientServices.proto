@@ -41,7 +41,7 @@ message ReadObjectRequest {
 message ReadObjectResponse {
     string id = 1;
     string value = 2;
-    string version = 3;
+    int32 version = 3;
 }
 
 

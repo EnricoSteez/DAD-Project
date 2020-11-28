@@ -26,8 +26,6 @@ namespace Server
 
 
 
-        //TODO : wait for prof to clarify the best way to perform the read
-
         //--------------------------------------------- READ OBJECT ---------------------------------------------
 
         public override Task<ReadObjectResponse> ReadObject(ReadObjectRequest request,
@@ -44,10 +42,20 @@ namespace Server
 
         private ReadObjectResponse RO(ReadObjectRequest request)
         {
-            ReadObjectResponse response = new ReadObjectResponse
-            {
-                Value = Local.RetrieveObject(request.ObjectId, request.PartitionId)
-            };
+            ReadObjectResponse response = new ReadObjectResponse();
+
+            Resource r = Local.RetrieveObject(request.ObjectId, request.PartitionId, request.LastVersion);
+            
+            response.Id = r.ObjectId;
+            response.Value = r.Value;
+            response.Version = r.Version;
+
+            /* RetrieveObjects returns:
+             * 
+             * (OLDER VERSION, OLDER VERSION, 0) if the version that the replica has stored is older than the client's last known version
+             * (N/A, N/A, 0) if the resource is not on that replica
+             * (Id, Value, Version) if everything is ok
+             */
 
             return response;
         }
@@ -80,6 +88,9 @@ namespace Server
                 {
                     WriteResult = Local.AddObject(new Resource(request.ObjectId, request.Value), request.PartitionId)
                 };
+
+                //AddObject updates the value and does version++ (if the object is already stored)
+                // or it adds the value to the storage with version = 1 (if the id is not present yet)
 
                 Monitor.Exit(Local);
 

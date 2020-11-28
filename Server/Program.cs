@@ -110,8 +110,7 @@ namespace Server
             return -1;
         }
 
-        
-        internal string RetrieveObject(string id, string partitionId)
+        internal Resource RetrieveObject(string id, string partitionId, int lastVersion)
         {
             Monitor.Enter(Storage);
             if (Storage.ContainsKey(partitionId))
@@ -127,9 +126,7 @@ namespace Server
 
                     Monitor.Enter(res);
                     
-                    if (!res.Locked)
-                        return res.Value;
-                    else //if the resource is locked I wait for a pulse on this resource from the Unlock function 
+                    if (res.Locked) //if the resource is locked I wait for a pulse on this resource from the Unlock function 
                     {
                         Monitor.Exit(res);
                         //leave the lock and wait for someone to unflag
@@ -138,7 +135,17 @@ namespace Server
                             Monitor.Wait(res);
                         }
 
-                        return res.Value;
+                    }
+
+                    //everything ok: resource present and more recent version
+                    if(res.Version > lastVersion)
+                    {
+                        return res;
+                    }
+                    else //resource present but older version: not updated from the master yet
+                    {
+                        return new Resource("OLDER VERSION", "OLDER VERSION") { Version = 0 };
+
                     }
                 }
                 else //the item requested from partition partitionId is not in that partition
@@ -150,7 +157,7 @@ namespace Server
             {
                 Monitor.Exit(Storage);
             }
-            return "N/A"; //no such resource on this server
+            return new Resource("N/A", "N/A") { Version = 0 }; //no such resource on this server
         }
 
         internal bool LockObject(string id, string partitionId)
