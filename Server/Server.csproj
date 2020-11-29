@@ -16,8 +16,11 @@
     <PackageReference Include="Google.Protobuf" Version="3.13.0" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="..\ServerClientServices.proto" GrpcServices="Server" />
-    <Protobuf Include="..\ServerServerServices.proto" GrpcServices="Both" />
-    <Protobuf Include="..\PuppetMasterServices.proto" GrpcServices="Server" />
+    <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Server" />
+    <Protobuf Include="protos\PuppetMasterServices.proto" GrpcServices="Server" />
+    <Protobuf Include="protos\ServerServerServices.proto" GrpcServices="Both" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="protos\" />
   </ItemGroup>
 </Project>

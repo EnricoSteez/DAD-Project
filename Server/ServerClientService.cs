@@ -20,6 +20,7 @@ namespace Server
         public Server Local { get; }
 
 
+
         public ServerClientService(Server server)
         {
             Local = server;
@@ -67,7 +68,7 @@ namespace Server
             ReadObjectResponse response = new ReadObjectResponse();
 
             Resource r = Local.RetrieveObject(request.ObjectId, request.PartitionId, request.LastVersion);
-            
+
             response.Id = r.ObjectId;
             response.Value = r.Value;
             response.Version = r.Version;
@@ -83,8 +84,7 @@ namespace Server
         }
 
 
-        //TODO check if Monitor.Enter works, i.e. if Local can get the lock to its own attributes (dictionary)
-        // even if the service has the lock on the whole Local object
+
 
         //--------------------------------------------- WRITE OBJECT ---------------------------------------------
 
@@ -98,6 +98,8 @@ namespace Server
             return Task.FromResult(WO(request));
 
         }
+        //TODO check if Monitor.Enter works, i.e. if Local can get the lock to its own attributes (dictionary)
+        // even if the service has the lock on the whole Local object
 
         //TODO: choose whether to update here, just after the client's request or in a separate function every tot min
 
@@ -140,16 +142,19 @@ namespace Server
         private ListServerResponse LS(ListServerRequest request)
         {
             ListServerResponse response = new ListServerResponse();
-            foreach(Partition p in Local.Storage.Values)
+            foreach (Partition p in Local.Storage.Values)
             {
                 //if this server is master of a partition, then it's also master of all the resources of the partition
                 bool isMaster = p.MasterId.Equals(Local.Server_id);
-                
+
                 foreach (Resource resource in p.Elements.Values)
                 {
-                    response.StoredObjects.Add(resource.ObjectId);
-                    response.IsMasterReplica.Add(isMaster);
-                    response.Versions.Add(resource.Version);
+                    response.Objects.Add(new ListServerResource
+                    {
+                        Id = resource.ObjectId,
+                        Version = resource.Version,
+                        IsMasterReplica = isMaster
+                    });
                 }
             }
 

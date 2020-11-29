@@ -1,0 +1,66 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Server.protos";
+
+service ServerStorageServices {
+    rpc ListServer (ListServerRequest) returns (ListServerResponse) {}
+    rpc ListGlobal (ListGlobalRequest) returns (ListGlobalResponse) {}
+    rpc ReadObject (ReadObjectRequest) returns (ReadObjectResponse) {}
+    rpc WriteObject (WriteObjectRequest) returns (WriteObjectResponse) {}
+}
+
+message ListServerRequest {
+}
+
+message ListServerResponse {
+    repeated ListServerResource objects = 1;
+}
+
+message ListServerResource {
+    string id = 1;
+    int32 version = 2;
+    bool isMasterReplica = 3;
+}
+
+
+message ListGlobalRequest {
+    
+}
+
+message ListGlobalResponse {
+    repeated PartitionIdentification partitions = 1;
+}
+
+message PartitionIdentification {
+    string PartitionId = 1;
+    repeated string ObjectIds = 2;
+    repeated int32 Versions = 3;
+}
+
+message ReadObjectRequest {
+    string partition_id = 1;
+    string object_id = 2;
+    int32 lastVersion = 3;
+}
+
+message ReadObjectResponse {
+    string id = 1;
+    string value = 2;
+    int32 version = 3;
+}
+
+
+message WriteObjectRequest {
+    string partition_id = 1;
+    string object_id = 2;
+    string value = 3;
+    string version = 4;
+}
+
+message WriteObjectResponse {
+    int32 writeResult = 1;
+}
+
+message Prova3 {
+    string present = 1;
+}
