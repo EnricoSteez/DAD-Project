@@ -13,6 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuppetMaster", "PuppetMaste
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCS", "PCS\PCS.csproj", "{FC8127A3-36F0-4F22-967C-3596D71EF8EC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BCB23068-FD92-48CC-BAEE-2AD52DA84FBC}"
+	ProjectSection(SolutionItems) = preProject
+		PuppetMasterServices.proto = PuppetMasterServices.proto
+		ServerClientServices.proto = ServerClientServices.proto
+		ServerServerServices.proto = ServerServerServices.proto
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

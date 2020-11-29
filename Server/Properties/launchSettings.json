@@ -2,7 +2,7 @@
   "profiles": {
     "Server": {
       "commandName": "Project",
-      "commandLineArgs": "1"
+      "commandLineArgs": "1 http://127.0.0.1:1001 0 0"
     },
     "Server2": {
       "commandName": "Project",

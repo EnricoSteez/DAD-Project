@@ -11,7 +11,7 @@ using Server.protos;
 
 namespace Server
 {
-    /*************************************** SERVICES FOR CLIENTS ***************************************/
+    /******************************************** SERVICES FOR CLIENTS ********************************************/
 
     public class ServerClientService : ServerStorageServices.ServerStorageServicesBase
     {
@@ -25,6 +25,8 @@ namespace Server
             Local = server;
         }
 
+
+        //----------TESTINGS------------------------
 
         private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
         {
@@ -44,7 +46,9 @@ namespace Server
 
         }
 
-        //--------------------READ OBJECT--------------------
+        //----------------------------------
+
+        //--------------------------------------------- READ OBJECT ---------------------------------------------
 
         public override Task<ReadObjectResponse> ReadObject(ReadObjectRequest request,
             ServerCallContext context)
@@ -60,16 +64,29 @@ namespace Server
 
         private ReadObjectResponse RO(ReadObjectRequest request)
         {
-            ReadObjectResponse response = new ReadObjectResponse
-            {
-                Value = Local.RetrieveObject(request.ObjectId, request.PartitionId)
-            };
+            ReadObjectResponse response = new ReadObjectResponse();
+
+            Resource r = Local.RetrieveObject(request.ObjectId, request.PartitionId, request.LastVersion);
+            
+            response.Id = r.ObjectId;
+            response.Value = r.Value;
+            response.Version = r.Version;
+
+            /* RetrieveObjects returns:
+             * 
+             * (OLDER VERSION, OLDER VERSION, 0) if the version that the replica has stored is older than the client's last known version
+             * (N/A, N/A, 0) if the resource is not on that replica
+             * (Id, Value, Version) if everything is ok
+             */
 
             return response;
         }
 
-        //--------------------WRITE OBJECT--------------------
 
+        //TODO check if Monitor.Enter works, i.e. if Local can get the lock to its own attributes (dictionary)
+        // even if the service has the lock on the whole Local object
+
+        //--------------------------------------------- WRITE OBJECT ---------------------------------------------
 
         public override Task<WriteObjectResponse> WriteObject(WriteObjectRequest request,
             ServerCallContext context)
@@ -77,163 +94,46 @@ namespace Server
             Console.WriteLine("Client " + context.Host + " wants to write {0}", request.ObjectId);
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Console.WriteLine("Client served in {0} seconds", waitTime);
-            //Thread.Sleep(waitTime * 1000);
+            Thread.Sleep(waitTime * 1000);
             return Task.FromResult(WO(request));
 
         }
 
+        //TODO: choose whether to update here, just after the client's request or in a separate function every tot min
+
         private WriteObjectResponse WO(WriteObjectRequest request)
         {
-            List<Task> tasks = new System.Collections.Generic.List<Task>();
-            Task requests = null;
-            int failed = 0;
+            Monitor.Enter(Local);
             if (Local.Storage.ContainsKey(request.PartitionId))
             {
-                //here I check if the object the clients wants to write is already stored in this partition or not
-                //and I do the locking request to all other servers replicating this partition
-                //only if necessary
-                if (Local.Storage[request.PartitionId].Elements.ContainsKey(request.ObjectId))
-                {
-                    foreach (string id in Local.SystemNodes.Keys)
-                    {
-                        ServerIdentification sampleServer = Local.SystemNodes[id];
-
-                        foreach (string part in sampleServer.Partitions)
-                        {
-
-                            //look for other replicas (excluding myself)
-                            //by scrolling all partitions of every server and finding match with the requested one
-                            if (request.PartitionId == part && Local.Server_id != sampleServer.Id)
-                            {
-                                GrpcChannel channel = GrpcChannel.ForAddress(
-                                    "http://" + sampleServer.Ip.ToString() + ":" + (1000 + int.Parse(id)).ToString());
-
-
-                                ServerCoordinationServices.ServerCoordinationServicesClient client =
-                                    new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
-
-                                LockRequest req = new LockRequest
-                                {
-                                    ObjectId = request.ObjectId,
-                                    PartitionId = request.PartitionId
-                                };
-
-                                tasks.Add(Task.Run(() => {
-                                    try
-                                    {
-                                        LockResponse l = client.LockResourceService(req, deadline: DateTime.UtcNow.AddSeconds(5));
-                                    }
-                                    catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
-                                    {
-                                        Interlocked.Increment(ref failed);
-                                        Console.WriteLine("Timeout.");
-                                    }
-                                })) ;
-                                    
-                            }
-                        }
-                    }
-                    requests = Task.WhenAll(tasks);
-                    requests.Wait();
-                    if (requests.Status == TaskStatus.RanToCompletion)
-                        Console.WriteLine("All lock requests succeeded.");
-                    else if (requests.Status == TaskStatus.Faulted)
-                        Console.WriteLine("{0} lock requests timed out", failed);
-                }
-
-
-
-
-                tasks.Clear();
-                Console.WriteLine("Going to Write");
-                requests = null;
-                failed = 0;
-
                 WriteObjectResponse response = new WriteObjectResponse
                 {
-                    /*
-                     * I'm sure I'm the master replica because only the master replica for any resource
-                     * is  to receive the write request and serve it
-                     * Hence why Local.Server_id in the whoIsMaster field of the new Resource
-                    */
-
                     WriteResult = Local.AddObject(new Resource(request.ObjectId, request.Value), request.PartitionId)
                 };
 
+                //AddObject updates the value and does version++ (if the object is already stored)
+                // or it adds the value to the storage with version = 1 (if the id is not present yet)
 
-                //SEND UPDATED VALUE TO (AGAIN) OTHER REPLICAS OF THIS PARTITION
-                //There's no way to avoid doing the same loop twice because of the confirmations gathering "stall"
-                foreach (string id in Local.SystemNodes.Keys)
-                {
-                    ServerIdentification sampleServer = Local.SystemNodes[id];
-
-                    UpdateValueRequest valueToUpdate = new UpdateValueRequest
-                    {
-                        Id = request.ObjectId,
-                        Value = request.Value,
-                        PartitionId = request.PartitionId
-                    };
-
-                    foreach (string part in sampleServer.Partitions)
-                    {
-                        if (request.PartitionId == part && Local.Server_id != sampleServer.Id)
-                        {
-                            Console.WriteLine("found a server with this partition");
-                            GrpcChannel channel = null;
-                            try
-                            {
-                                channel = GrpcChannel.ForAddress(
-                                "http://" + sampleServer.Ip + ":" + (1000 + int.Parse(sampleServer.Id)).ToString());
-                                Console.WriteLine("created the channel");
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("failed to create channel: " + e.Message);
-                            }
-                            
-
-                            ServerCoordinationServices.ServerCoordinationServicesClient client =
-                                new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
-                            tasks.Add(Task.Run(() => {
-                                try
-                                {
-                                    UnlockConfirmation l = client.UpdateValue(valueToUpdate, deadline: DateTime.UtcNow.AddSeconds(5));
-                                    channel.ShutdownAsync();
-
-                                }
-                                catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
-                                {
-                                    Interlocked.Increment(ref failed);
-                                    Console.WriteLine("Timeout.");
-                                }
-                            }));
-
-                        }   
-                    }
-
-                }
-                Console.WriteLine("waiting for update confirmations");
-                requests = Task.WhenAll(tasks);
-
-                requests.Wait();
-
-                if (requests.Status == TaskStatus.RanToCompletion)
-                    Console.WriteLine("All unlock requests succeeded.");
-                else if (requests.Status == TaskStatus.Faulted)
-                    Console.WriteLine("{0} unlock requests timed out", failed);
+                Monitor.Exit(Local);
 
                 return response;
             }
-
-            return new WriteObjectResponse { WriteResult = -1 };
+            else
+            {
+                Monitor.Exit(Local);
+                return new WriteObjectResponse { WriteResult = -1 };
+            }
         }
+
+
+        //--------------------------------------------- LIST SERVER ---------------------------------------------
 
 
         public override Task<ListServerResponse> ListServer(ListServerRequest request, ServerCallContext context)
         {
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Thread.Sleep(waitTime * 1000);
-            Console.WriteLine(Local.Storage.Values);
+            Console.WriteLine("ListGlobal request:\n" + Local.Storage.Values);
             return Task.FromResult(LS(request));
         }
 
@@ -249,11 +149,15 @@ namespace Server
                 {
                     response.StoredObjects.Add(resource.ObjectId);
                     response.IsMasterReplica.Add(isMaster);
+                    response.Versions.Add(resource.Version);
                 }
             }
 
             return response;
         }
+
+
+        //--------------------------------------------- LIST GLOBAL ---------------------------------------------
 
         public override Task<ListGlobalResponse> ListGlobal(ListGlobalRequest request, ServerCallContext context)
         {
@@ -264,86 +168,21 @@ namespace Server
 
         private ListGlobalResponse LG(ListGlobalRequest request)
         {
-            List<Task> tasks = new System.Collections.Generic.List<Task>();
-            int failed = 0;
-
-            Console.WriteLine("listGlobal");
             ListGlobalResponse response = new ListGlobalResponse();
-
-            foreach(ServerIdentification server in Local.SystemNodes.Values)
+            foreach (Partition p in Local.Storage.Values)
             {
-                GrpcChannel channel = GrpcChannel.ForAddress(
-                            "http://" + server.Ip + ":" + (1000 + int.Parse(server.Id)).ToString());
-
-
-                ServerCoordinationServices.ServerCoordinationServicesClient client =
-                    new ServerCoordinationServices.ServerCoordinationServicesClient(channel);
-
-                SendInfoResponse res = null;
-
-
-                tasks.Add(Task.Run(() => {
-                    try
-                    {
-                        SendInfoResponse res = client.SendInfo(new SendInfoRequest(), deadline: DateTime.UtcNow.AddSeconds(5));
-                        Console.WriteLine("Conected to server {0}", server.Id);
-                    }
-                    catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
-                    {
-                        Interlocked.Increment(ref failed);
-                        Console.WriteLine("Timeout.");
-                    }
-                    catch(Exception e)
-                    {
-                        Interlocked.Increment(ref failed);
-                        Console.WriteLine("Error: " + e.StackTrace);
-                    }
-                }));
-
-                Task union = Task.WhenAll(tasks);
-
-                union.Wait();
-
-                if (failed > 0)
+                PartitionIdentification pid = new PartitionIdentification()
                 {
-                    Console.WriteLine("Failed: " + failed);
+                    PartitionId = p.Id
+                };
+
+                foreach (Resource r in p.Elements.Values)
+                {
+                    pid.ObjectIds.Add(r.ObjectId);
+                    pid.Versions.Add(r.Version);
                 }
 
-                /* this is super dumb but using the same message (PartitionIdentification)
-                    * in two different methods that reside in different .proto files
-                    * creates a lot of conflicts
-                    * initializing the same message in both files create redeclaration
-                    * while initializing it only in 1 file leads to "undefined message"
-                    * we'll fix this after...
-                    */
-
-                foreach (PartitionID pid in res.Partitions)
-                {
-                    bool toInsert = true;
-                    foreach (PartitionIdentification partitionIdentification in response.Partitions)
-                    {
-                        if (pid.PartitionId.Equals(partitionIdentification.PartitionId))
-                        {
-                            toInsert = false;
-                        }
-                    }
-                    if (toInsert)
-                    {
-                        PartitionIdentification p = new PartitionIdentification
-                        {
-                            PartitionId = pid.PartitionId
-                        };
-
-
-                        p.ObjectIds.Add(pid.ObjectIds);
-
-                        response.Partitions.Add(p);
-                        
-                    }
-                }
-
-                channel.ShutdownAsync();
-                    
+                response.Partitions.Add(pid);
             }
 
             return response;

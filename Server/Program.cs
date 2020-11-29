@@ -34,6 +34,10 @@ namespace Server
         public Server(string server_id, string ip, int minDelay, int maxDelay)
         {
             Server_id = server_id;
+            if(ip.Equals("localhost"))
+            {
+                ip = "127.0.0.1";
+            }
             Ip = IPAddress.Parse(ip);
             Storage = new Dictionary<string, Partition>();
             SystemNodes = new Dictionary<string, ServerIdentification>();
@@ -80,11 +84,13 @@ namespace Server
                     Monitor.Enter(p);
 
                     p.Elements[newValue.ObjectId] = newValue;
+                    p.Elements[newValue.ObjectId].Version++;
 
                     Monitor.Exit(p);
                 }
-                else //add new resource to the Elements of the correct Partition
+                else //add new resource to the Elements of the correct Partition, with version=1
                 {
+                    newValue.Version = 1;
                     p.Elements.Add(newValue.ObjectId, newValue);
 
                     //just in case someone is passing a locked resource
@@ -108,8 +114,7 @@ namespace Server
             return -1;
         }
 
-        
-        internal string RetrieveObject(string id, string partitionId)
+        internal Resource RetrieveObject(string id, string partitionId, int lastVersion)
         {
             Monitor.Enter(Storage);
             if (Storage.ContainsKey(partitionId))
@@ -125,9 +130,7 @@ namespace Server
 
                     Monitor.Enter(res);
                     
-                    if (!res.Locked)
-                        return res.Value;
-                    else //if the resource is locked I wait for a pulse on this resource from the Unlock function 
+                    if (res.Locked) //if the resource is locked I wait for a pulse on this resource from the Unlock function 
                     {
                         Monitor.Exit(res);
                         //leave the lock and wait for someone to unflag
@@ -136,7 +139,17 @@ namespace Server
                             Monitor.Wait(res);
                         }
 
-                        return res.Value;
+                    }
+
+                    //everything ok: resource present and more recent version
+                    if(res.Version > lastVersion)
+                    {
+                        return res;
+                    }
+                    else //resource present but older version: not updated from the master yet
+                    {
+                        return new Resource("OLDER VERSION", "OLDER VERSION") { Version = 0 };
+
                     }
                 }
                 else //the item requested from partition partitionId is not in that partition
@@ -148,7 +161,7 @@ namespace Server
             {
                 Monitor.Exit(Storage);
             }
-            return "N/A"; //no such resource on this server
+            return new Resource("N/A", "N/A") { Version = 0 }; //no such resource on this server
         }
 
         internal bool LockObject(string id, string partitionId)
@@ -259,9 +272,9 @@ namespace Server
          */
         internal bool UpdateSpecialPermission(Resource resource, string partitionId)
         {
-            Monitor.Enter(Storage[partitionId].Elements);
+            Monitor.Enter(Storage[partitionId]);
             Storage[partitionId].Elements[resource.ObjectId] = resource;
-            Monitor.Exit(Storage[partitionId].Elements);
+            Monitor.Exit(Storage[partitionId]);
 
             return true;
         }
@@ -286,8 +299,8 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            ServerClientService.delay();
-            return;
+
+            //args: id url minDelay maxDelay
             string[] a = { "12", "111" };
             string id = args[0];
             string url = args[1];
@@ -307,8 +320,8 @@ namespace Server
                 partitionIds.Add(args[i]);
                 masterIds.Add(args[i + 1]);
             }
-            
-            Server init = new Server(id,url,minDelay,maxDelay);
+            url = url.Split("//")[1];
+            Server init = new Server(id,url.Split(":")[0],minDelay,maxDelay);
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             for(int i = 0; i < partitionIds.ToArray().Length ; i++)
@@ -325,7 +338,7 @@ namespace Server
                     ServerCoordinationServices.BindService(new ServerServerService(init))
                 },
 
-                Ports = { new ServerPort("127.0.0.1", 1000 + int.Parse(init.Server_id), ServerCredentials.Insecure) }
+                Ports = { new ServerPort("127.0.0.1",  int.Parse(url.Split(":")[1]), ServerCredentials.Insecure) }
             };
 
             try

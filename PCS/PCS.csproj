@@ -15,9 +15,6 @@
 		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-		<Protobuf Include="protos\PuppetMasterService.proto" GrpcServices="Server" />
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="protos\" />
+		<Protobuf Include="..\PuppetMasterServices.proto" GrpcServices="Server" />
 	</ItemGroup>
 </Project>

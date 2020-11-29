@@ -24,11 +24,12 @@ namespace PCS
         {
             
             Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe ", request.Scriptfile + " " + request.ClientUrl + " " + request.Username);
-            return Task.FromResult(new ClientResponseObject { Succes = "true" });
+            return Task.FromResult(new ClientResponseObject { Succes = true });
         }
 
         public override Task<ServerResponseObject> ServerRequest(ServerRequestObject request, ServerCallContext context)
         {
+            Console.WriteLine("Going to create a Server");
             String argumentsString = request.ServerId + " " + request.Url + " " + request.MinDelay + " " + request.MaxDelay;
             foreach(PartitionMessage pm in request.Partitions)
             {
@@ -36,7 +37,7 @@ namespace PCS
             }
             Process server = Process.Start("..\\..\\..\\..\\Server\\bin\\Debug\\netcoreapp3.1\\Server.exe", argumentsString);
             servers.Add(request.ServerId, server);
-            return Task.FromResult(new ServerResponseObject { Success = "true" });
+            return Task.FromResult(new ServerResponseObject { Success = true });
         }
         public override Task<CrashResponseObject> CrashRequest(CrashRequestObject request, ServerCallContext context)
         {
@@ -54,16 +55,28 @@ namespace PCS
     {
         static void Main(string[] args)
         {
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
             Grpc.Core.Server server = new Grpc.Core.Server
             {
                 Services =
                 {
                     PuppetMasterServices.BindService(new PCSServerService())
                 },
-                Ports = { new ServerPort("localhost", 10000, ServerCredentials.Insecure) }
+                Ports = { new ServerPort("127.0.0.1", 10000, ServerCredentials.Insecure) }
             };
 
-            server.Start();
+
+            try
+            {
+                server.Start();
+                Console.WriteLine("PCS is Running Running");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            Console.ReadLine();
         }
     }
 }
