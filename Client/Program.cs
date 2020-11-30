@@ -28,10 +28,11 @@ namespace Client
         private static ServerStorageServices.ServerStorageServicesClient currentServer = null;
         private static string currentServerId = null;
 
-
+        
 
         private static ServerStorageServices.ServerStorageServicesClient RetrieveServer(string serverId)
         {
+
             GrpcServer res = servers.GetValueOrDefault(serverId, new GrpcServer("http://localhost:" + (1000 + inc++)));
 
             if (servers[serverId] == null)
@@ -244,8 +245,7 @@ namespace Client
                         }
                         catch (RpcException exx) when (
                                       exx.StatusCode == StatusCode.Unknown ||
-                                      exx.StatusCode == StatusCode.Unavailable ||
-                                      exx.StatusCode == StatusCode.DeadlineExceeded)
+                                      exx.StatusCode == StatusCode.Unavailable)
                         {
                             Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
                             //ADIOS
@@ -278,8 +278,7 @@ namespace Client
                             }
                             catch (RpcException exx) when (
                                         exx.StatusCode == StatusCode.Unknown ||
-                                        exx.StatusCode == StatusCode.Unavailable ||
-                                        exx.StatusCode == StatusCode.DeadlineExceeded)
+                                        exx.StatusCode == StatusCode.Unavailable)
                             {
                                 Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
                                 //farewell champ
@@ -316,8 +315,7 @@ namespace Client
                                     }
                                     catch (RpcException exx) when (
                                         exx.StatusCode == StatusCode.Unknown ||
-                                        exx.StatusCode == StatusCode.Unavailable ||
-                                        exx.StatusCode == StatusCode.DeadlineExceeded)
+                                        exx.StatusCode == StatusCode.Unavailable)
                                     {
                                         Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
                                         //goodbye sweetheart

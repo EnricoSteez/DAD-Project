@@ -26,5 +26,11 @@ namespace Server
             }
         }
 
+        public ServerIdentification(string id, List<string> partitions, string ip)
+        {
+            Id = id;
+            Partitions = partitions;
+            Ip = ip;
+        }
     }
 }
