@@ -135,7 +135,7 @@ namespace Server
         {
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Thread.Sleep(waitTime * 1000);
-            Console.WriteLine("ListGlobal request:\n" + Local.Storage.Values);
+            Console.WriteLine("ListServer request:\n" + Local.Storage.ToString());
             return Task.FromResult(LS(request));
         }
 

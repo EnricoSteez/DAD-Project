@@ -41,6 +41,8 @@ namespace Client
                 servers[serverId] = res;
             }
 
+            Console.WriteLine("retrieve server will return: " + res.ToString());
+
             return res.Service;
         }
 
@@ -102,7 +104,7 @@ namespace Client
             FileStream servfsin = new FileStream(serversFile, FileMode.Open, FileAccess.Read, FileShare.None);
 
             partitions = (Dictionary<string, List<string>>)bf.Deserialize(partfsin);
-            simpleservers = (Dictionary<string, string>)bf.Deserialize(servfsin);
+            simpleservers = (Dictionary<string, string>)bf.Deserialize(servfsin);  //key - serverId value - server url
 
             foreach (string ss in simpleservers.Keys)
             {
@@ -274,12 +276,15 @@ namespace Client
                         }
                         catch (RpcException exx) when (
                                       exx.StatusCode == StatusCode.Unknown ||
-                                      exx.StatusCode == StatusCode.Unavailable ||
-                                      exx.StatusCode == StatusCode.DeadlineExceeded)
+                                      exx.StatusCode == StatusCode.Unavailable)
                         {
                             Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
                             //ADIOS
                             servers.Remove(currentServerId);
+                        }
+                        catch(RpcException exx) when(exx.StatusCode == StatusCode.DeadlineExceeded)
+                        {
+                            Console.WriteLine("Server {0} Frozen, will try to elect another server", currentServerId);
                         }
                         break;
                     case "listServer":
@@ -335,46 +340,41 @@ namespace Client
 
                             foreach (string serv in servers.Keys)
                             {
+                                Console.WriteLine("asking server " + serv);
                                 currentServer = RetrieveServer(serv);
-                                currentServerId = serv;
+                                try
+                                {
+                                    currentServerId = serv;
+                                    reply = currentServer.ListGlobal(new ListGlobalRequest { });
+                                    Console.WriteLine("asked " + currentServerId);
 
-                                tasks.Add(Task.Run(() => {
-                                    try
-                                    {
-                                        reply = currentServer.ListGlobal(new ListGlobalRequest { });
-
-                                    }
-                                    catch (RpcException exx) when (
-                                        exx.StatusCode == StatusCode.Unknown ||
-                                        exx.StatusCode == StatusCode.Unavailable ||
-                                        exx.StatusCode == StatusCode.DeadlineExceeded)
-                                    {
-                                        Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
-                                        //goodbye sweetheart
-                                        servers.Remove(currentServerId);
-                                    }
-                                    catch (Exception exx)
-                                    {
-                                        Console.WriteLine("Unexpected Error!!\n{0}", exx.Message);
-                                    }
+                                }
+                                catch (RpcException exx) when (
+                                    exx.StatusCode == StatusCode.Unknown ||
+                                    exx.StatusCode == StatusCode.Unavailable ||
+                                    exx.StatusCode == StatusCode.DeadlineExceeded)
+                                {
+                                    Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
+                                    //goodbye sweetheart
+                                    servers.Remove(currentServerId);
+                                }
+                                catch (Exception exx)
+                                {
+                                    Console.WriteLine("Unexpected Error!!\n{0}", exx.Message);
+                                }
 
 
-                                    Console.WriteLine("Server {0} Partitions:", currentServerId);
-                                    foreach (PartitionIdentification p in reply.Partitions)
+                                Console.WriteLine("Server {0} Partitions:", currentServerId);
+                                foreach (PartitionIdentification p in reply.Partitions)
+                                {
+                                    Console.WriteLine("->{0}", p.PartitionId);
+                                    Console.WriteLine("\tObjects:");
+                                    for (int i = 0; i < p.ObjectIds.Count; i++)
                                     {
-                                        Console.WriteLine("->{0}", p.PartitionId);
-                                        Console.WriteLine("\tObjects:");
-                                        for (int i = 0; i < p.ObjectIds.Count; i++)
-                                        {
-                                            Console.WriteLine("{0}\tV{1}", p.ObjectIds[i], p.Versions[i]);
-                                        }
+                                        Console.WriteLine("{0}\tV{1}", p.ObjectIds[i], p.Versions[i]);
                                     }
-                                }));
+                                }
                             }
-
-                            Task union = Task.WhenAll(tasks);
-
-                            union.Wait();
 
 
                         }
