@@ -4,7 +4,7 @@ namespace Server
     public class Resource
     {
         public string ObjectId { get; }
-        public string Value { get; }
+        public string Value { get; set; }
         public bool Locked { get; set; }
         public int Version { get; set; }
 

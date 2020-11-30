@@ -98,33 +98,93 @@ namespace Server
             return Task.FromResult(WO(request));
 
         }
-        //TODO check if Monitor.Enter works, i.e. if Local can get the lock to its own attributes (dictionary)
-        // even if the service has the lock on the whole Local object
+        //TODO implement open connections and RetrieveServer like in the client Program
 
-        //TODO: choose whether to update here, just after the client's request or in a separate function every tot min
 
         private WriteObjectResponse WO(WriteObjectRequest request)
         {
+            WriteObjectResponse response = new WriteObjectResponse();
+
+
             Monitor.Enter(Local);
             if (Local.Storage.ContainsKey(request.PartitionId))
             {
-                WriteObjectResponse response = new WriteObjectResponse
-                {
-                    WriteResult = Local.AddObject(new Resource(request.ObjectId, request.Value), request.PartitionId)
-                };
-
-                //AddObject updates the value and does version++ (if the object is already stored)
-                // or it adds the value to the storage with version = 1 (if the id is not present yet)
+                //the response is the version of the added object (calculated locally)
+                response.WriteResult = Local.AddObject(new Resource(request.ObjectId, request.Value, -1), request.PartitionId);
+                
+                //if I put version = -1 it means I'm writing locally, then
+                    //AddObject updates the value and does version++ (if the object is already stored)
+                    // or it adds the value to the storage with version = 1 (if the id is not present yet)
+                //if I put the version it means the update is coming from the master (see ServerServerService.cs)
 
                 Monitor.Exit(Local);
+                UpdateResponse l = new UpdateResponse { Ok = -1 };
+                int failed = 0;
+                int countUpdates = 0;
+                List<Task> tasks = new List<Task>();
 
-                return response;
+                foreach (ServerIdentification sampleServer in Local.SystemNodes.Values)
+                {
+                    if (Local.Server_id != sampleServer.Id && sampleServer.Partitions.Contains(request.PartitionId))
+                    {
+                        ServerCoordinationServices.ServerCoordinationServicesClient replica =
+                            Local.RetrieveServer(sampleServer.Id);
+
+                        countUpdates++;
+
+                        //here the other node will do AddObject but with a version != -1
+                        //so before adding it will check whether he has to update or he's already up to date with the master
+                        //it should update because this follows a write
+                        UpdateValueRequest req = new UpdateValueRequest
+                        {
+                            PartitionId = request.PartitionId,
+                            Id = request.ObjectId,
+                            Value = request.Value,
+                            Version = response.WriteResult
+                        };
+
+                        tasks.Add(Task.Run(() =>
+                        {
+                            try
+                            {
+                                l = replica.UpdateValue(req, deadline: DateTime.UtcNow.AddSeconds(15));
+                                Console.WriteLine("updating replica " + sampleServer.Id);
+                            } //TODO check error model
+                            catch (RpcException ex) when
+                                (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode== StatusCode.Unavailable)
+                            {
+                                Console.WriteLine("Server "+ sampleServer.Id + " unavailable");
+                                failed++;
+                            }
+                        }));
+                    }
+                }
+
+                Task firstThatUpdates = Task.WhenAny(tasks);
+
+                //here I wait for the first non failed task that returned true
+                //I stop if all of them fail
+                while(l.Ok == -1 && failed < countUpdates)
+                {
+                    firstThatUpdates.Wait();
+                }
+
+                if (firstThatUpdates.Status == TaskStatus.RanToCompletion && l.Ok > 0 )
+                    Console.WriteLine("At least one replica updated the value. Returning back to the client");
+                else
+                {
+                    Console.WriteLine("All update requests timed out, sending -1 to the client");
+                    response.WriteResult = -1;
+                }
             }
             else
             {
                 Monitor.Exit(Local);
-                return new WriteObjectResponse { WriteResult = -1 };
+                response.WriteResult = -1;
             }
+
+            return response;
+            
         }
 
 
@@ -135,7 +195,7 @@ namespace Server
         {
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Thread.Sleep(waitTime * 1000);
-            Console.WriteLine("ListGlobal request:\n" + Local.Storage.Values);
+            Console.WriteLine("ListGlobal request:\n" + Local.Storage);
             return Task.FromResult(LS(request));
         }
 

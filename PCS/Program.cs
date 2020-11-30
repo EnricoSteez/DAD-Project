@@ -70,7 +70,7 @@ namespace PCS
             }
             catch(Exception e)
             {
-                Console.WriteLine("FODA-SE");
+                Console.WriteLine("FODA-SE" + e);
             }
 
             Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe ", arguments);

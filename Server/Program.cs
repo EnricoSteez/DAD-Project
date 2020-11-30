@@ -11,6 +11,8 @@ namespace Server
 
     public class Server
     {
+        private static readonly Dictionary<string, ServerCoordinationServices.ServerCoordinationServicesClient> connections =
+            new Dictionary<string, ServerCoordinationServices.ServerCoordinationServicesClient>();
         public Dictionary<string, Partition> Storage { get; }
         public Dictionary<string, ServerIdentification> SystemNodes { get; set; }
         public string Server_id { get; }
@@ -19,8 +21,19 @@ namespace Server
         public int MaxDelay;
         private List<string> _isMasterOf;
 
+        public ServerCoordinationServices.ServerCoordinationServicesClient RetrieveServer(string serverId)
+        {
+            if (!connections.ContainsKey(serverId))
+            {
+                connections.Add(serverId, new ServerCoordinationServices.ServerCoordinationServicesClient(
+                    GrpcChannel.ForAddress(SystemNodes[serverId].Ip)));
+            }
 
-        public Server() //dummy implementation for debugging with just 1 server at localhost
+            return connections[serverId];
+        }
+
+
+        public Server() //dummy implementation for debugging
         {
             Server_id = "1";
             Ip = IPAddress.Parse("127.0.0.1");
@@ -57,6 +70,7 @@ namespace Server
 
                 //lock partition
                 Monitor.Enter(p);
+                int newVersion;
                 if (p.Elements.ContainsKey(newValue.ObjectId))
                 {
                     Resource res = p.Elements[newValue.ObjectId];
@@ -65,46 +79,38 @@ namespace Server
                     //lock resource
                     Monitor.Enter(res);
 
-                    if (res.Locked) //wait
+                    if(newValue.Version == -1) //local addObject with already present resource -> increment version
                     {
-                        Console.WriteLine("Object {0} is locked, waiting for unlock ...", res.ObjectId);
-
-                        Monitor.Exit(res);
-                        //leave the lock and wait for someone to unflag
-                        while (res.Locked)
-                        {
-                            Monitor.Wait(res);
-                        }
+                        newVersion = res.Version + 1;
+                        res.Version++;
+                    } else //update from the master -> version != -1 -> copy version
+                    {
+                        //if(newValue.Version > res.Version) always true because it's comimg from the master
+                        
+                        newVersion = newValue.Version;
+                        res = newValue;
+                    }
+                    
+                    Monitor.Exit(res);
+                }
+                else //add new resource to the Elements of the correct Partition
+                {
+                    if (newValue.Version == -1) //first propagation by the master -> version = 1
+                    {
+                        newVersion = 1;
+                        newValue.Version = 1;
+                    } else //in case I missed the first propagation, should never happen
+                    {
+                        newVersion = newValue.Version;
                     }
 
-                    Monitor.Exit(res);
-                    //here I can just lock the partition because Partitions don't change
-                    //no need to lock the entire storage of a server
-
-                    Monitor.Enter(p);
-
-                    p.Elements[newValue.ObjectId] = newValue;
-                    p.Elements[newValue.ObjectId].Version++;
-
-                    Monitor.Exit(p);
-                }
-                else //add new resource to the Elements of the correct Partition, with version=1
-                {
-                    newValue.Version = 1;
                     p.Elements.Add(newValue.ObjectId, newValue);
 
-                    //just in case someone is passing a locked resource
-                    Resource res = Storage[partitionId].Elements[newValue.ObjectId];
-
                     Monitor.Exit(p);
-
-                    Monitor.Enter(res);
-                    res.Locked = false;
-                    Monitor.Exit(res);
 
                 }
 
-                return 0;
+                return newVersion;
             }
             else
             {
@@ -335,7 +341,8 @@ namespace Server
                 Services =
                 {
                     ServerStorageServices.BindService(new ServerClientService(init)),
-                    ServerCoordinationServices.BindService(new ServerServerService(init))
+                    ServerCoordinationServices.BindService(new ServerServerService(init)),
+                    //TODO add PuppetMasterServices.BindService()
                 },
 
                 Ports = { new ServerPort("127.0.0.1",  int.Parse(url.Split(":")[1]), ServerCredentials.Insecure) }
