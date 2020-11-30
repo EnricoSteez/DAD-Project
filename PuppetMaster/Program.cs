@@ -70,7 +70,7 @@ namespace PuppetMaster
 
             /*----*/
             List<Server.ServerIdentification> servers = new List<Server.ServerIdentification>();
-            Dictionary<String, List<String>> partitions = new Dictionary<String, List<string>>(); 
+            Dictionary<string, List<string>> partitions = new Dictionary<String, List<string>>(); 
             //IMPORTANT: mapping partition Id to a list of server Ids where the partition is replicated (first is master)
             //IMPORTANT: ->>> when you create a server, search for that server id in the list of every entry in the dictionary
             //the master Id will be the first element of the list.
@@ -98,7 +98,7 @@ namespace PuppetMaster
                 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
                 switch (words[0].ToLower()) {
-                    case "replicationFactor":
+                    case "replicationfactor":
                         Console.WriteLine("Replication Factor???");
                     //    if (words.Length == 2 && int.TryParse(words[1], out r))
                     //    {
@@ -153,7 +153,7 @@ namespace PuppetMaster
 
                             if (result.Success)
                             {
-                                servers.Add(new Server.ServerIdentification(serverId, address));
+                                servers.Add(new Server.ServerIdentification(serverId, URL));
                             }
                         }
                         else
@@ -201,14 +201,22 @@ namespace PuppetMaster
                                 Scriptfile = scriptFile
 
                             };
-
                             foreach(string partition in partitions.Keys)
                             {
-                                PartitionMessage p = new PartitionMessage();
+                                PartitionDetails p = new PartitionDetails();
                                 p.Id = partition;
                                 p.MasterId = partitions[partition][0];
+                                for(int pi = 1;  pi < partitions[partition].Count; pi++)
+                                {
+                                    p.Replicas.Add(partitions[partition][pi]);
+                                }
                                 // all servers later
                                 request.Everypartition.Add(p);
+                            }
+                            foreach(Server.ServerIdentification s in servers)
+                            {
+                                ServerDetails sd = new ServerDetails { Id = s.Id, Url = s.Ip };
+                                request.EveryServer.Add(sd);
                             }
 
                             ClientResponseObject result = node.ClientRequest(request);

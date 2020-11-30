@@ -4,9 +4,11 @@ using Server.protos;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -70,26 +72,54 @@ namespace Client
 
         static void Main(string[] args)
         {
-            servers.Add("1", new GrpcServer("http://127.0.0.1:1001"));
-            servers.Add("2", new GrpcServer("http://127.0.0.1:1002"));
-            servers.Add("3", new GrpcServer("http://127.0.0.1:1003"));
-            servers.Add("4", new GrpcServer("http://127.0.0.1:1004"));
-            servers.Add("5", new GrpcServer("http://127.0.0.1:1005"));
-            partitions.Add("p1", new List<string> { "1", "2", "3" });
-            partitions.Add("p2", new List<string> { "2", "4", "5" });
+
+            Dictionary<string, string> simpleservers = new Dictionary<string, string>();
+
+            /*variables declarations*/
             string fileName = @"../../../test.txt";
-            if (args.Length == 1)
+            string url = "localhost";
+            string username = "john";
+            string partitionsFile = "partitions.binary";
+            string serversFile = "servers.binary";
+
+            /*read arguments*/
+            if (args.Length == 5)
             {
                 fileName = args[0];
+                url = args[1];
+                username = args[2];
+                partitionsFile = args[3];
+                serversFile = args[4];
             }
-            int counter = 0;
-            string line;
+
+
+            Console.WriteLine(partitionsFile + " " + serversFile);
+            /*parse serialized dictionaries*/
+
+            BinaryFormatter bf = new BinaryFormatter();
+
+            FileStream partfsin = new FileStream(partitionsFile, FileMode.Open, FileAccess.Read, FileShare.None);
+            FileStream servfsin = new FileStream(serversFile, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            partitions = (Dictionary<string, List<string>>)bf.Deserialize(partfsin);
+            simpleservers = (Dictionary<string, string>)bf.Deserialize(servfsin);
+
+            foreach (string ss in simpleservers.Keys)
+            {
+                servers.Add(ss, new GrpcServer(simpleservers[ss]));
+            }
+
+            simpleservers.Clear();            
+
+
+
 
             List<string> loopCommands = new List<string>();
             List<string> commands = new List<string>();
-
             // Read the file and display it line by line.  
-            System.IO.StreamReader file = new System.IO.StreamReader(fileName);
+            StreamReader file = new StreamReader(fileName);
+            int counter = 0;
+            string line;
             while ((line = GetElement(commands)) != null || (line = file.ReadLine()) != null)
             {
                 string[] words = line.Split(' ', 4);

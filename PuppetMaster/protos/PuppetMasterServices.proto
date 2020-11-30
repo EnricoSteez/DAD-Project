@@ -41,8 +41,20 @@ message ClientRequestObject {
     string username = 1;
     string client_url = 2;
     string scriptfile = 3;
-    repeated PartitionMessage everypartition = 4;
-} 
+    repeated PartitionDetails everypartition = 4;
+    repeated ServerDetails every_server = 5;
+}
+
+message ServerDetails {
+    string id = 1;
+    string url =2;
+}
+
+message PartitionDetails {
+    string id = 1;
+    string masterId = 2;
+    repeated string replicas = 3;
+}
 
 message ClientResponseObject {
     bool succes = 1;

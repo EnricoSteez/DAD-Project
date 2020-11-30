@@ -1,11 +1,16 @@
 ﻿using Grpc.Core;
+using Grpc.Net.Client;
 using Server;
 using Server.protos;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace PCS
 {
@@ -22,8 +27,53 @@ namespace PCS
 
         public override Task<ClientResponseObject> ClientRequest(ClientRequestObject request, ServerCallContext context)
         {
-            
-            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe ", request.Scriptfile + " " + request.ClientUrl + " " + request.Username);
+            Dictionary<string, List<string>> partitions = new Dictionary<string, List<string>>(); //key - partitionId object - list of servers with that partition
+            Dictionary<string, string> servers = new Dictionary<string, string>(); //key - serverId value - server url
+            string arguments = request.Scriptfile + " " + request.ClientUrl + " " + request.Username + " partitions.binary servers.binary";
+
+            foreach(ServerDetails sd in request.EveryServer)
+            {
+                servers.Add(sd.Id, sd.Url);
+            }
+            foreach (PartitionDetails pd in request.Everypartition)
+            {
+                List<string> aux = new List<string>();                
+                if(pd.MasterId != null && pd.MasterId.Length > 0)
+                {
+                    aux.Add(pd.MasterId);
+                }
+                foreach(string part in pd.Replicas)
+                {
+                    aux.Add(part);
+                }
+                partitions.Add(pd.Id, aux);
+            }
+
+            BinaryFormatter bf = new BinaryFormatter();
+            try
+            {
+                FileStream partitionsout = new FileStream("partitions.binary", FileMode.Create, FileAccess.Write, FileShare.None);
+                FileStream serversout = new FileStream("servers.binary", FileMode.Create, FileAccess.Write, FileShare.None);
+
+                using (partitionsout)
+                {
+                    bf.Serialize(partitionsout, partitions);
+                    partitionsout.Close();
+                }
+
+
+                using (serversout)
+                {
+                    bf.Serialize(serversout, servers);
+                    serversout.Close();
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("FODA-SE");
+            }
+
+            Process.Start("..\\..\\..\\..\\Client\\bin\\Debug\\netcoreapp3.1\\Client.exe ", arguments);
             return Task.FromResult(new ClientResponseObject { Succes = true });
         }
 
@@ -55,6 +105,7 @@ namespace PCS
     {
         static void Main(string[] args)
         {
+
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             Grpc.Core.Server server = new Grpc.Core.Server
