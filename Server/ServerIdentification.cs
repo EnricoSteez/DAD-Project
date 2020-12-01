@@ -8,7 +8,7 @@ namespace Server
     //this is a simple and light mask with all the INFORMATIONS of a Server that could be passed
     //so that we can avoid passing al the data such as Dictionaries etc
     //It's just a representation to recognize each Server's public infos
-
+    [Serializable]
     public class ServerIdentification
     {
         public string Id;
@@ -26,5 +26,11 @@ namespace Server
             }
         }
 
+        public ServerIdentification(string id, List<string> partitions, string ip)
+        {
+            Id = id;
+            Partitions = partitions;
+            Ip = ip;
+        }
     }
 }

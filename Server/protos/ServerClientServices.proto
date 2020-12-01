@@ -7,6 +7,15 @@ service ServerStorageServices {
     rpc ListGlobal (ListGlobalRequest) returns (ListGlobalResponse) {}
     rpc ReadObject (ReadObjectRequest) returns (ReadObjectResponse) {}
     rpc WriteObject (WriteObjectRequest) returns (WriteObjectResponse) {}
+    rpc Register (RegisterRequest) returns (RegisterResponse) {}
+}
+
+message RegisterRequest {
+    string url = 1;
+}
+
+message RegisterResponse {
+
 }
 
 message ListServerRequest {

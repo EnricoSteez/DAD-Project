@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -11,16 +13,37 @@ namespace Server
 
     public class Server
     {
+        private static readonly Dictionary<string, ServerCoordinationServices.ServerCoordinationServicesClient> connections =
+            new Dictionary<string, ServerCoordinationServices.ServerCoordinationServicesClient>();
         public Dictionary<string, Partition> Storage { get; }
         public Dictionary<string, ServerIdentification> SystemNodes { get; set; }
+
+        public List<string> clients { get; set; }
         public string Server_id { get; }
         public  IPAddress Ip { get; }
         public int MinDelay;
         public int MaxDelay;
         private List<string> _isMasterOf;
 
+        public static void Print(string s)
+        {
+            Console.BackgroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Server:   " + s);
+        }
+        public ServerCoordinationServices.ServerCoordinationServicesClient RetrieveServer(string serverId)
+        {
+            if (!connections.ContainsKey(serverId))
+            {
+                connections.Add(serverId, new ServerCoordinationServices.ServerCoordinationServicesClient(
+                    GrpcChannel.ForAddress(SystemNodes[serverId].Ip)));
+            }
 
-        public Server() //dummy implementation for debugging with just 1 server at localhost
+            return connections[serverId];
+        }
+
+
+        public Server() //dummy implementation for debugging
         {
             Server_id = "1";
             Ip = IPAddress.Parse("127.0.0.1");
@@ -28,6 +51,7 @@ namespace Server
             Storage = new Dictionary<string, Partition>();
             //empty dictionary at startup
             SystemNodes = new Dictionary<string, ServerIdentification>();
+            clients = new List<string>();
             _isMasterOf = new List<string>();
         }
 
@@ -41,6 +65,7 @@ namespace Server
             Ip = IPAddress.Parse(ip);
             Storage = new Dictionary<string, Partition>();
             SystemNodes = new Dictionary<string, ServerIdentification>();
+            clients = new List<string>();
             MinDelay = minDelay;
             MaxDelay = maxDelay;
             _isMasterOf = new List<string>();
@@ -57,6 +82,7 @@ namespace Server
 
                 //lock partition
                 Monitor.Enter(p);
+                int newVersion;
                 if (p.Elements.ContainsKey(newValue.ObjectId))
                 {
                     Resource res = p.Elements[newValue.ObjectId];
@@ -65,46 +91,38 @@ namespace Server
                     //lock resource
                     Monitor.Enter(res);
 
-                    if (res.Locked) //wait
+                    if(newValue.Version == -1) //local addObject with already present resource -> increment version
                     {
-                        Console.WriteLine("Object {0} is locked, waiting for unlock ...", res.ObjectId);
-
-                        Monitor.Exit(res);
-                        //leave the lock and wait for someone to unflag
-                        while (res.Locked)
-                        {
-                            Monitor.Wait(res);
-                        }
+                        newVersion = res.Version + 1;
+                        res.Version++;
+                    } else //update from the master -> version != -1 -> copy version
+                    {
+                        //if(newValue.Version > res.Version) always true because it's comimg from the master
+                        
+                        newVersion = newValue.Version;
+                        res = newValue;
+                    }
+                    
+                    Monitor.Exit(res);
+                }
+                else //add new resource to the Elements of the correct Partition
+                {
+                    if (newValue.Version == -1) //first propagation by the master -> version = 1
+                    {
+                        newVersion = 1;
+                        newValue.Version = 1;
+                    } else //in case I missed the first propagation, should never happen
+                    {
+                        newVersion = newValue.Version;
                     }
 
-                    Monitor.Exit(res);
-                    //here I can just lock the partition because Partitions don't change
-                    //no need to lock the entire storage of a server
-
-                    Monitor.Enter(p);
-
-                    p.Elements[newValue.ObjectId] = newValue;
-                    p.Elements[newValue.ObjectId].Version++;
-
-                    Monitor.Exit(p);
-                }
-                else //add new resource to the Elements of the correct Partition, with version=1
-                {
-                    newValue.Version = 1;
                     p.Elements.Add(newValue.ObjectId, newValue);
 
-                    //just in case someone is passing a locked resource
-                    Resource res = Storage[partitionId].Elements[newValue.ObjectId];
-
                     Monitor.Exit(p);
-
-                    Monitor.Enter(res);
-                    res.Locked = false;
-                    Monitor.Exit(res);
 
                 }
 
-                return 0;
+                return newVersion;
             }
             else
             {
@@ -183,8 +201,8 @@ namespace Server
 
                     if (!res.Locked)
                     {
-                        Console.WriteLine("Thread {0} just got the permission for locking resource {1} in Partition {2}",
-                        Thread.CurrentThread.Name, id, partitionId);
+                        Server.Print(String.Format("Thread {0} just got the permission for locking resource {1} in Partition {2}",
+                        Thread.CurrentThread.Name, id, partitionId));
 
                         res.Locked = true;
                         Monitor.Exit(res);
@@ -279,6 +297,17 @@ namespace Server
             return true;
         }
 
+
+        public bool UpdateMaster(string partitionId, string newMaster)
+        {
+            Monitor.Enter(Storage[partitionId]);
+            Storage[partitionId].MasterId = newMaster;
+            Monitor.Exit(Storage[partitionId]);
+
+            return true;
+        }
+
+
         public void AddPartition(Partition p)
         {
             Monitor.Enter(Storage);
@@ -293,6 +322,15 @@ namespace Server
             }
             
         }
+
+        public void AddClient(string url)
+        {
+            Monitor.Enter(clients);
+            clients.Add(url);
+            Monitor.Exit(clients);
+
+            
+        }
     }
 
     public class Program
@@ -300,42 +338,59 @@ namespace Server
         public static void Main(string[] args)
         {
 
-            //args: id url minDelay maxDelay
-            string[] a = { "12", "111" };
+
+            Dictionary<string, List<string>> partitions = new Dictionary<string, List<string>>(); //key - partitionId object - list of servers with that partition
+
+            //args: id url minDelay maxDelay            
+
+            /*
+                * this is working only if PCS passes as arguments only the actually stored partitions
+                * and not all the partitions of the system
+                */
+            if (args.Length != 6)
+            {
+                Server.Print("FODEU");
+                return;
+            }
+
             string id = args[0];
             string url = args[1];
             int.TryParse(args[2], out int minDelay);
             int.TryParse(args[3], out int maxDelay);
+            string serversFile = args[4];
+            string partitionsFile = args[5];
 
-            /*
-             * this is working only if PCS passes as arguments only the actually stored partitions
-             * and not all the partitions of the system
-             */
+            /*parse serialized dictionaries*/
 
-            List<string> partitionIds = new List<string>();
-            List<string> masterIds = new List<string>();
+            BinaryFormatter bf = new BinaryFormatter();
 
-            for (int i=4 ; i<args.Length; i+=2)
-            {
-                partitionIds.Add(args[i]);
-                masterIds.Add(args[i + 1]);
-            }
+            FileStream partfsin = new FileStream(partitionsFile, FileMode.Open, FileAccess.Read, FileShare.None);
+            FileStream servfsin = new FileStream(serversFile, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            partitions = (Dictionary<string, List<string>>)bf.Deserialize(partfsin);
+
+
+            /////////////////
+
             url = url.Split("//")[1];
             Server init = new Server(id,url.Split(":")[0],minDelay,maxDelay);
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-            for(int i = 0; i < partitionIds.ToArray().Length ; i++)
+            foreach(string partId in partitions.Keys)
             {
-                init.AddPartition(new Partition(partitionIds[i],masterIds[i]));
+                init.AddPartition(new Partition(partId,partitions[partId][0]));
             }
-            
+            Server.Print(serversFile);
+            init.SystemNodes = (Dictionary<string, ServerIdentification>)bf.Deserialize(servfsin);  //key - serverId value - server url
 
+            Server.Print("numero de servers:  " + init.SystemNodes.Count);
             Grpc.Core.Server server = new Grpc.Core.Server
             {
                 Services =
                 {
                     ServerStorageServices.BindService(new ServerClientService(init)),
-                    ServerCoordinationServices.BindService(new ServerServerService(init))
+                    ServerCoordinationServices.BindService(new ServerServerService(init)),
+                    //TODO add PuppetMasterServices.BindService()
                 },
 
                 Ports = { new ServerPort("127.0.0.1",  int.Parse(url.Split(":")[1]), ServerCredentials.Insecure) }
@@ -347,7 +402,7 @@ namespace Server
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Server.Print(e.Message);
             }
             Console.ReadLine();
 

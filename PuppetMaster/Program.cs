@@ -109,7 +109,7 @@ namespace PuppetMaster
                     //        Console.WriteLine("Wrong number of arguments!");
                     //    }
                         break;
-                // Script starts with Server setup (Server and Partition commands)
+                    // Script starts with Server setup (Server and Partition commands)
                     // create server process
                     case "server":
                         int minDelay;
@@ -123,7 +123,7 @@ namespace PuppetMaster
                             int.TryParse(words[3], out minDelay);
                             int.TryParse(words[4], out maxDelay);
 
-                            string address = String.Join(':', URL.Split(':').SkipLast(1).ToArray());
+                            string address = string.Join(':', URL.Split(':').SkipLast(1).ToArray());
                             GrpcChannel channel = GrpcChannel.ForAddress( address + ':' + 10000);
                            
                             PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
@@ -138,11 +138,16 @@ namespace PuppetMaster
 
                             foreach(string partition in partitions.Keys)
                             {
-                                if (partitions[partition].Contains(serverId)){
+                                if (partitions[partition].Contains(serverId))
+                                {
                                     
-                                    PartitionMessage p = new PartitionMessage();
+                                    PartitionDetails p = new PartitionDetails();
                                     p.Id = partition;
                                     p.MasterId = partitions[partition][0];
+                                    for(int k = 1; k < partitions[partition].Count; k++)
+                                    {
+                                        p.Replicas.Add(partitions[partition][k]);
+                                    }
                                     request.Partitions.Add(p);
                                 }
                             }
@@ -189,7 +194,7 @@ namespace PuppetMaster
                             URL = words[2];
                             scriptFile = words[3];
 
-                            string address = String.Join(':', words[2].Split(':').SkipLast(1).ToArray());
+                            string address = string.Join(':', words[2].Split(':').SkipLast(1).ToArray());
                             GrpcChannel channel = GrpcChannel.ForAddress(address + ':' + 10000);
 
                             PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);

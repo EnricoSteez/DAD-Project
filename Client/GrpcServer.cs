@@ -24,6 +24,13 @@ namespace Client
             Service = new ServerStorageServices.ServerStorageServicesClient(channel);
         }
 
+
+        public override string ToString()
+        {
+
+            return this.Url;
+        }
+
         /*public GrpcServer(string partition_id, string url)
         {
 

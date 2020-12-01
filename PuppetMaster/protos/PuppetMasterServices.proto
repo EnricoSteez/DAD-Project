@@ -17,13 +17,9 @@ message ServerRequestObject {
     int32 min_delay = 2;
     int32 max_delay = 3;
     string url = 4;
-    repeated PartitionMessage partitions = 5;
+    repeated PartitionDetails partitions = 5;
 }
 
-message PartitionMessage {
-    string id = 1;
-    string masterId = 2;
-}
 
 message ServerResponseObject {
     bool success = 1;
