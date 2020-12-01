@@ -1,0 +1,27 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Server.protos";
+
+service ElectionServices {
+    rpc ChooseMaster (ChooseMasterRequest) returns (ChooseMasterResponse) {}
+    rpc AnnounceMaster (AnnounceMasterRequest) returns (AnnounceMasterResponse) {}
+}
+
+
+message ChooseMasterRequest {
+    string partitionId = 1;
+}
+
+message ChooseMasterResponse {
+    bool success = 1;
+}
+
+
+message AnnounceMasterRequest {
+    string partitionId = 1;
+    string serverId = 2;
+}
+
+message AnnounceMasterResponse {
+    bool success = 1;
+}

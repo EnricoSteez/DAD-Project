@@ -1,9 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="protos\ElectionServices.proto" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.13.0" />
@@ -14,11 +18,9 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="protos\" />
-  </ItemGroup>
     
   <ItemGroup>
+    <Protobuf Include="protos\ElectionServices.proto" GrpcServices="Both" />
     <Protobuf Include="protos\ServerClientServices.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

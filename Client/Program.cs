@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
@@ -23,17 +24,26 @@ namespace Client
         private static int inc = 1;
         private static Dictionary<string, GrpcServer> servers = new Dictionary<string, GrpcServer>();
 
-        private static Dictionary<string, List<string>> partitions = new Dictionary<string, List<string>>(); //key - partitionId object - list of servers with that partition
+        public static Dictionary<string, List<string>> partitions = new Dictionary<string, List<string>>(); //key - partitionId object - list of servers with that partition
 
         private static Dictionary<string, int> lastKnownObjects = new Dictionary<string, int>(); //(ObjectIDs,LastKnownVersions)
 
         private static ServerStorageServices.ServerStorageServicesClient currentServer = null;
         private static string currentServerId = null;
 
+        
+        private static void Print(string s)
+        {
 
+            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Client:   " + s);
+
+        }
 
         private static ServerStorageServices.ServerStorageServicesClient RetrieveServer(string serverId)
         {
+
             GrpcServer res = servers.GetValueOrDefault(serverId, new GrpcServer("http://localhost:" + (1000 + inc++)));
 
             if (servers[serverId] == null)
@@ -41,9 +51,45 @@ namespace Client
                 servers[serverId] = res;
             }
 
-            Console.WriteLine("retrieve server will return: " + res.ToString());
+            Program.Print("retrieve server will return: " + res.ToString());
 
             return res.Service;
+        }
+
+        private static bool ElectNewMaster(string partitionId)
+        {
+
+            if(partitions[partitionId].Count < 2)
+            {
+                return false;
+            }
+            Monitor.Enter(partitions[partitionId]);
+            List<string> partitionservers = partitions[partitionId].Skip(1).ToList();
+            Monitor.Exit(partitions[partitionId]);
+            partitionservers.Sort();
+            for (int sindex = 1; sindex < partitionservers.Count; sindex++)
+            {
+                currentServerId = partitionservers[sindex];
+                GrpcServer servvvv;
+                if (servers.TryGetValue(currentServerId, out servvvv))
+                {
+                    GrpcChannel c = GrpcChannel.ForAddress(servvvv.Url);
+                    ElectionServices.ElectionServicesClient service = new ElectionServices.ElectionServicesClient(c);
+                    try
+                    {
+                        ChooseMasterResponse resp = service.ChooseMaster(new ChooseMasterRequest { PartitionId = partitionId });
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        Program.Print("Could not elect server " + currentServerId);
+                    }
+                }
+
+                
+            }
+            return false;
+
         }
 
 
@@ -74,17 +120,12 @@ namespace Client
 
         static void Main(string[] args)
         {
-
             Dictionary<string, string> simpleservers = new Dictionary<string, string>();
-
-            /*variables declarations*/
             string fileName = @"../../../test.txt";
             string url = "localhost";
             string username = "john";
             string partitionsFile = "partitions.binary";
             string serversFile = "servers.binary";
-
-            /*read arguments*/
             if (args.Length == 5)
             {
                 fileName = args[0];
@@ -95,7 +136,9 @@ namespace Client
             }
 
 
-            Console.WriteLine(partitionsFile + " " + serversFile);
+            Program.Print(partitionsFile + " " + serversFile);
+
+
             /*parse serialized dictionaries*/
 
             BinaryFormatter bf = new BinaryFormatter();
@@ -110,18 +153,40 @@ namespace Client
             {
                 servers.Add(ss, new GrpcServer(simpleservers[ss]));
             }
+            int counter = 0;
+            string line;
 
-            simpleservers.Clear();            
 
-
-
+            /////////////////
 
             List<string> loopCommands = new List<string>();
             List<string> commands = new List<string>();
+
+
+            List<Task> registerRequestTasks = new List<Task>();
+            foreach (GrpcServer s in servers.Values)
+            {
+
+                registerRequestTasks.Add(Task.Run(() =>
+                {
+                    try
+                    {
+                        s.Service.Register(new RegisterRequest { Url = url }, deadline: DateTime.UtcNow.AddSeconds(5));
+                    } 
+                    catch(RpcException ex) when(ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unknown || ex.StatusCode == StatusCode.Unavailable)
+                    {
+                        Program.Print("Server " + s.Url + " unavailable");
+                    }
+                }));
+
+                Task union = Task.WhenAll(registerRequestTasks);
+                union.Wait();
+
+            }
+
+
             // Read the file and display it line by line.  
-            StreamReader file = new StreamReader(fileName);
-            int counter = 0;
-            string line;
+            System.IO.StreamReader file = new System.IO.StreamReader(fileName);
             while ((line = GetElement(commands)) != null || (line = file.ReadLine()) != null)
             {
                 string[] words = line.Split(' ', 4);
@@ -134,7 +199,7 @@ namespace Client
                     case "read":
                         if (words.Length != 4)
                         {
-                            Console.WriteLine("Wrong number of args!");
+                            Program.Print("Wrong number of args!");
                             break;
                         }
                         partitionId = words[1];
@@ -191,14 +256,14 @@ namespace Client
                                         }
                                         else //after this (which I know is unreachable) there's nothing else to try
                                         {
-                                            Console.WriteLine("No more servers available, sorry!");
+                                            Program.Print("No more servers available, sorry!");
                                             break;
                                         }
                                     }
 
                                     
                                     
-                                    Console.WriteLine("Server Unreachable, trying with {0}", newAttemptId);
+                                    Program.Print(String.Format("Server Unreachable, trying with {0}", newAttemptId));
                                     currentServer = RetrieveServer(newAttemptId);
                                     currentServerId = newAttemptId;
                                     attempt++;
@@ -206,13 +271,13 @@ namespace Client
                                 }
                                 else
                                 {
-                                    Console.WriteLine("No more servers available, sorry!");
+                                    Program.Print("No more servers available, sorry!");
                                     break;
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine("Unexpected Error!!\n{0}", ex.Message);
+                                Program.Print("Unexpected Error!!\n " + ex.Message);
                             }
                         }
 
@@ -220,12 +285,12 @@ namespace Client
                         if (readResponse != null)
                         {
                             if (readResponse.Id == "OLDER VERSION" && readResponse.Value == "OLDER VERSION")
-                                Console.WriteLine("The server only has an older version of this object");
+                                Program.Print("The server only has an older version of this object");
                             else if (readResponse.Id == "N/A" && readResponse.Value == "N/A")
-                                Console.WriteLine("The server doesn't store the required object");
+                                Program.Print("The server doesn't store the required object");
                             else
                             {
-                                Console.WriteLine("Object {0} read: {1}   V{2}", readResponse.Id, readResponse.Value, readResponse.Version);
+                                Program.Print(String.Format("Object {0} read: {1}   V{2}", readResponse.Id, readResponse.Value, readResponse.Version));
                                 if (lastKnownObjects.ContainsKey(readResponse.Id))
                                 {
                                     lastKnownObjects[readResponse.Id] = readResponse.Version;
@@ -238,7 +303,7 @@ namespace Client
                         }
                         else
                         {
-                            Console.WriteLine("Error getting reply");
+                            Program.Print("Error getting reply");
                         }
 
                         break;
@@ -246,7 +311,7 @@ namespace Client
 
                         if (words.Length != 4)
                         {
-                            Console.WriteLine("Wrong number of args!");
+                            Program.Print("Wrong number of args!");
                             break;
                         }
 
@@ -270,21 +335,45 @@ namespace Client
                         };
                         try
                         {
-                            WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest);
-                            Console.WriteLine("Write object {0} result: {1}", objectId, writeResponse.WriteResult);
+                            WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline:DateTime.UtcNow.AddSeconds(5));
+                            Program.Print(String.Format("Write object {0} result: {1}", objectId, writeResponse.WriteResult));
 
                         }
                         catch (RpcException exx) when (
                                       exx.StatusCode == StatusCode.Unknown ||
-                                      exx.StatusCode == StatusCode.Unavailable)
+                                      exx.StatusCode == StatusCode.Unavailable || exx.StatusCode == StatusCode.DeadlineExceeded)
                         {
-                            Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
-                            //ADIOS
-                            servers.Remove(currentServerId);
-                        }
-                        catch(RpcException exx) when(exx.StatusCode == StatusCode.DeadlineExceeded)
-                        {
-                            Console.WriteLine("Server {0} Frozen, will try to elect another server", currentServerId);
+
+                            
+
+                            if (exx.StatusCode == StatusCode.Unknown || exx.StatusCode == StatusCode.Unavailable )
+                            {
+                                Program.Print(String.Format("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId));
+                                //ADIOS
+                                servers.Remove(currentServerId);
+                            }
+                            else
+                            {
+                                Program.Print(String.Format("Server {0} Frozen", currentServerId));
+                            }
+                            Program.Print("will try to elect another server");
+                            if(ElectNewMaster(partitionId))
+                            {
+                                currentServer = RetrieveServer(partitions[partitionId][0]);
+                                currentServerId = partitions[partitionId][0];
+                                try
+                                {
+                                    WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline: DateTime.UtcNow.AddSeconds(5));
+                                    Program.Print(String.Format("Write object {0} result: {1}", objectId, writeResponse.WriteResult));
+
+                                }
+                                catch (RpcException exxx) when (
+                                      exxx.StatusCode == StatusCode.Unknown ||
+                                      exxx.StatusCode == StatusCode.Unavailable || exx.StatusCode == StatusCode.DeadlineExceeded)
+                                {
+                                    Program.Print(String.Format("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId));
+                                }
+                            }
                         }
                         break;
                     case "listServer":
@@ -303,31 +392,30 @@ namespace Client
                                 ListServerResponse reply = currentServer.ListServer(new ListServerRequest { });
 
                                 //PRINT RESULTS
-                                Console.WriteLine("Objects:");
+                                Program.Print("Objects:");
 
                                 foreach (ListServerResource r in reply.Objects)
                                 {
-                                    Console.WriteLine("Object: {0} V{1}, master: {2}", r.Id, r.Version, r.IsMasterReplica);
+                                    Program.Print(String.Format("Object: {0} V{1}, master: {2}", r.Id, r.Version, r.IsMasterReplica));
                                 }
 
                             }
                             catch (RpcException exx) when (
                                         exx.StatusCode == StatusCode.Unknown ||
-                                        exx.StatusCode == StatusCode.Unavailable ||
-                                        exx.StatusCode == StatusCode.DeadlineExceeded)
+                                        exx.StatusCode == StatusCode.Unavailable)
                             {
-                                Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
+                                Program.Print(String.Format("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId));
                                 //farewell champ
                                 servers.Remove(currentServerId);
                             }
                             catch (Exception exx)
                             {
-                                Console.WriteLine("Unexpected Error!!\n{0}", exx.Message);
+                                Program.Print("Unexpected Error!!\n" + exx.Message);
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Wrong number of args!");
+                            Program.Print("Wrong number of args!");
                         }
                         break;
                     case "listGlobal":
@@ -340,47 +428,44 @@ namespace Client
 
                             foreach (string serv in servers.Keys)
                             {
-                                Console.WriteLine("asking server " + serv);
+                                Program.Print("asking server " + serv);
                                 currentServer = RetrieveServer(serv);
                                 try
                                 {
                                     currentServerId = serv;
                                     reply = currentServer.ListGlobal(new ListGlobalRequest { });
-                                    Console.WriteLine("asked " + currentServerId);
-
+                                    Program.Print("asked " + currentServerId);
                                 }
                                 catch (RpcException exx) when (
                                     exx.StatusCode == StatusCode.Unknown ||
                                     exx.StatusCode == StatusCode.Unavailable ||
                                     exx.StatusCode == StatusCode.DeadlineExceeded)
                                 {
-                                    Console.WriteLine("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId);
+                                    Program.Print(string.Format("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId));
                                     //goodbye sweetheart
                                     servers.Remove(currentServerId);
                                 }
                                 catch (Exception exx)
                                 {
-                                    Console.WriteLine("Unexpected Error!!\n{0}", exx.Message);
+                                    Program.Print("Unexpected Error!!\n" + exx.Message);
                                 }
 
 
-                                Console.WriteLine("Server {0} Partitions:", currentServerId);
+                                Program.Print(String.Format("Server {0} Partitions:", currentServerId));
                                 foreach (PartitionIdentification p in reply.Partitions)
                                 {
-                                    Console.WriteLine("->{0}", p.PartitionId);
-                                    Console.WriteLine("\tObjects:");
+                                    Program.Print(String.Format("->{0}", p.PartitionId));
+                                    Program.Print("\tObjects:");
                                     for (int i = 0; i < p.ObjectIds.Count; i++)
                                     {
-                                        Console.WriteLine("{0}\tV{1}", p.ObjectIds[i], p.Versions[i]);
+                                        Program.Print(String.Format("{0}\tV{1}", p.ObjectIds[i], p.Versions[i]));
                                     }
                                 }
                             }
-
-
                         }
                         else
                         {
-                            Console.WriteLine("Wrong number of args!");
+                            Program.Print("Wrong number of args!");
                         }
                         break;
                     case "wait":
@@ -388,12 +473,12 @@ namespace Client
                         if (words.Length == 2 && int.TryParse(words[1], out ms))
                         {
 
-                            Console.WriteLine("Waiting {0} ms", words[1]);
+                            Program.Print(String.Format("Waiting {0} ms", words[1]));
                             Thread.Sleep(ms);
                         }
                         else
                         {
-                            Console.WriteLine("Wrong number of args!");
+                            Program.Print("Wrong number of args!");
                         }
                         break;
                     case "begin-repeat":
@@ -412,17 +497,17 @@ namespace Client
                             else
                             {
                                 rep = 0;
-                                Console.WriteLine("Invalid number of repetitions");
+                                Program.Print("Invalid number of repetitions");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Invalid repetition!");
+                            Program.Print("Invalid repetition!");
 
                         }
                         break;
                     default:
-                        Console.WriteLine("Invalid command!");
+                        Program.Print("Invalid command!");
                         break;
 
                 }

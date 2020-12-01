@@ -17,9 +17,13 @@ message ServerRequestObject {
     int32 min_delay = 2;
     int32 max_delay = 3;
     string url = 4;
-    repeated PartitionDetails partitions = 5;
+    repeated PartitionMessage partitions = 5;
 }
 
+message PartitionMessage {
+    string id = 1;
+    string masterId = 2;
+}
 
 message ServerResponseObject {
     bool success = 1;
@@ -37,20 +41,8 @@ message ClientRequestObject {
     string username = 1;
     string client_url = 2;
     string scriptfile = 3;
-    repeated PartitionDetails everypartition = 4;
-    repeated ServerDetails every_server = 5;
-}
-
-message ServerDetails {
-    string id = 1;
-    string url =2;
-}
-
-message PartitionDetails {
-    string id = 1;
-    string masterId = 2;
-    repeated string replicas = 3;
-}
+    repeated PartitionMessage everypartition = 4;
+} 
 
 message ClientResponseObject {
     bool succes = 1;

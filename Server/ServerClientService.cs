@@ -31,7 +31,7 @@ namespace Server
 
         private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
         {
-            Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+            Server.Print(String.Format("The Elapsed event was raised at {0}", e.SignalTime));
         }
         public static void delay()
         {
@@ -49,15 +49,26 @@ namespace Server
 
         //----------------------------------
 
+        //---------------------------REGISTER CLIENT---------------
+
+        public override Task<RegisterResponse> Register(RegisterRequest request, ServerCallContext context)
+        {
+            Local.AddClient(request.Url);
+            Server.Print("Server " + Local.Server_id + " registered client " + request.Url);
+            return Task.FromResult(new RegisterResponse());
+        }
+
+        //---------------
+
         //--------------------------------------------- READ OBJECT ---------------------------------------------
 
         public override Task<ReadObjectResponse> ReadObject(ReadObjectRequest request,
             ServerCallContext context)
         {
-            Console.WriteLine("Client " + context.Host + " wants to READ {0} from Partition {1}",
-                request.ObjectId, request.PartitionId);
+            Server.Print(String.Format("Client " + context.Host + " wants to READ {0} from Partition {1}",
+                request.ObjectId, request.PartitionId));
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
-            Console.WriteLine("Client served in {0} seconds", waitTime);
+            Server.Print(String.Format("Client served in {0} seconds", waitTime));
             //Thread.Sleep(waitTime * 1000); //Timer event
             return Task.FromResult(RO(request));
 
@@ -91,40 +102,109 @@ namespace Server
         public override Task<WriteObjectResponse> WriteObject(WriteObjectRequest request,
             ServerCallContext context)
         {
-            Console.WriteLine("Client " + context.Host + " wants to write {0}", request.ObjectId);
+            Server.Print(String.Format("Client " + context.Host + " wants to write {0}", request.ObjectId));
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
-            Console.WriteLine("Client served in {0} seconds", waitTime);
+            Server.Print(String.Format("Client served in {0} seconds", waitTime));
             Thread.Sleep(waitTime * 1000);
             return Task.FromResult(WO(request));
 
         }
-        //TODO check if Monitor.Enter works, i.e. if Local can get the lock to its own attributes (dictionary)
-        // even if the service has the lock on the whole Local object
+        //TODO implement open connections and RetrieveServer like in the client Program
 
-        //TODO: choose whether to update here, just after the client's request or in a separate function every tot min
 
         private WriteObjectResponse WO(WriteObjectRequest request)
         {
+            WriteObjectResponse response = new WriteObjectResponse();
+
             Monitor.Enter(Local);
             if (Local.Storage.ContainsKey(request.PartitionId))
             {
-                WriteObjectResponse response = new WriteObjectResponse
-                {
-                    WriteResult = Local.AddObject(new Resource(request.ObjectId, request.Value), request.PartitionId)
-                };
-
-                //AddObject updates the value and does version++ (if the object is already stored)
-                // or it adds the value to the storage with version = 1 (if the id is not present yet)
+                //the response is the version of the added object (calculated locally)
+                response.WriteResult = Local.AddObject(new Resource(request.ObjectId, request.Value, -1), request.PartitionId);
+                
+                //if I put version = -1 it means I'm writing locally, then
+                    //AddObject updates the value and does version++ (if the object is already stored)
+                    // or it adds the value to the storage with version = 1 (if the id is not present yet)
+                //if I put the version it means the update is coming from the master (see ServerServerService.cs)
 
                 Monitor.Exit(Local);
+                UpdateResponse l = new UpdateResponse { Ok = -1 };
+                int failed = 0;
+                int countUpdates = 0;
+                List<Task> tasks = new List<Task>();
 
-                return response;
+                foreach (ServerIdentification sampleServer in Local.SystemNodes.Values)
+                {
+                    Server.Print("é suposto entrar");
+                    if (Local.Server_id != sampleServer.Id && sampleServer.Partitions.Contains(request.PartitionId))
+                    {
+                        Server.Print("não é suposto entrar");
+                        ServerCoordinationServices.ServerCoordinationServicesClient replica =
+                            Local.RetrieveServer(sampleServer.Id);
+
+                        countUpdates++;
+
+                        //here the other node will do AddObject but with a version != -1
+                        //so before adding it will check whether he has to update or he's already up to date with the master
+                        //it should update because this follows a write
+                        UpdateValueRequest req = new UpdateValueRequest
+                        {
+                            PartitionId = request.PartitionId,
+                            Id = request.ObjectId,
+                            Value = request.Value,
+                            Version = response.WriteResult
+                        };
+
+                        tasks.Add(Task.Run(() =>
+                        {
+                            try
+                            {
+                                l = replica.UpdateValue(req, deadline: DateTime.UtcNow.AddSeconds(15));
+                                Server.Print("updating replica " + sampleServer.Id);
+                            } //TODO check error model
+                            catch (RpcException ex) when
+                                (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode== StatusCode.Unavailable)
+                            {
+                                Server.Print("Server "+ sampleServer.Id + " unavailable");
+                                failed++;
+                            }
+                        }));
+                    }
+                }
+                if(tasks.Count > 0)
+                {
+                    Task firstThatUpdates = Task.WhenAny(tasks);
+
+                    //here I wait for the first non failed task that returned true
+                    //I stop if all of them fail
+                    while (l.Ok == -1 && failed < countUpdates)
+                    {
+                        firstThatUpdates.Wait();
+                    }
+
+                    if (firstThatUpdates.Status == TaskStatus.RanToCompletion && l.Ok > 0)
+                        Server.Print("At least one replica updated the value. Returning back to the client");
+                    else
+                    {
+                        Server.Print("All update requests timed out, sending -1 to the client");
+                        response.WriteResult = -1;
+                    }
+                }
+
+                else
+                {
+                    Server.Print("no replica to update. returning.");
+                }
+                
             }
             else
             {
                 Monitor.Exit(Local);
-                return new WriteObjectResponse { WriteResult = -1 };
+                response.WriteResult = -1;
             }
+
+            return response;
+            
         }
 
 
@@ -135,7 +215,7 @@ namespace Server
         {
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Thread.Sleep(waitTime * 1000);
-            Console.WriteLine("ListServer request:\n" + Local.Storage.ToString());
+            Server.Print("ListServer request:\n" + Local.Storage.ToString());
             return Task.FromResult(LS(request));
         }
 
