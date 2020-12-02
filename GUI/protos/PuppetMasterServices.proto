@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+option csharp_namespace = "Server.protos";
+
+
+service PuppetMasterServices {
+    rpc ServerRequest (ServerRequestObject) returns (ServerResponseObject) {}
+    rpc StatusRequest (StatusRequestObject) returns (StatusResponseObject) {} //to Server
+    rpc ClientRequest (ClientRequestObject) returns (ClientResponseObject) {} //to PCS
+    rpc CrashRequest (CrashRequestObject) returns (CrashResponseObject) {} //to Server
+    rpc FreezeRequest (FreezeRequestObject) returns (FreezeResponseObject) {} //to Server
+    rpc UnfreezeRequest (UnfreezeRequestObject) returns (UnfreezeResponseObject) {} //to Server
+}
+
+message ServerRequestObject {
+    string server_id = 1;
+    int32 min_delay = 2;
+    int32 max_delay = 3;
+    string url = 4;
+    repeated PartitionDetails partitions = 5;
+}
+
+
+message ServerResponseObject {
+    bool success = 1;
+}
+
+message StatusRequestObject {
+}
+
+message StatusResponseObject {
+    string success = 1;
+}
+
+
+message ClientRequestObject {
+    string username = 1;
+    string client_url = 2;
+    string scriptfile = 3;
+    repeated PartitionDetails everypartition = 4;
+    repeated ServerDetails every_server = 5;
+}
+
+message ServerDetails {
+    string id = 1;
+    string url =2;
+}
+
+message PartitionDetails {
+    string id = 1;
+    string masterId = 2;
+    repeated string replicas = 3;
+}
+
+message ClientResponseObject {
+    bool succes = 1;
+}
+
+message CrashRequestObject {
+    string server_id = 1;
+}
+
+message CrashResponseObject {
+    bool success = 1;
+}
+
+message FreezeRequestObject {
+
+}
+
+message FreezeResponseObject {
+    string success = 1;
+}
+
+message UnfreezeRequestObject {
+
+}
+
+message UnfreezeResponseObject {
+    string success = 1;
+}
+
+message Prova {
+    string prova = 1;
+}

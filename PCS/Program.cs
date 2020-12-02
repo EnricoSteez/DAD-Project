@@ -20,7 +20,7 @@ namespace PCS
         private static Dictionary<string, Process> servers;
         private static Dictionary<string, Server.ServerIdentification> serversDetails;
         private static List<ServerRequestObject> serverRequests;
-
+        private static int counter = 0;
 
         public PCSServerService()
         {
@@ -42,7 +42,7 @@ namespace PCS
             Thread.Sleep(2000);
             Dictionary<string, List<string>> partitions = new Dictionary<string, List<string>>(); //key - partitionId object - list of servers with that partition
             Dictionary<string, string> servers = new Dictionary<string, string>(); //key - serverId value - server url
-            string arguments = request.Scriptfile + " " + request.ClientUrl + " " + request.Username + " partitions.binary servers.binary";
+            string arguments = request.Scriptfile + " " + request.ClientUrl + " " + request.Username + " partitions" + counter +".binary servers"  + counter + ".binary";
 
             foreach(ServerDetails sd in request.EveryServer)
             {
@@ -65,8 +65,8 @@ namespace PCS
             BinaryFormatter bf = new BinaryFormatter();
             try
             {
-                FileStream partitionsout = new FileStream("partitions.binary", FileMode.Create, FileAccess.Write, FileShare.None);
-                FileStream serversout = new FileStream("servers.binary", FileMode.Create, FileAccess.Write, FileShare.None);
+                FileStream partitionsout = new FileStream("partitions" + counter +".binary", FileMode.Create, FileAccess.Write, FileShare.None);
+                FileStream serversout = new FileStream("servers" + counter++ +".binary", FileMode.Create, FileAccess.Write, FileShare.None);
 
                 using (partitionsout)
                 {
@@ -184,14 +184,18 @@ namespace PCS
                 servers.Add(request.ServerId, server);
             }
 
-            serversDetails.Clear();
+            serverRequests.Clear();
+            serverRequests = new List<ServerRequestObject>();
         }
         public override Task<CrashResponseObject> CrashRequest(CrashRequestObject request, ServerCallContext context)
         {
+
+            Print("Crash Request received: server " + request.ServerId);
             CreateServers();
             Process server;
             if(servers.TryGetValue(request.ServerId, out server))
             {
+                Print("found the server");
                 server.Kill();
                 servers.Remove(request.ServerId);
                 return Task.FromResult(new CrashResponseObject { Success = true });

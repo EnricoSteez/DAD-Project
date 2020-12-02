@@ -264,14 +264,14 @@ namespace PuppetMaster
                         if (words.Length == 2)
                         {
                             serverId = words[1];
-                            CrashRequestObject request = new CrashRequestObject
-                            { };
-
+                            CrashRequestObject request = new CrashRequestObject { ServerId=serverId };
+                            bool found = false;
                             // send crash request to corresponding server address + port 10000
                             foreach (Server.ServerIdentification serv in servers)
                             {
-                                if (serv.Id.Contains(serverId))
+                                if (serv.Id.Equals(serverId))
                                 {
+                                    found = true;
                                     string urll = serv.Ip;
 
                                     // extracting address from url
@@ -281,10 +281,12 @@ namespace PuppetMaster
                                     GrpcChannel channel = GrpcChannel.ForAddress(address + ':' + 10000);
                                     PuppetMasterServices.PuppetMasterServicesClient node = new PuppetMasterServices.PuppetMasterServicesClient(channel);
                                     CrashResponseObject result = node.CrashRequest(request);
+                                    break;
                                 }
-                                else
-                                    Console.WriteLine("Server not found");
+
                             }
+                            if(!found)
+                                Console.WriteLine("Server not found");
                         }
                         else
                         {

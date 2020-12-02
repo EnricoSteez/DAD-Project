@@ -29,11 +29,11 @@ namespace Server
 
         //----------TESTINGS------------------------
 
-        private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        /*private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
         {
-            Server.Print(String.Format("The Elapsed event was raised at {0}", e.SignalTime));
-        }
-        public static void delay()
+            Server.Print(Local.Server_id, String.Format("The Elapsed event was raised at {0}", e.SignalTime));
+        }*/
+        /*public static void delay()
         {
             // Create a timer and set a two second interval.
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
@@ -45,7 +45,7 @@ namespace Server
 
             aTimer.Start();
 
-        }
+        }*/
 
         //----------------------------------
 
@@ -54,7 +54,7 @@ namespace Server
         public override Task<RegisterResponse> Register(RegisterRequest request, ServerCallContext context)
         {
             Local.AddClient(request.Url);
-            Server.Print("Server " + Local.Server_id + " registered client " + request.Url);
+            Server.Print(Local.Server_id, "Server " + Local.Server_id + " registered client " + request.Url);
             return Task.FromResult(new RegisterResponse());
         }
 
@@ -65,10 +65,10 @@ namespace Server
         public override Task<ReadObjectResponse> ReadObject(ReadObjectRequest request,
             ServerCallContext context)
         {
-            Server.Print(String.Format("Client " + context.Host + " wants to READ {0} from Partition {1}",
+            Server.Print(Local.Server_id, String.Format("Client " + context.Host + " wants to READ {0} from Partition {1}",
                 request.ObjectId, request.PartitionId));
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
-            Server.Print(String.Format("Client served in {0} seconds", waitTime));
+            Server.Print(Local.Server_id, String.Format("Client served in {0} seconds", waitTime));
             //Thread.Sleep(waitTime * 1000); //Timer event
             return Task.FromResult(RO(request));
 
@@ -102,9 +102,9 @@ namespace Server
         public override Task<WriteObjectResponse> WriteObject(WriteObjectRequest request,
             ServerCallContext context)
         {
-            Server.Print(String.Format("Client " + context.Host + " wants to write {0}", request.ObjectId));
+            Server.Print(Local.Server_id, String.Format("Client " + context.Host + " wants to write {0}", request.ObjectId));
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
-            Server.Print(String.Format("Client served in {0} seconds", waitTime));
+            Server.Print(Local.Server_id, String.Format("Client served in {0} seconds", waitTime));
             Thread.Sleep(waitTime * 1000);
             return Task.FromResult(WO(request));
 
@@ -135,10 +135,8 @@ namespace Server
 
                 foreach (ServerIdentification sampleServer in Local.SystemNodes.Values)
                 {
-                    Server.Print("é suposto entrar");
                     if (Local.Server_id != sampleServer.Id && sampleServer.Partitions.Contains(request.PartitionId))
                     {
-                        Server.Print("não é suposto entrar");
                         ServerCoordinationServices.ServerCoordinationServicesClient replica =
                             Local.RetrieveServer(sampleServer.Id);
 
@@ -160,12 +158,12 @@ namespace Server
                             try
                             {
                                 l = replica.UpdateValue(req, deadline: DateTime.UtcNow.AddSeconds(15));
-                                Server.Print("updating replica " + sampleServer.Id);
+                                Server.Print(Local.Server_id, "updating replica " + sampleServer.Id);
                             } //TODO check error model
                             catch (RpcException ex) when
                                 (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode== StatusCode.Unavailable)
                             {
-                                Server.Print("Server "+ sampleServer.Id + " unavailable");
+                                Server.Print(Local.Server_id, "Server "+ sampleServer.Id + " unavailable");
                                 failed++;
                             }
                         }));
@@ -183,17 +181,17 @@ namespace Server
                     }
 
                     if (firstThatUpdates.Status == TaskStatus.RanToCompletion && l.Ok > 0)
-                        Server.Print("At least one replica updated the value. Returning back to the client");
+                        Server.Print(Local.Server_id, "At least one replica updated the value. Returning back to the client");
                     else
                     {
-                        Server.Print("All update requests timed out, sending -1 to the client");
+                        Server.Print(Local.Server_id, "All update requests timed out, sending -1 to the client");
                         response.WriteResult = -1;
                     }
                 }
 
                 else
                 {
-                    Server.Print("no replica to update. returning.");
+                    Server.Print(Local.Server_id, "no replica to update. returning.");
                 }
                 
             }
@@ -215,7 +213,7 @@ namespace Server
         {
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
             Thread.Sleep(waitTime * 1000);
-            Server.Print("ListServer request:\n" + Local.Storage.ToString());
+            Server.Print(Local.Server_id, "ListServer request:\n" + Local.Storage.ToString());
             return Task.FromResult(LS(request));
         }
 

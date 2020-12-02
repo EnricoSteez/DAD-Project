@@ -23,6 +23,8 @@ namespace Server
             ServerCallContext context)
         {
 
+            Server.Print(Local.Server_id, "I am being elected");
+
             List<Task> allTasks = new List<Task>();
 
             foreach (string url in Local.clients)
@@ -39,7 +41,7 @@ namespace Server
                     catch(Exception e)
                     {
                         c.Dispose();
-                        Server.Print(e.ToString());
+                        Server.Print(Local.Server_id, e.ToString());
                     }
                     
 

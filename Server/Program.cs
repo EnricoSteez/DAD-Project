@@ -25,11 +25,11 @@ namespace Server
         public int MaxDelay;
         private List<string> _isMasterOf;
 
-        public static void Print(string s)
+        public static void Print(string id, string s)
         {
             Console.BackgroundColor = ConsoleColor.Green;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Server:   " + s);
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine("Server " + id + ":   " + s);
         }
         public ServerCoordinationServices.ServerCoordinationServicesClient RetrieveServer(string serverId)
         {
@@ -201,7 +201,7 @@ namespace Server
 
                     if (!res.Locked)
                     {
-                        Server.Print(String.Format("Thread {0} just got the permission for locking resource {1} in Partition {2}",
+                        Server.Print(this.Server_id, String.Format("Thread {0} just got the permission for locking resource {1} in Partition {2}",
                         Thread.CurrentThread.Name, id, partitionId));
 
                         res.Locked = true;
@@ -349,7 +349,7 @@ namespace Server
                 */
             if (args.Length != 6)
             {
-                Server.Print("FODEU");
+                Server.Print("unknown", "Wrong number of args");
                 return;
             }
 
@@ -380,16 +380,16 @@ namespace Server
             {
                 init.AddPartition(new Partition(partId,partitions[partId][0]));
             }
-            Server.Print(serversFile);
+            Server.Print(id, serversFile);
             init.SystemNodes = (Dictionary<string, ServerIdentification>)bf.Deserialize(servfsin);  //key - serverId value - server url
 
-            Server.Print("numero de servers:  " + init.SystemNodes.Count);
             Grpc.Core.Server server = new Grpc.Core.Server
             {
                 Services =
                 {
                     ServerStorageServices.BindService(new ServerClientService(init)),
                     ServerCoordinationServices.BindService(new ServerServerService(init)),
+                    ElectionServices.BindService(new ElectionServicesClass(init))
                     //TODO add PuppetMasterServices.BindService()
                 },
 
@@ -402,7 +402,7 @@ namespace Server
             }
             catch (Exception e)
             {
-                Server.Print(e.Message);
+                Server.Print(id, e.Message);
             }
             Console.ReadLine();
 

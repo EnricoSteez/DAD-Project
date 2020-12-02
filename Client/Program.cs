@@ -21,6 +21,8 @@ namespace Client
 {
     class Program
     {
+        private static string url;
+        private static string username;
         private static int inc = 1;
         private static Dictionary<string, GrpcServer> servers = new Dictionary<string, GrpcServer>();
 
@@ -37,18 +39,23 @@ namespace Client
 
             Console.BackgroundColor = ConsoleColor.DarkYellow;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Client:   " + s);
+            Console.WriteLine("Client " + username + ":   " + s);
 
         }
 
         private static ServerStorageServices.ServerStorageServicesClient RetrieveServer(string serverId)
         {
 
+            if(serverId.Equals("-1"))
+            {
+                throw new Exception();
+            }
+
             GrpcServer res = servers.GetValueOrDefault(serverId, new GrpcServer("http://localhost:" + (1000 + inc++)));
 
-            if (servers[serverId] == null)
+            if (!servers.ContainsKey(serverId))
             {
-                servers[serverId] = res;
+                servers.Add(serverId, res);
             }
 
             Program.Print("retrieve server will return: " + res.ToString());
@@ -78,6 +85,7 @@ namespace Client
                     try
                     {
                         ChooseMasterResponse resp = service.ChooseMaster(new ChooseMasterRequest { PartitionId = partitionId });
+                        Print("elected server " + currentServerId + "as the new master of the partition " + partitionId);
                         return true;
                     }
                     catch (Exception e)
@@ -120,10 +128,14 @@ namespace Client
 
         static void Main(string[] args)
         {
+
+
+
+
             Dictionary<string, string> simpleservers = new Dictionary<string, string>();
             string fileName = @"../../../test.txt";
-            string url = "localhost";
-            string username = "john";
+            url = "localhost";
+            username = "john";
             string partitionsFile = "partitions.binary";
             string serversFile = "servers.binary";
             if (args.Length == 5)
@@ -173,7 +185,7 @@ namespace Client
                     {
                         s.Service.Register(new RegisterRequest { Url = url }, deadline: DateTime.UtcNow.AddSeconds(5));
                     } 
-                    catch(RpcException ex) when(ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unknown || ex.StatusCode == StatusCode.Unavailable)
+                    catch(RpcException ex) when(ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unknown || ex.StatusCode == StatusCode.Unavailable || ex.StatusCode == StatusCode.Internal)
                     {
                         Program.Print("Server " + s.Url + " unavailable");
                     }
@@ -184,6 +196,28 @@ namespace Client
 
             }
 
+
+
+
+            Grpc.Core.Server server = new Grpc.Core.Server
+            {
+                Services =
+                {
+                    ElectionServices.BindService(new ElectionServicesClass())
+                    //TODO add PuppetMasterServices.BindService()
+                },
+
+                Ports = { new ServerPort("127.0.0.1", int.Parse(url.Split(":")[2]), ServerCredentials.Insecure) }
+            };
+
+            try
+            {
+                server.Start();
+            }
+            catch (Exception e)
+            {
+                Program.Print(e.Message);
+            }
 
             // Read the file and display it line by line.  
             System.IO.StreamReader file = new System.IO.StreamReader(fileName);
@@ -209,7 +243,7 @@ namespace Client
                         //here I could also only check != -1 and assume that I never read before being connected to anyone
                         //as it wouldn't make sense to read before inserting any objects
                         //and as soon as I insert an object I'm connected to someone ;)
-                        if (serverId != "-1" || currentServer == null)
+                        if (!serverId.Equals("-1") || currentServer == null)
                         {
                             currentServer = RetrieveServer(serverId);
                             currentServerId = serverId;
@@ -308,7 +342,6 @@ namespace Client
 
                         break;
                     case "write":
-
                         if (words.Length != 4)
                         {
                             Program.Print("Wrong number of args!");
@@ -325,6 +358,7 @@ namespace Client
                             currentServerId = partitions[partitionId][0];
                         }
 
+
                         // the version of the updates is handled server side,
                         // no version in the request
                         WriteObjectRequest writeRequest = new WriteObjectRequest
@@ -333,6 +367,8 @@ namespace Client
                             ObjectId = objectId,
                             Value = value
                         };
+                        Program.Print("will write to: " + currentServerId);
+
                         try
                         {
                             WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline:DateTime.UtcNow.AddSeconds(5));
@@ -341,12 +377,12 @@ namespace Client
                         }
                         catch (RpcException exx) when (
                                       exx.StatusCode == StatusCode.Unknown ||
-                                      exx.StatusCode == StatusCode.Unavailable || exx.StatusCode == StatusCode.DeadlineExceeded)
+                                      exx.StatusCode == StatusCode.Unavailable || exx.StatusCode == StatusCode.DeadlineExceeded || exx.StatusCode == StatusCode.Internal)
                         {
 
                             
 
-                            if (exx.StatusCode == StatusCode.Unknown || exx.StatusCode == StatusCode.Unavailable )
+                            if (exx.StatusCode == StatusCode.Unknown || exx.StatusCode == StatusCode.Unavailable || exx.StatusCode == StatusCode.Internal)
                             {
                                 Program.Print(String.Format("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId));
                                 //ADIOS
@@ -363,6 +399,7 @@ namespace Client
                                 currentServerId = partitions[partitionId][0];
                                 try
                                 {
+                                    Program.Print("will write to: " + currentServerId);
                                     WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline: DateTime.UtcNow.AddSeconds(5));
                                     Program.Print(String.Format("Write object {0} result: {1}", objectId, writeResponse.WriteResult));
 
