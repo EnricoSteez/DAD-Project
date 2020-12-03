@@ -24,25 +24,25 @@ namespace Server
 
         public override Task<UpdateResponse> UpdateValue(UpdateValueRequest tuple, ServerCallContext context)
         {
-            Console.WriteLine("Update Value Request Received");
+            Server.Print(Local.Server_id, "Update Value Request Received");
             return Task.FromResult(UV(tuple));
         }
 
         private UpdateResponse UV(UpdateValueRequest tuple)
         {
-            Monitor.Enter(Local);
-
+            //Monitor.Enter(Local);
             Resource newValue = new Resource(tuple.Id, tuple.Value, tuple.Version);
 
             //Here I do AddObject with Version != -1
             //Which means it's an Update from the master and the version must be copied
+            Server.Print(Local.Server_id, "will update");
             UpdateResponse result = new UpdateResponse
             {
                 Ok = Local.AddObject(newValue, tuple.PartitionId)
             };
 
-            Monitor.Exit(Local);
-
+            //Monitor.Exit(Local);
+            Server.Print(Local.Server_id, "updated " + tuple.Id);
             return result;
         }
     }

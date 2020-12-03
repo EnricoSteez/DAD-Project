@@ -75,6 +75,7 @@ namespace Server
         {
             //lock storage
             Monitor.Enter(Storage);
+            Server.Print(Server_id, "ENTERED MONITOR ENTER STORAGE");
             if (Storage.ContainsKey(partitionId)) //update resource
             {
                 Partition p = Storage[partitionId];
@@ -82,6 +83,8 @@ namespace Server
 
                 //lock partition
                 Monitor.Enter(p);
+                Server.Print(Server_id, "ENTERED MONITOR ENTER P");
+
                 int newVersion;
                 if (p.Elements.ContainsKey(newValue.ObjectId))
                 {
@@ -90,8 +93,8 @@ namespace Server
 
                     //lock resource
                     Monitor.Enter(res);
-
-                    if(newValue.Version == -1) //local addObject with already present resource -> increment version
+                    Server.Print(Server_id, "ENTERED MONITOR ENTER RES");
+                    if (newValue.Version == -1) //local addObject with already present resource -> increment version
                     {
                         newVersion = res.Version + 1;
                         res.Version++;
@@ -100,10 +103,13 @@ namespace Server
                         //if(newValue.Version > res.Version) always true because it's comimg from the master
                         
                         newVersion = newValue.Version;
-                        res = newValue;
+                        res.Value = newValue.Value;
+                        res.Version = newValue.Version;
+                        //res = newValue;
                     }
                     
                     Monitor.Exit(res);
+                    Server.Print(Server_id, "RES " + res.ToString());
                 }
                 else //add new resource to the Elements of the correct Partition
                 {
@@ -121,7 +127,7 @@ namespace Server
                     Monitor.Exit(p);
 
                 }
-
+                Server.Print(Server_id, "WILL RETURN");
                 return newVersion;
             }
             else
@@ -135,32 +141,25 @@ namespace Server
         internal Resource RetrieveObject(string id, string partitionId, int lastVersion)
         {
             Monitor.Enter(Storage);
+            Server.Print(Server_id, "ENTERED MONITOR ENTER STORAGE");
             if (Storage.ContainsKey(partitionId))
             {
                 Partition p = Storage[partitionId];
                 Monitor.Exit(Storage);
 
                 Monitor.Enter(p);
+                Server.Print(Server_id, "ENTERED MONITOR ENTER P");
+
                 if (p.Elements.ContainsKey(id))
                 {
                     Resource res = p.Elements[id];
                     Monitor.Exit(p);
 
                     Monitor.Enter(res);
-                    
-                    if (res.Locked) //if the resource is locked I wait for a pulse on this resource from the Unlock function 
-                    {
-                        Monitor.Exit(res);
-                        //leave the lock and wait for someone to unflag
-                        while (res.Locked)
-                        {
-                            Monitor.Wait(res);
-                        }
-
-                    }
+                    Server.Print(Server_id, "ENTERED MONITOR ENTER RES");
 
                     //everything ok: resource present and more recent version
-                    if(res.Version > lastVersion)
+                    if (res.Version > lastVersion)
                     {
                         return res;
                     }

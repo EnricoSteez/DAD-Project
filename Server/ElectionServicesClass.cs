@@ -41,7 +41,7 @@ namespace Server
                     catch(Exception e)
                     {
                         c.Dispose();
-                        Server.Print(Local.Server_id, e.ToString());
+                        Server.Print(Local.Server_id, "Client " + url + "unreachable");
                     }
                     
 

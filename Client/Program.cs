@@ -51,16 +51,20 @@ namespace Client
                 throw new Exception();
             }
 
-            GrpcServer res = servers.GetValueOrDefault(serverId, new GrpcServer("http://localhost:" + (1000 + inc++)));
+            GrpcServer res;
 
-            if (!servers.ContainsKey(serverId))
+            if (servers.TryGetValue(serverId, out res))
             {
-                servers.Add(serverId, res);
+                Program.Print("retrieve server will return: " + res.ToString() + " (server " + serverId + ")");
+                return res.Service;
+            }
+            else
+            {
+                Program.Print("Server not in list");
+                return null;
             }
 
-            Program.Print("retrieve server will return: " + res.ToString());
 
-            return res.Service;
         }
 
         private static bool ElectNewMaster(string partitionId)
@@ -267,10 +271,14 @@ namespace Client
                         {
                             try
                             {
+                                if(currentServer == null)
+                                {
+                                    throw new RpcException (new Status(StatusCode.Internal, "server not found"));
+                                }
                                 readResponse = currentServer.ReadObject(readRequest);
                                 retry = false;
                             }
-                            catch (RpcException ex) when (ex.StatusCode == StatusCode.Internal)
+                            catch (RpcException ex) when (ex.StatusCode == StatusCode.Internal || ex.StatusCode == StatusCode.Unknown || ex.StatusCode == StatusCode.Unavailable)
                             {
                                 //just in case it got modified with random return values anyways
                                 readResponse = null;
@@ -371,6 +379,10 @@ namespace Client
 
                         try
                         {
+                            if(currentServer == null)
+                            {
+                                throw new RpcException(new Status(StatusCode.Internal, "server not found"));
+                            }
                             WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline:DateTime.UtcNow.AddSeconds(5));
                             Program.Print(String.Format("Write object {0} result: {1}", objectId, writeResponse.WriteResult));
 
@@ -426,6 +438,10 @@ namespace Client
 
                             try
                             {
+                                if(currentServer == null)
+                                {
+                                    throw new RpcException(new Status(StatusCode.Internal, "server not found"));
+                                }
                                 ListServerResponse reply = currentServer.ListServer(new ListServerRequest { });
 
                                 //PRINT RESULTS
@@ -439,7 +455,7 @@ namespace Client
                             }
                             catch (RpcException exx) when (
                                         exx.StatusCode == StatusCode.Unknown ||
-                                        exx.StatusCode == StatusCode.Unavailable)
+                                        exx.StatusCode == StatusCode.Unavailable || exx.StatusCode == StatusCode.Internal)
                             {
                                 Program.Print(String.Format("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId));
                                 //farewell champ
@@ -469,14 +485,28 @@ namespace Client
                                 currentServer = RetrieveServer(serv);
                                 try
                                 {
+                                    if(currentServer == null)
+                                    {
+                                        throw new RpcException(new Status(StatusCode.Internal, "server not found"));
+                                    }
                                     currentServerId = serv;
                                     reply = currentServer.ListGlobal(new ListGlobalRequest { });
                                     Program.Print("asked " + currentServerId);
+                                    Program.Print(String.Format("Server {0} Partitions:", currentServerId));
+                                    foreach (PartitionIdentification p in reply.Partitions)
+                                    {
+                                        Program.Print(String.Format("->{0}", p.PartitionId));
+                                        Program.Print("\tObjects:");
+                                        for (int i = 0; i < p.ObjectIds.Count; i++)
+                                        {
+                                            Program.Print(String.Format("{0}\tV{1}", p.ObjectIds[i], p.Versions[i]));
+                                        }
+                                    }
                                 }
                                 catch (RpcException exx) when (
                                     exx.StatusCode == StatusCode.Unknown ||
                                     exx.StatusCode == StatusCode.Unavailable ||
-                                    exx.StatusCode == StatusCode.DeadlineExceeded)
+                                    exx.StatusCode == StatusCode.DeadlineExceeded || exx.StatusCode == StatusCode.Internal)
                                 {
                                     Program.Print(string.Format("Server {0} Unreachable, say Goodbye before it's too late...", currentServerId));
                                     //goodbye sweetheart
@@ -488,16 +518,7 @@ namespace Client
                                 }
 
 
-                                Program.Print(String.Format("Server {0} Partitions:", currentServerId));
-                                foreach (PartitionIdentification p in reply.Partitions)
-                                {
-                                    Program.Print(String.Format("->{0}", p.PartitionId));
-                                    Program.Print("\tObjects:");
-                                    for (int i = 0; i < p.ObjectIds.Count; i++)
-                                    {
-                                        Program.Print(String.Format("{0}\tV{1}", p.ObjectIds[i], p.Versions[i]));
-                                    }
-                                }
+                                
                             }
                         }
                         else

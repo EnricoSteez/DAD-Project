@@ -68,9 +68,10 @@ namespace Server
             Server.Print(Local.Server_id, String.Format("Client " + context.Host + " wants to READ {0} from Partition {1}",
                 request.ObjectId, request.PartitionId));
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
+            ReadObjectResponse res = RO(request);
             Server.Print(Local.Server_id, String.Format("Client served in {0} seconds", waitTime));
             //Thread.Sleep(waitTime * 1000); //Timer event
-            return Task.FromResult(RO(request));
+            return Task.FromResult(res);
 
         }
 
@@ -102,11 +103,12 @@ namespace Server
         public override Task<WriteObjectResponse> WriteObject(WriteObjectRequest request,
             ServerCallContext context)
         {
-            Server.Print(Local.Server_id, String.Format("Client " + context.Host + " wants to write {0}", request.ObjectId));
+            Server.Print(Local.Server_id, String.Format("Client " + context.Peer + " wants to write {0}", request.ObjectId));
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
-            Server.Print(Local.Server_id, String.Format("Client served in {0} seconds", waitTime));
             Thread.Sleep(waitTime * 1000);
-            return Task.FromResult(WO(request));
+            WriteObjectResponse res = WO(request);
+            Server.Print(Local.Server_id, String.Format("Client served in {0} seconds", waitTime));
+            return Task.FromResult(res);
 
         }
         //TODO implement open connections and RetrieveServer like in the client Program
