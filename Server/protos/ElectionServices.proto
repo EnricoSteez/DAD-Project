@@ -7,7 +7,6 @@ service ElectionServices {
     rpc AnnounceMaster (AnnounceMasterRequest) returns (AnnounceMasterResponse) {}
 }
 
-
 message ChooseMasterRequest {
     string partitionId = 1;
 }

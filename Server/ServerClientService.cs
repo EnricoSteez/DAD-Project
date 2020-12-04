@@ -54,8 +54,19 @@ namespace Server
         public override Task<RegisterResponse> Register(RegisterRequest request, ServerCallContext context)
         {
             Local.AddClient(request.Url);
-            Server.Print(Local.Server_id, "Server " + Local.Server_id + " registered client " + request.Url);
-            return Task.FromResult(new RegisterResponse());
+            RegisterResponse res = new RegisterResponse();
+            string newmasters_print = "";
+            if (Local.new_masters != null)
+            {
+                foreach (string partitionId in Local.new_masters.Keys)
+                {
+                    newmasters_print += partitionId + " ";
+                    res.NewMasters.Add(new NewMastersStructure { PartitionId = partitionId, ServerId = Local.new_masters[partitionId] });
+                }
+            }
+            
+            Server.Print(Local.Server_id, "Server " + Local.Server_id + " registered client " + request.Url + "and sent partitions " + newmasters_print);
+            return Task.FromResult(res);
         }
 
         //---------------
@@ -158,9 +169,9 @@ namespace Server
                         tasks.Add(Task.Run(() =>
                         {
                             try
-                            {
-                                l = replica.UpdateValue(req, deadline: DateTime.UtcNow.AddSeconds(15));
+                            {   
                                 Server.Print(Local.Server_id, "updating replica " + sampleServer.Id);
+                                l = replica.UpdateValue(req, deadline: DateTime.UtcNow.AddSeconds(8));
                             } //TODO check error model
                             catch (RpcException ex) when
                                 (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode== StatusCode.Unavailable)

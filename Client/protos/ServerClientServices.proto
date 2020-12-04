@@ -15,8 +15,15 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-
+    repeated NewMastersStructure new_masters = 1;
 }
+
+
+message NewMastersStructure {
+    string partition_id = 1;    
+    string server_id = 2;    
+}
+
 
 message ListServerRequest {
 }

@@ -13,6 +13,7 @@ namespace Server
 
     public class Server
     {
+        public Dictionary<string, string> new_masters; //partitionid-serverid
         private static readonly Dictionary<string, ServerCoordinationServices.ServerCoordinationServicesClient> connections =
             new Dictionary<string, ServerCoordinationServices.ServerCoordinationServicesClient>();
         public Dictionary<string, Partition> Storage { get; }
@@ -45,6 +46,7 @@ namespace Server
 
         public Server() //dummy implementation for debugging
         {
+            new_masters = null;
             Server_id = "1";
             Ip = IPAddress.Parse("127.0.0.1");
             //empty storage at startup
@@ -57,6 +59,7 @@ namespace Server
 
         public Server(string server_id, string ip, int minDelay, int maxDelay)
         {
+            new_masters = null;
             Server_id = server_id;
             if(ip.Equals("localhost"))
             {
@@ -75,7 +78,7 @@ namespace Server
         {
             //lock storage
             Monitor.Enter(Storage);
-            Server.Print(Server_id, "ENTERED MONITOR ENTER STORAGE");
+            //Server.Print(Server_id, "ENTERED MONITOR ENTER STORAGE");
             if (Storage.ContainsKey(partitionId)) //update resource
             {
                 Partition p = Storage[partitionId];
@@ -83,7 +86,7 @@ namespace Server
 
                 //lock partition
                 Monitor.Enter(p);
-                Server.Print(Server_id, "ENTERED MONITOR ENTER P");
+                //Server.Print(Server_id, "ENTERED MONITOR ENTER P");
 
                 int newVersion;
                 if (p.Elements.ContainsKey(newValue.ObjectId))
@@ -93,7 +96,7 @@ namespace Server
 
                     //lock resource
                     Monitor.Enter(res);
-                    Server.Print(Server_id, "ENTERED MONITOR ENTER RES");
+                    //Server.Print(Server_id, "ENTERED MONITOR ENTER RES");
                     if (newValue.Version == -1) //local addObject with already present resource -> increment version
                     {
                         newVersion = res.Version + 1;
@@ -141,14 +144,14 @@ namespace Server
         internal Resource RetrieveObject(string id, string partitionId, int lastVersion)
         {
             Monitor.Enter(Storage);
-            Server.Print(Server_id, "ENTERED MONITOR ENTER STORAGE");
+            //Server.Print(Server_id, "ENTERED MONITOR ENTER STORAGE");
             if (Storage.ContainsKey(partitionId))
             {
                 Partition p = Storage[partitionId];
                 Monitor.Exit(Storage);
 
                 Monitor.Enter(p);
-                Server.Print(Server_id, "ENTERED MONITOR ENTER P");
+                //Server.Print(Server_id, "ENTERED MONITOR ENTER P");
 
                 if (p.Elements.ContainsKey(id))
                 {
@@ -156,7 +159,7 @@ namespace Server
                     Monitor.Exit(p);
 
                     Monitor.Enter(res);
-                    Server.Print(Server_id, "ENTERED MONITOR ENTER RES");
+                    //Server.Print(Server_id, "ENTERED MONITOR ENTER RES");
 
                     //everything ok: resource present and more recent version
                     if (res.Version > lastVersion)
@@ -336,6 +339,7 @@ namespace Server
     {
         public static void Main(string[] args)
         {
+            
 
 
             Dictionary<string, List<string>> partitions = new Dictionary<string, List<string>>(); //key - partitionId object - list of servers with that partition

@@ -34,7 +34,7 @@ namespace Client
         private static string currentServerId = null;
 
         
-        private static void Print(string s)
+        public static void Print(string s)
         {
 
             Console.BackgroundColor = ConsoleColor.DarkYellow;
@@ -60,7 +60,7 @@ namespace Client
             }
             else
             {
-                Program.Print("Server not in list");
+                Program.Print("Server" + serverId + "not in list");
                 return null;
             }
 
@@ -89,6 +89,18 @@ namespace Client
                     try
                     {
                         ChooseMasterResponse resp = service.ChooseMaster(new ChooseMasterRequest { PartitionId = partitionId });
+                        Monitor.Enter(Program.partitions[partitionId]);
+
+                        if (Program.partitions[partitionId][0] != currentServerId)
+                        {
+                            string oldMaster = Program.partitions[partitionId][0];
+                            Program.partitions[partitionId].RemoveAt(0);
+                            Program.partitions[partitionId].Insert(0, currentServerId);
+                            Program.partitions[partitionId].Add(oldMaster);
+
+                            Program.Print(Program.partitions[partitionId].ToString());
+                        }
+                        Monitor.Exit(Program.partitions[partitionId]);
                         Print("elected server " + currentServerId + "as the new master of the partition " + partitionId);
                         return true;
                     }
@@ -180,6 +192,7 @@ namespace Client
 
 
             List<Task> registerRequestTasks = new List<Task>();
+            bool updated = false;
             foreach (GrpcServer s in servers.Values)
             {
 
@@ -187,19 +200,35 @@ namespace Client
                 {
                     try
                     {
-                        s.Service.Register(new RegisterRequest { Url = url }, deadline: DateTime.UtcNow.AddSeconds(5));
+                        Print("i will register in server " + s.Url);
+                        RegisterResponse res = s.Service.Register(new RegisterRequest { Url = url }, deadline: DateTime.UtcNow.AddSeconds(8));
+                        Print("register response:::  " + res.NewMasters.ToString());
+                        if (!updated)
+                        {
+                            
+                            foreach (NewMastersStructure nm in res.NewMasters)
+                            {
+                                string partitionId = nm.PartitionId;
+                                string serverId = nm.ServerId;
+                                Monitor.Enter(Program.partitions[partitionId]);
+                                string oldMaster = Program.partitions[partitionId][0];
+                                partitions[partitionId].RemoveAt(0);
+                                partitions[partitionId].Insert(0, serverId);
+                                partitions[partitionId].Add(oldMaster);
+                                Monitor.Exit(Program.partitions[partitionId]);
+                                Print("Updated " + partitionId + " with new master " + serverId);
+                            }
+                            updated = true;
+                        }
                     } 
                     catch(RpcException ex) when(ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode == StatusCode.Unknown || ex.StatusCode == StatusCode.Unavailable || ex.StatusCode == StatusCode.Internal)
                     {
                         Program.Print("Server " + s.Url + " unavailable");
                     }
                 }));
-
-                Task union = Task.WhenAll(registerRequestTasks);
-                union.Wait();
-
             }
-
+            Task union = Task.WhenAll(registerRequestTasks);
+            union.Wait();
 
 
 
@@ -282,7 +311,7 @@ namespace Client
                             {
                                 //just in case it got modified with random return values anyways
                                 readResponse = null;
-
+                                Monitor.Enter(partitions[partitionId]);
                                 if (attempt < partitions[partitionId].Count)
                                 {
                                     string newAttemptId = partitions[partitionId][attempt];
@@ -316,6 +345,7 @@ namespace Client
                                     Program.Print("No more servers available, sorry!");
                                     break;
                                 }
+                                Monitor.Exit(partitions[partitionId]);
                             }
                             catch (Exception ex)
                             {
@@ -359,12 +389,14 @@ namespace Client
                         partitionId = words[1];
                         objectId = words[2];
                         string value = words[3];
-
+                        Monitor.Enter(partitions[partitionId]);
                         if (currentServerId != partitions[partitionId][0])
                         {
                             currentServer = RetrieveServer(partitions[partitionId][0]);
                             currentServerId = partitions[partitionId][0];
                         }
+                        Monitor.Exit(partitions[partitionId]);
+
 
 
                         // the version of the updates is handled server side,
@@ -383,7 +415,7 @@ namespace Client
                             {
                                 throw new RpcException(new Status(StatusCode.Internal, "server not found"));
                             }
-                            WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline:DateTime.UtcNow.AddSeconds(5));
+                            WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline:DateTime.UtcNow.AddSeconds(8));
                             Program.Print(String.Format("Write object {0} result: {1}", objectId, writeResponse.WriteResult));
 
                         }
@@ -407,12 +439,14 @@ namespace Client
                             Program.Print("will try to elect another server");
                             if(ElectNewMaster(partitionId))
                             {
+                                Monitor.Enter(partitions[partitionId]);
                                 currentServer = RetrieveServer(partitions[partitionId][0]);
                                 currentServerId = partitions[partitionId][0];
+                                Monitor.Exit(partitions[partitionId]);
                                 try
                                 {
                                     Program.Print("will write to: " + currentServerId);
-                                    WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline: DateTime.UtcNow.AddSeconds(5));
+                                    WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline: DateTime.UtcNow.AddSeconds(8));
                                     Program.Print(String.Format("Write object {0} result: {1}", objectId, writeResponse.WriteResult));
 
                                 }
