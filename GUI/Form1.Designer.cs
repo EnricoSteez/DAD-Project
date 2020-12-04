@@ -33,6 +33,7 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.button_woc4 = new ePOSOne.btnProduct.Button_WOC();
             this.button_woc2 = new ePOSOne.btnProduct.Button_WOC();
+            this.button_woc3 = new ePOSOne.btnProduct.Button_WOC();
             this.SuspendLayout();
             // 
             // button_woc1
@@ -112,6 +113,25 @@
             this.button_woc2.UseVisualStyleBackColor = true;
             this.button_woc2.Click += new System.EventHandler(this.Runline_Click);
             // 
+            // button_woc3
+            // 
+            this.button_woc3.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.button_woc3.ButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(30)))), ((int)(((byte)(58)))));
+            this.button_woc3.FlatAppearance.BorderSize = 0;
+            this.button_woc3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button_woc3.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.button_woc3.Location = new System.Drawing.Point(526, 278);
+            this.button_woc3.Name = "button_woc3";
+            this.button_woc3.OnHoverBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.button_woc3.OnHoverButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.button_woc3.OnHoverTextColor = System.Drawing.SystemColors.HighlightText;
+            this.button_woc3.Size = new System.Drawing.Size(201, 65);
+            this.button_woc3.TabIndex = 1;
+            this.button_woc3.Text = "Run all";
+            this.button_woc3.TextColor = System.Drawing.Color.White;
+            this.button_woc3.UseVisualStyleBackColor = true;
+            this.button_woc3.Click += new System.EventHandler(this.Runall_Click);
+            // 
             // Form1
             // 
             this.AcceptButton = this.button_woc1;
@@ -119,6 +139,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(30)))), ((int)(((byte)(58)))));
             this.ClientSize = new System.Drawing.Size(800, 495);
+            this.Controls.Add(this.button_woc3);
             this.Controls.Add(this.button_woc2);
             this.Controls.Add(this.button_woc4);
             this.Controls.Add(this.richTextBox1);
@@ -139,6 +160,7 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private ePOSOne.btnProduct.Button_WOC button_woc4;
         private ePOSOne.btnProduct.Button_WOC button_woc2;
+        private ePOSOne.btnProduct.Button_WOC button_woc3;
     }
 }
 

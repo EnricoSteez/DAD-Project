@@ -118,9 +118,9 @@ namespace GUI
 
 
                 newline_index = line_index + 1;
-                
+
                 // SEND COMMAND TO PUPPETMASTER
-                execute(command);
+                executeline(command);
 
                 System.Diagnostics.Debug.WriteLine("Executed: \"" + command + "\". " + "Line " + (line_index + 1) + " of " + numlines);
 
@@ -135,7 +135,32 @@ namespace GUI
             }
         }
 
-        private void execute(string line)
+        private void Runall_Click(object sender, EventArgs e)
+        {
+            while (line_index + 1 <= numlines)
+            {
+                string command = richTextBox1.Lines[line_index];
+
+                // Unhighlight the executed command and make bold 
+                var start1 = richTextBox1.GetFirstCharIndexFromLine(line_index);  // Get the 1st char index of the appended text
+                var length1 = command.Length;
+                richTextBox1.Select(start1, length1);
+
+                Font font = new Font(richTextBox1.Font.FontFamily, richTextBox1.Font.Size, FontStyle.Bold);
+                richTextBox1.SelectionFont = font; // Bold
+                richTextBox1.SelectionBackColor = Color.Transparent; // Unhighlight
+
+                line_index += 1;
+                
+                executeline(command);
+                System.Diagnostics.Debug.WriteLine("Executed: \"" + command + "\". " + "Line " + (line_index + 1) + " of " + numlines);
+            }
+            newline_index = line_index;
+        }
+
+
+
+            private void executeline(string line)
         {
             string[] words = line.Split(' '); // depends how many words to split
 
