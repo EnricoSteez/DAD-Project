@@ -116,7 +116,7 @@ namespace Server
         {
             Server.Print(Local.Server_id, String.Format("Client " + context.Peer + " wants to write {0}", request.ObjectId));
             int waitTime = new Random().Next(Local.MinDelay, Local.MaxDelay);
-            Thread.Sleep(waitTime * 1000);
+            Thread.Sleep(waitTime);
             WriteObjectResponse res = WO(request);
             Server.Print(Local.Server_id, String.Format("Client served in {0} seconds", waitTime));
             return Task.FromResult(res);
@@ -170,8 +170,9 @@ namespace Server
                         {
                             try
                             {   
-                                Server.Print(Local.Server_id, "updating replica " + sampleServer.Id);
+                                Server.Print(Local.Server_id, "Update request to " + sampleServer.Id + ", waiting for confirmation");
                                 l = replica.UpdateValue(req, deadline: DateTime.UtcNow.AddSeconds(8));
+                                Server.Print(Local.Server_id, sampleServer.Id + " updated");
                             } //TODO check error model
                             catch (RpcException ex) when
                                 (ex.StatusCode == StatusCode.DeadlineExceeded || ex.StatusCode== StatusCode.Unavailable)

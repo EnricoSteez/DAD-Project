@@ -130,7 +130,6 @@ namespace Server
                     Monitor.Exit(p);
 
                 }
-                Server.Print(Server_id, "WILL RETURN");
                 return newVersion;
             }
             else

@@ -4,6 +4,7 @@ using Server.protos;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -37,8 +38,8 @@ namespace Client
         public static void Print(string s)
         {
 
-            Console.BackgroundColor = ConsoleColor.DarkYellow;
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Black;
             Console.WriteLine("Client " + username + ":   " + s);
 
         }
@@ -407,7 +408,6 @@ namespace Client
                             ObjectId = objectId,
                             Value = value
                         };
-                        Program.Print("will write to: " + currentServerId);
 
                         try
                         {
@@ -415,8 +415,10 @@ namespace Client
                             {
                                 throw new RpcException(new Status(StatusCode.Internal, "server not found"));
                             }
+                            Stopwatch watch = Stopwatch.StartNew();
                             WriteObjectResponse writeResponse = currentServer.WriteObject(writeRequest, deadline:DateTime.UtcNow.AddSeconds(8));
-                            Program.Print(String.Format("Write object {0} result: {1}", objectId, writeResponse.WriteResult));
+                            watch.Stop();
+                            Program.Print(String.Format("Write object {0} result: {1}, took {2} millisecnonds", objectId, writeResponse.WriteResult, watch.Elapsed.TotalMilliseconds));
 
                         }
                         catch (RpcException exx) when (
